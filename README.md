@@ -1,1 +1,3 @@
 # timecatcher
+
+Smart Scheduling project
