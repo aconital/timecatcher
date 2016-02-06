@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Timecatcher</string>
+    <string-array name="my_facebook_permissions">
+        <item>public_profile</item>
+        <item>user_friends</item>
+    </string-array>
 </resources>
