@@ -2,6 +2,8 @@ package com.cpsc.timecatcher;
 
 import android.app.Application;
 import com.parse.Parse;
+import com.parse.ParseFacebookUtils;
+
 public class AppController extends Application {
 
     public static final String TAG = AppController.class.getSimpleName();
@@ -13,7 +15,7 @@ public class AppController extends Application {
      * Enum used to identify the tracker that needs to be used for tracking.
      * <p/>
      * A single tracker is usually enough for most purposes. In case you do need multiple trackers,
-     * storing them all in Application object helps ensure that they are created only once per
+     * storing them; all in Application object helps ensure that they are created only once per
      * application instance.
      */
 
@@ -26,7 +28,7 @@ public class AppController extends Application {
 // https://parse.com/docs/android/guide#local-datastore
         Parse.enableLocalDatastore(this);
         Parse.initialize(this);
-
+        ParseFacebookUtils.initialize(this);
         mInstance = this;
     }
 

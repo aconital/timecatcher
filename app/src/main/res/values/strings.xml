@@ -4,4 +4,5 @@
         <item>public_profile</item>
         <item>user_friends</item>
     </string-array>
+    <string name="facebook_app_id">1229123093769166</string>
 </resources>
