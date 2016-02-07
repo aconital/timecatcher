@@ -22,12 +22,6 @@ import java.util.List;
 public class Task extends ParseObject implements ITask, ITimeSlot {
 
     public static final String TAG = "Task";
-    public Task() {
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        if (currentUser != null) {
-            this.setUser(currentUser);
-        }
-    }
 
     @Override
     public String getTitle() {

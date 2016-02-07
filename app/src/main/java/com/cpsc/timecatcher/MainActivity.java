@@ -8,8 +8,10 @@ import android.util.Log;
 import com.cpsc.timecatcher.model.Category;
 import com.cpsc.timecatcher.model.Task;
 import com.facebook.appevents.AppEventsLogger;
+import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.parse.ui.ParseLoginBuilder;
 
 public class MainActivity extends AppCompatActivity {
@@ -21,19 +23,19 @@ public class MainActivity extends AppCompatActivity {
         ParseLoginBuilder builder = new ParseLoginBuilder(MainActivity.this);
         startActivityForResult(builder.build(), 0);
 
+        final Task t = new Task();
+        t.setTitle("test task");
+        t.setDescription("simple test");
+        t.setUser(ParseUser.getCurrentUser());
+        t.saveInBackground();
 
-        Category c = new Category();
+        final Category c = new Category();
         c.setTitle("test category");
         c.setUser(ParseUser.getCurrentUser());
         c.saveInBackground();
-
-        Task t = new Task();
-        t.setTitle("test task");
-        t.setDescription("simple test");
-        t.saveInBackground();
-        t.setUser(ParseUser.getCurrentUser());
         t.addCategory(c);
-        t.saveInBackground();
+
+        t.addCategory("zE9hQsFdcS");
     }
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

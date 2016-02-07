@@ -11,12 +11,6 @@ import com.parse.ParseUser;
 
 @ParseClassName("Category")
 public class Category extends ParseObject {
-    public Category() {
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        if (currentUser != null) {
-            this.setUser(currentUser);
-        }
-    }
     public String getTitle() {
         return getString("title");
     }
