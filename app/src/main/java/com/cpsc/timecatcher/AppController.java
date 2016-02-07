@@ -1,8 +1,12 @@
 package com.cpsc.timecatcher;
 
 import android.app.Application;
+
+import com.cpsc.timecatcher.model.Category;
+import com.cpsc.timecatcher.model.Task;
 import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseObject;
 
 public class AppController extends Application {
 
@@ -23,6 +27,9 @@ public class AppController extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        ParseObject.registerSubclass(Task.class);
+        ParseObject.registerSubclass(Category.class);
 
 // [Optional] Power your app with Local Datastore. For more info, go to
 // https://parse.com/docs/android/guide#local-datastore
