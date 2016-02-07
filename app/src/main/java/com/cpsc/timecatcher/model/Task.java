@@ -1,5 +1,7 @@
 package com.cpsc.timecatcher.model;
 
+import android.util.Log;
+
 import com.cpsc.timecatcher.algorithm.TimeUtils;
 import com.parse.FindCallback;
 import com.parse.ParseClassName;
@@ -8,6 +10,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.Date;
 import java.util.List;
@@ -18,6 +21,7 @@ import java.util.List;
 @ParseClassName("Task")
 public class Task extends ParseObject implements ITask, ITimeSlot {
 
+    public static final String TAG = "Task";
     public Task() {
         ParseUser currentUser = ParseUser.getCurrentUser();
         if (currentUser != null) {
@@ -64,19 +68,53 @@ public class Task extends ParseObject implements ITask, ITimeSlot {
     }
 
     @Override
-    public void addCategory(Category category) {
-        this.getRelation("categories").add(category);
+    public void addCategory(final Category category) {
+        final ParseObject that = this;
+        category.saveInBackground(new SaveCallback() {
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.d(TAG, e.getMessage());
+                } else {
+                    ParseRelation relation = that.getRelation("categories");
+                    relation.add(category);
+                    that.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e != null) {
+                                Log.d(TAG, e.getMessage());
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    public void addCategory(String categoryId) {
+        ParseObject category = ParseObject.createWithoutData("Category", categoryId);
+        ParseRelation relation = this.getRelation("categories");
+        relation.add(category);
+        this.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.d(TAG, e.getMessage());
+                }
+            }
+        });
     }
 
     @Override
     public void removeCategory(Category category) {
-        this.getRelation("categories").remove(category);
+        ParseRelation relation = this.getRelation("categories");
+        relation.remove(category);
+        this.saveInBackground();
     }
 
-    // Default implementation is blocking, since algorithm needs categories upfront.
     @Override
     public ParseQuery<ParseObject> getCategories() {
-        return this.getRelation("categories").getQuery();
+        ParseRelation relation = this.getRelation("categories");
+        return relation.getQuery();
     }
 
     @Override
