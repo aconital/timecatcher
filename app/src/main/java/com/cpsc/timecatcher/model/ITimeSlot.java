@@ -8,7 +8,8 @@ import java.util.Date;
 public interface ITimeSlot {
 
     // Mutators
-    void setTotalTime(int minutes);
+    void setStartTime(Date startTime);
+    void setEndTime(Date endTime);
 
     // Accessors
     Date getStartTime();

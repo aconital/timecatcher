@@ -10,4 +10,11 @@ public class TimeUtils {
     public static boolean isOverlap(Date startA, Date endA, Date startB, Date endB) {
         return startA.before(endB) && startB.before(endA);
     }
+
+    public static int getMinutesDiff(Date startTime, Date endTime) {
+        if( startTime == null || endTime == null ) return 0;
+        else {
+            return (int)((endTime.getTime() / 60000) - (startTime.getTime()/60000));
+        }
+    }
 }

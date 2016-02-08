@@ -3,7 +3,6 @@ package com.cpsc.timecatcher.model;
 import android.util.Log;
 
 import com.cpsc.timecatcher.algorithm.TimeUtils;
-import com.parse.FindCallback;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -13,32 +12,35 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by yutongluo on 2/5/16.
  */
 @ParseClassName("Task")
-public class Task extends ParseObject implements ITask, ITimeSlot {
+public class Task extends ParseObject implements ITimeSlot {
 
     public static final String TAG = "Task";
 
-    @Override
+    public Boolean getFixed() {
+        return getBoolean("fixed");
+    }
+
+    public void setFixed(Boolean fixed) {
+        put("fixed", fixed);
+    }
+
     public String getTitle() {
         return getString("title");
     }
 
-    @Override
     public void setTitle(String title) {
         put("title", title);
     }
 
-    @Override
     public String getDescription() {
         return getString("description");
     }
 
-    @Override
     public void setDescription(String description) {
         put("description", description);
     }
@@ -48,6 +50,7 @@ public class Task extends ParseObject implements ITask, ITimeSlot {
         return getDate("startTime");
     }
 
+    @Override
     public void setStartTime(Date startTime) {
         put("startTime", startTime);
     }
@@ -57,11 +60,24 @@ public class Task extends ParseObject implements ITask, ITimeSlot {
         return getDate("endTime");
     }
 
+    @Override
     public void setEndTime(Date endTime) {
         put("endTime", endTime);
     }
 
-    @Override
+    public void setDay(Day day) {
+        put("day", day);
+    }
+
+    public void setDay(String dayId) {
+        ParseObject day = ParseObject.createWithoutData("Day", dayId);
+        put("day", day);
+    }
+
+    public Day getDay() {
+        return (Day) getParseObject("day");
+    }
+
     public void addCategory(final Category category) {
         final ParseObject that = this;
         category.saveInBackground(new SaveCallback() {
@@ -98,20 +114,71 @@ public class Task extends ParseObject implements ITask, ITimeSlot {
         });
     }
 
-    @Override
     public void removeCategory(Category category) {
         ParseRelation relation = this.getRelation("categories");
         relation.remove(category);
         this.saveInBackground();
     }
 
-    @Override
     public ParseQuery<ParseObject> getCategories() {
         ParseRelation relation = this.getRelation("categories");
         return relation.getQuery();
     }
 
-    @Override
+    public void addConstraint(final Constraint constraint) {
+        final ParseObject that = this;
+        constraint.saveInBackground(new SaveCallback() {
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.d(TAG, e.getMessage());
+                } else {
+                    ParseRelation relation = that.getRelation("constraints");
+                    relation.add(constraint);
+                    that.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e != null) {
+                                Log.d(TAG, e.getMessage());
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    public void addConstraint(String constraintId) {
+        ParseObject constraint = ParseObject.createWithoutData("Constraint", constraintId);
+        ParseRelation relation = this.getRelation("constraints");
+        relation.add(constraint);
+        this.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.d(TAG, e.getMessage());
+                }
+            }
+        });
+    }
+
+    public void removeConstraint(Constraint constraint) {
+        ParseRelation relation = this.getRelation("constraints");
+        relation.remove(constraint);
+        this.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.d(TAG, e.getMessage());
+                }
+            }
+        });
+    }
+
+    public ParseQuery<ParseObject> getConstraints() {
+        ParseRelation relation = this.getRelation("constraints");
+        return relation.getQuery();
+    }
+
     public void setTotalTime(int minutes) {
         put("totalTime", minutes);
     }
@@ -126,7 +193,8 @@ public class Task extends ParseObject implements ITask, ITimeSlot {
     }
 
     public void setUser(ParseUser value) {
-        put("user", value);
+        if (value != null)
+            put("user", value);
     }
 
     @Override

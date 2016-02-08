@@ -32,7 +32,8 @@ public class Category extends ParseObject {
     }
 
     public void setUser(ParseUser value) {
-        put("user", value);
+        if (value != null)
+            put("user", value);
     }
 
     public static ParseQuery<Category> getQuery() {
