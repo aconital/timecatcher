@@ -1,13 +1,11 @@
 package com.cpsc.timecatcher;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 
 import com.facebook.appevents.AppEventsLogger;
 import com.parse.ParseFacebookUtils;
-import com.parse.ParseObject;
 import com.parse.ui.ParseLoginBuilder;
 
 public class MainActivity extends AppCompatActivity {
