@@ -18,7 +18,7 @@ import com.parse.ui.ParseLoginBuilder;
 
 public class StructureActivity extends FragmentActivity implements  ScheduleFragment.OnFragmentInteractionListener{
 
-    private Button schedule,likes,search,profile;
+    private Button schedule,calendar,analytics,profile;
 
 
     @Override
@@ -37,7 +37,7 @@ public class StructureActivity extends FragmentActivity implements  ScheduleFrag
         }
 
 
-        schedule =(Button) findViewById(R.id.home);
+        schedule =(Button) findViewById(R.id.schedule);
         schedule.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -49,14 +49,14 @@ public class StructureActivity extends FragmentActivity implements  ScheduleFrag
                 }
             }
         });
-        likes=(Button) findViewById(R.id.likes);
-        likes.setOnClickListener(new View.OnClickListener() {
+        calendar=(Button) findViewById(R.id.calendar);
+        calendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
             }
         });
-        search=(Button)findViewById(R.id.search);
+        analytics=(Button)findViewById(R.id.analytics);
 /*        search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

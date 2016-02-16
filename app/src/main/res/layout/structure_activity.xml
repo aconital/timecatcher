@@ -27,18 +27,18 @@
 
         <com.joanzapata.iconify.widget.IconButton
             android:background="@color/grape_dark"
-            android:text="{fa-calendar-o}"
+            android:text="{fa-clock-o}"
             android:textColor="@color/white"
             android:layout_weight="1"
-            android:id="@+id/home"
+            android:id="@+id/schedule"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent" />
         <com.joanzapata.iconify.widget.IconButton
             android:textColor="@color/white"
             android:background="@color/grape_dark"
-            android:text="{fa-heart}"
+            android:text="{fa-calendar}"
             android:layout_weight="1"
-            android:id="@+id/likes"
+            android:id="@+id/calendar"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent" />
 
@@ -46,15 +46,15 @@
             android:textColor="@color/white"
             android:background="@color/pale_purple"
             android:layout_weight="1"
-            android:id="@+id/scan"
+            android:id="@+id/action"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent" />
         <com.joanzapata.iconify.widget.IconButton
             android:textColor="@color/white"
             android:background="@color/grape_dark"
-            android:text="{fa-search}"
+            android:text="{fa-bar-chart}"
             android:layout_weight="1"
-            android:id="@+id/search"
+            android:id="@+id/analytics"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent" />
         <com.joanzapata.iconify.widget.IconButton
