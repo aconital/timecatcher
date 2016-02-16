@@ -8,6 +8,8 @@ import com.cpsc.timecatcher.model.Constraint;
 import com.cpsc.timecatcher.model.Day;
 import com.cpsc.timecatcher.model.Task;
 import com.cengalabs.flatui.FlatUI;
+import com.joanzapata.iconify.Iconify;
+import com.joanzapata.iconify.fonts.FontAwesomeModule;
 import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
@@ -43,7 +45,8 @@ public class AppController extends Application {
         Parse.initialize(this);
         ParseFacebookUtils.initialize(this);
         mInstance = this;
-
+        Iconify
+                .with(new FontAwesomeModule());
         //flat ui
         // Converts the default values (radius, size, border) to dp to be compatible with different
 // screen sizes. If you skip this there may be problem with different screen densities
@@ -51,7 +54,7 @@ public class AppController extends Application {
 
 // Setting default theme to avoid to add the attribute "theme" to XML
 // and to be able to change the whole theme at once
-        FlatUI.setDefaultTheme(FlatUI.DEEP);
+        FlatUI.setDefaultTheme(FlatUI.GRAPE);
 
 
 

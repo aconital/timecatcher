@@ -11,11 +11,54 @@
     <color name="custom_theme_light">#fae8c8</color>
     <color name="year">#999999</color>
     <color name="title">#222222</color>
+    <color name="list_background">#303030</color>
+    <color name="list_background_pressed">#992416</color>
+    <color name="counter_text_bg">#626262</color>
+    <color name="gray_text">#ff292929</color>
+    <color name="counter_text_color">#c5c4c4</color>
+    <color name="actionbar_opacity">#DD000000</color>
+    <color name="grey">#88000000</color>
+    <color name="black">#000000</color>
+    <color name="white">#ffffff</color>
+    <color name="white_transparent">#F2ffffff</color>
+    <color name="white_more_transparent">#CCffffff</color>
+    <color name="feed_bg">#d3d6db</color>
+    <color name="feed_item_bg">#ffffff</color>
+    <color name="feed_item_border">#c2c3c8</color>
+    <color name="light_grey">#f0f2f5</color>
+    <color name="divider_grey">#dadde0</color>
+    <color name="link">#0a80d1</color>
+    <color name="timestamp">#a0a3a7</color>
+    <color name="grape">#685b8c</color>
+    <color name="pale_purple">#B7B1C9</color>
+    <color name="gape_light">#8c5b7f</color>
+    <color name="blood">#d94332</color>
+    <color name="alizarin">#E74C3C</color>
+    <color name="pomegranate">#C0392B</color>
+    <color name="sand">#fabd5a</color>
+    <color name="orange">#F39C12</color>
+    <color name="deep">#455569</color>
+    <color name="grass">#00b868</color>
+    <color name="emerald">#00b868</color>
+    <color name="sea">#2e75d9</color>
+    <color name="holo_blue_dark">#ff0099cc</color>
+    <color name="view_divider_color">#BABABA</color>
+    <color name="view_divider_color_2">#DADADA</color>
+    <color name="light_pink">#AFB5C6</color>
+    <color name="pale_yellow">#edece6</color>
 
     <integer-array name="custom_theme">
         <item>@color/custom_theme_darker</item> <!-- really much darker color of main color -->
         <item>@color/custom_theme_dark</item> <!-- a bit darker color of your main color -->
         <item>@color/custom_theme_primary</item> <!-- main color of your theme -->
         <item>@color/custom_theme_light</item> <!-- really much lighter color of main color -->
+        <item>@color/emerald</item>
+        <item>@color/sea</item>
+        <item>@color/grass</item>
+        <item>@color/grape</item> <!-- really much darker color of main color -->
+        <item>@color/sand</item> <!-- a bit darker color of your main color -->
+        <item>@color/blood</item> <!-- main color of your theme -->
+        <item>@color/deep</item> <!-- really much lighter color of main color -->
     </integer-array>
+
 </resources>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.cpsc.timecatcher.StructureActivity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_purple"
+
+    >
+    <FrameLayout
+        android:layout_above="@+id/footer"
+        android:id="@+id/frame_container"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+
+        />
+
+    <LinearLayout
+        android:id="@+id/footer"
+        android:divider="@color/pale_purple"
+        android:background="@color/grape"
+        android:gravity="center"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <com.joanzapata.iconify.widget.IconButton
+            android:background="@color/grape_dark"
+            android:text="{fa-calendar-o}"
+            android:textColor="@color/white"
+            android:layout_weight="1"
+            android:id="@+id/home"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
+        <com.joanzapata.iconify.widget.IconButton
+            android:textColor="@color/white"
+            android:background="@color/grape_dark"
+            android:text="{fa-heart}"
+            android:layout_weight="1"
+            android:id="@+id/likes"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
+
+        <ImageButton
+            android:textColor="@color/white"
+            android:background="@color/pale_purple"
+            android:layout_weight="1"
+            android:id="@+id/scan"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
+        <com.joanzapata.iconify.widget.IconButton
+            android:textColor="@color/white"
+            android:background="@color/grape_dark"
+            android:text="{fa-search}"
+            android:layout_weight="1"
+            android:id="@+id/search"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
+        <com.joanzapata.iconify.widget.IconButton
+            android:textColor="@color/white"
+            android:background="@color/grape_dark"
+            android:text="{fa-user}"
+            android:layout_weight="1"
+            android:id="@+id/profile"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
+    </LinearLayout>
+
+</RelativeLayout>
