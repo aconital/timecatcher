@@ -73,5 +73,9 @@ public class Day extends ParseObject {
         return query;
     }
 
+    public static ParseQuery<Day> getQuery() {
+        return ParseQuery.getQuery(Day.class);
+    }
+
 
 }

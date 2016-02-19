@@ -1,7 +1,9 @@
 package com.cpsc.timecatcher;
 
+import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -23,13 +26,13 @@ import android.widget.TimePicker;
 
 import com.cpsc.timecatcher.gui.MultiSpinner;
 import com.cpsc.timecatcher.model.Category;
+import com.cpsc.timecatcher.model.Day;
 import com.cpsc.timecatcher.model.Task;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-
-import org.w3c.dom.Text;
+import com.parse.SaveCallback;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -62,12 +65,19 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
     private Date date;
     private final static String DATE_TAG="DATE";
 
+    private boolean fixed;
     private Date startTime;
     private Date endTime;
 
     private final DateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.CANADA);
     private final DateFormat dateFormat = new SimpleDateFormat("EEE, MMM d", Locale.CANADA);
     private OnFragmentInteractionListener mListener;
+
+    private List<String> categories;
+
+    private boolean[] selected;
+
+    private Task task;
 
     public NewTaskFragment() {
         // Required empty public constructor
@@ -77,11 +87,11 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param date Date
+     * @param long Date MAKE SURE THIS DATE IS THE STRIPED DATE WITH 0h:0m:0s:00
      * @return A new instance of fragment NewTaskFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static NewTaskFragment newInstance(Long date) {
+    public static NewTaskFragment newInstance(long date) {
         NewTaskFragment fragment = new NewTaskFragment();
         Bundle args = new Bundle();
         args.putLong(DATE_TAG, date);
@@ -103,7 +113,6 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
         final Set<String> allCategories = new HashSet<>(Arrays.asList(defaultCategories));
         final ParseQuery<Category> categoryQuery = Category.getQuery();
         categoryQuery.whereEqualTo("user", ParseUser.getCurrentUser());
-        final MultiSpinner.MultiSpinnerListener that = this;
         categoryQuery.findInBackground(new FindCallback<Category>() {
             @Override
             public void done(List<Category> objects, ParseException e) {
@@ -114,9 +123,9 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                 } else {
                     Log.e(Constants.NEW_TASK_TAG, "Could not fetch categories!");
                 }
-
-                spinner.setItems(new ArrayList<>(allCategories),
-                        getResources().getString(R.string.new_task_category_hint), that);
+                NewTaskFragment.this.categories = new ArrayList<>(allCategories);
+                spinner.setItems(new ArrayList<>(NewTaskFragment.this.categories),
+                        getResources().getString(R.string.new_task_category_hint), NewTaskFragment.this);
             }
         });
     }
@@ -136,9 +145,9 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
         final RelativeLayout startTimeLayout = (RelativeLayout) view.findViewById(R.id.startTimeLayout);
         final RelativeLayout endTimeLayout = (RelativeLayout) view.findViewById(R.id.endTimeLayout);
         final LinearLayout totalTimeLayout = (LinearLayout) view.findViewById(R.id.totalTimeLayout);
-
         final Spinner totalTimeHour = (Spinner) view.findViewById(R.id.totalTimeHour);
         final Spinner totalTimeMinute = (Spinner) view.findViewById(R.id.totalTimeHourMinute);
+        final Button saveButton = (Button) view.findViewById(R.id.save_button);
 
 
         // Validate field inputs
@@ -166,9 +175,16 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                     query.findInBackground(new FindCallback<Task>() {
                         @Override
                         public void done(List<Task> objects, ParseException e) {
-                            if (objects.size() > 0) {
-                                title.setError("Already have a task with the same name!");
+                            if (e == null) {
+                                Log.e(Constants.NEW_TASK_TAG, "# tasks with same name: " + objects.size());
+
+                                if (objects.size() > 0) {
+                                    title.setError("Already have a task with the same name!");
+                                }
+                            } else {
+                                Log.e(Constants.NEW_TASK_TAG, e.getMessage());
                             }
+
                         }
                     });
                 }
@@ -181,8 +197,9 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
 
         dateTextView.setText(dateFormat.format(calendar.getTime()));
         startTime.setText(timeFormat.format(calendar.getTime()));
+        this.startTime = calendar.getTime();
         endTime.setText(timeFormat.format(addMinutesToDate(calendar, 30).getTime()));
-
+        this.endTime = addMinutesToDate(calendar, 30).getTime();
 
         // initialize spinner items
         ArrayAdapter<CharSequence> totalTimeHourAdapter = ArrayAdapter.createFromResource(
@@ -206,6 +223,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
         fixedSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                fixed = isChecked;
                 if (isChecked) {
                     startTimeLayout.setVisibility(View.VISIBLE);
                     endTimeLayout.setVisibility(View.VISIBLE);
@@ -215,6 +233,103 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                     startTimeLayout.setVisibility(View.GONE);
                     endTimeLayout.setVisibility(View.GONE);
                     totalTimeLayout.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CharSequence error = title.getError();
+                int totalHours = Integer.parseInt(totalTimeHour.getSelectedItem().toString());
+                int totalMinutes = Integer.parseInt(totalTimeMinute.getSelectedItem().toString());
+                int totalTime = totalHours * 60 + totalMinutes;
+                if (error != null) {
+                    // If title is empty
+                    title.requestFocus();
+                } else if (title.getText().toString().matches("")) {
+                    // The title error only shows if user edits the field
+                    // this check is still necessary
+                    title.setError("Task name cannot be empty!");
+                    title.requestFocus();
+                } else if (totalTime == 0 && !fixed) {
+                    // Total time shouldn't be zero
+                    new AlertDialog.Builder(getContext())
+                            .setTitle("Save Task Error")
+                            .setMessage("Can't create a task with no total time!")
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    totalTimeMinute.requestFocus();
+                                }
+                            }).show();
+                } else {
+                    task = new Task();
+                    saveButton.setEnabled(false);
+                    task.setTitle(title.getText().toString());
+                    task.setDescription(description.getText().toString());
+                    task.setFixed(fixed);
+                    task.setUser(ParseUser.getCurrentUser());
+
+                    // Time
+                    if (fixed) {
+                        task.setStartTime(NewTaskFragment.this.startTime);
+                        task.setEndTime(NewTaskFragment.this.endTime);
+                    } else {
+                        task.setTotalTime(totalTime);
+                    }
+
+                    // Day
+                    ParseQuery<Day> dayParseQuery = Day.getQuery();
+                    dayParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+                    dayParseQuery.whereEqualTo("date", date);
+
+                    // Categories
+                    if (selected != null) {
+                        for (int i = 0; i < selected.length; i++) {
+                            if (selected[i]) {
+                                // this category is selected, look it up on Parse
+                                ParseQuery<Category> categoryParseQuery = Category.getQuery();
+                                categoryParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+                                categoryParseQuery.whereEqualTo("title", categories.get(i));
+                                final String title = categories.get(i);
+                                categoryParseQuery.findInBackground(new FindCallback<Category>() {
+                                    @Override
+                                    public void done(List<Category> objects, ParseException e) {
+                                        if (e == null) {
+                                            if (objects.size() == 0) {
+                                                // no objects fetched, create category
+                                                // This is for one of the 5 default categories each
+                                                // user has.
+                                                final Category c = new Category();
+                                                c.setTitle(title);
+                                                c.setUser(ParseUser.getCurrentUser());
+                                                c.saveEventually(new SaveCallback() {
+                                                    @Override
+                                                    public void done(ParseException e) {
+                                                        task.addCategory(c);
+                                                    }
+                                                });
+                                            } else if (objects.size() == 1) {
+                                                task.addCategory(objects.get(0));
+                                            } else {
+                                                Log.e(Constants.NEW_TASK_TAG, "Multiple categories returned!");
+                                            }
+                                        } else {
+                                            Log.e(Constants.NEW_TASK_TAG, "Could not fetch categories!");
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+
+                    task.saveEventually(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            // TODO: Close view
+                            saveButton.setText("Saved!");
+                        }
+                    });
                 }
             }
         });
@@ -317,6 +432,6 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
     }
 
     public void onItemsSelected(boolean[] selected) {
-
+        this.selected = selected;
     }
 }
