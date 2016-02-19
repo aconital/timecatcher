@@ -3,6 +3,7 @@ package com.cpsc.timecatcher;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.cpsc.timecatcher.model.Day;
 import com.cpsc.timecatcher.model.Task;
@@ -43,7 +45,7 @@ public class ScheduleFragment extends Fragment {
     private String currentDate;
     private Date date;
     private final static String DATE_TAG="DATE";
-
+    private FloatingActionButton fab;
     private List<Task> taskList = new ArrayList<>();
     private RecyclerView recyclerView;
     private TaskAdapter mAdapter;
@@ -76,17 +78,48 @@ public class ScheduleFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_schedule, container, false);
+        setTitle();
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-
+        fab= (FloatingActionButton) view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println("asdasdas");
+            }
+        });
         mAdapter = new TaskAdapter(taskList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
+
+        return view;
+    }
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        updateSchedule();
+    }
+    private void setTitle()
+    {       SimpleDateFormat newDateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy");
+        try {
+            date = newDateFormat.parse(date.toString());
+            newDateFormat.applyPattern("EEEE d MMM");
+            String title=newDateFormat.format(date);
+            getActivity().setTitle(title);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+    private void updateSchedule()
+    {   taskList.clear();
         ParseQuery<Day> query = new ParseQuery<Day>("Day");
         query.whereEqualTo("user", ParseUser.getCurrentUser());
         query.whereEqualTo("date", date);
+        query.orderByAscending("startTime");
         query.getFirstInBackground(new GetCallback<Day>() {
             @Override
             public void done(Day object, com.parse.ParseException e) {
@@ -116,10 +149,7 @@ public class ScheduleFragment extends Fragment {
         });
 
 
-        return view;
     }
-
-
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

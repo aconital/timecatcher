@@ -9,6 +9,7 @@ import android.widget.TextView;
 import com.cpsc.timecatcher.R;
 import com.cpsc.timecatcher.model.Task;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -50,19 +51,27 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
 
         Date endtime= task.getEndTime();
         Date starttime=task.getStartTime();
+
         String title=   task.getTitle();
         if(title !=null)
             holder.title.setText(title);
         else
             holder.end.setText("No Title");
 
-        if(endtime !=null)
-            holder.end.setText(endtime.toString());
+        if(endtime !=null) {
+            Calendar calendar = Calendar.getInstance(); // creates a new calendar instance
+            calendar.setTime(endtime);   // assigns calendar to given date
+            holder.end.setText(calendar.get(Calendar.HOUR_OF_DAY)+":"+ calendar.get(Calendar.MINUTE));
+        }
         else
             holder.end.setText("No EndTime");
 
         if(starttime!=null)
-            holder.start.setText(starttime.toString());
+        {
+            Calendar calendar = Calendar.getInstance(); // creates a new calendar instance
+            calendar.setTime(starttime);   // assigns calendar to given date
+            holder.start.setText(calendar.get(Calendar.HOUR_OF_DAY)+":"+ calendar.get(Calendar.MINUTE));
+        }
         else
             holder.start.setText("No StartTime");
     }

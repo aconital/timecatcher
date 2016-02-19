@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -19,7 +20,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 
-public class StructureActivity extends FragmentActivity implements  ScheduleFragment.OnFragmentInteractionListener{
+public class StructureActivity extends AppCompatActivity implements  ScheduleFragment.OnFragmentInteractionListener{
 
     private Button schedule,calendar,analytics,profile;
 
