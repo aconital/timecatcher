@@ -84,27 +84,26 @@ public class ScheduleFragment extends Fragment {
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
-
-        ParseQuery<Day> query = ParseQuery.getQuery(Day.class);
+        ParseQuery<Day> query = new ParseQuery<Day>("Day");
         query.whereEqualTo("user", ParseUser.getCurrentUser());
+        query.whereEqualTo("date", date);
         query.getFirstInBackground(new GetCallback<Day>() {
             @Override
             public void done(Day object, com.parse.ParseException e) {
-
                 if (object != null) {
                     Day day = object;
-
-                    ParseQuery<Task> query = Task.getQuery();
+                    ParseQuery<Task> query = new ParseQuery<Task>("Task");
                     query.whereEqualTo("day", day);
-                    query.whereEqualTo("user", ParseUser.getCurrentUser());
                     query.findInBackground(new FindCallback<Task>() {
                         @Override
                         public void done(List<Task> objects, com.parse.ParseException e) {
-                            if(objects.size()>0){
-                            for (Task t : objects) {
-                                taskList.add(t);
-                            }
-                            mAdapter.notifyDataSetChanged();
+                            if(objects.size()>0)
+                            {
+                                for (Task t : objects)
+                                {
+                                    taskList.add(t);
+                                }
+                                mAdapter.notifyDataSetChanged();
                             }
                             else
                                 Log.e("Parse","No tasks found");

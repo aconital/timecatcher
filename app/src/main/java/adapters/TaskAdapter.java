@@ -9,6 +9,7 @@ import android.widget.TextView;
 import com.cpsc.timecatcher.R;
 import com.cpsc.timecatcher.model.Task;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -46,9 +47,24 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Task task = taskList.get(position);
-        holder.title.setText(task.getTitle());
-        holder.end.setText(task.getEndTime().toString());
-        holder.start.setText(task.getStartTime().toString());
+
+        Date endtime= task.getEndTime();
+        Date starttime=task.getStartTime();
+        String title=   task.getTitle();
+        if(title !=null)
+            holder.title.setText(title);
+        else
+            holder.end.setText("No Title");
+
+        if(endtime !=null)
+            holder.end.setText(endtime.toString());
+        else
+            holder.end.setText("No EndTime");
+
+        if(starttime!=null)
+            holder.start.setText(starttime.toString());
+        else
+            holder.start.setText("No StartTime");
     }
 
     @Override

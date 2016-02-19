@@ -28,9 +28,6 @@ public class StructureActivity extends FragmentActivity implements  ScheduleFrag
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.structure_activity);
-        ParseLoginBuilder builder = new ParseLoginBuilder(StructureActivity.this);
-        startActivityForResult(builder.build(), 0);
-
 
         //    getActionBar().hide();
         if(null == savedInstanceState) {
@@ -96,10 +93,7 @@ public class StructureActivity extends FragmentActivity implements  ScheduleFrag
             Log.e("MainActivity", "Error in creating fragment");
         }
     }
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
-    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu items for use in the action bar
