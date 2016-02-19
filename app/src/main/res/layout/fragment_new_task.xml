@@ -18,6 +18,17 @@
         android:textSize="20sp">
     </com.cengalabs.flatui.views.FlatTextView>
 
+    <com.cengalabs.flatui.views.FlatTextView
+        android:id="@+id/title_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dip"
+        android:layout_marginStart="5dip"
+        android:maxLines="1"
+        android:gravity="center_vertical"
+        android:textSize="15sp">
+    </com.cengalabs.flatui.views.FlatTextView>
+
 
     <View
         android:layout_width="match_parent"

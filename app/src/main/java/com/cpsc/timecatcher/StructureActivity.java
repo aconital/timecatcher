@@ -15,6 +15,8 @@ import com.facebook.appevents.AppEventsLogger;
 import com.parse.ParseFacebookUtils;
 import com.parse.ui.ParseLoginBuilder;
 
+import java.util.Calendar;
+
 
 public class StructureActivity extends FragmentActivity implements ScheduleFragment.OnFragmentInteractionListener
                                                         , NewTaskFragment.OnFragmentInteractionListener {
@@ -58,7 +60,7 @@ public class StructureActivity extends FragmentActivity implements ScheduleFragm
                 Fragment f = getSupportFragmentManager().findFragmentById(R.id.frame_container);
                 if (!(f instanceof NewTaskFragment))
                 {
-                    Fragment newTaskFragment = new NewTaskFragment();
+                    Fragment newTaskFragment = NewTaskFragment.newInstance(Calendar.getInstance().getTimeInMillis());
                     launchFragment(newTaskFragment, Constants.NEW_TASK_TAG);
                 }
             }

@@ -29,6 +29,8 @@ import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import org.w3c.dom.Text;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,17 +58,15 @@ import static com.cpsc.timecatcher.algorithm.TimeUtils.addMinutesToDate;
 public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinnerListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private Date date;
+    private final static String DATE_TAG="DATE";
 
     private Date startTime;
     private Date endTime;
 
-    private final DateFormat dateFormat = new SimpleDateFormat("hh:mm a", Locale.CANADA);
+    private final DateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.CANADA);
+    private final DateFormat dateFormat = new SimpleDateFormat("EEE, MMM d", Locale.CANADA);
     private OnFragmentInteractionListener mListener;
 
     public NewTaskFragment() {
@@ -77,19 +77,15 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param date Date
      * @return A new instance of fragment NewTaskFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static NewTaskFragment newInstance(String param1, String param2) {
+    public static NewTaskFragment newInstance(Long date) {
         NewTaskFragment fragment = new NewTaskFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putLong(DATE_TAG, date);
         fragment.setArguments(args);
-
-
         return fragment;
     }
 
@@ -97,8 +93,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            date = new Date(getArguments().getLong(DATE_TAG));
         }
     }
 
@@ -135,6 +130,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
         final EditText description = (EditText) view.findViewById(R.id.edit_task_description);
         final TextView startTime = (TextView) view.findViewById(R.id.startTime);
         final TextView endTime = (TextView) view.findViewById(R.id.endTime);
+        final TextView dateTextView = (TextView) view.findViewById(R.id.title_date);
         final MultiSpinner multiSpinner = (MultiSpinner) view.findViewById(R.id.categories);
         final Switch fixedSwitch = (Switch) view.findViewById(R.id.fixed);
         final RelativeLayout startTimeLayout = (RelativeLayout) view.findViewById(R.id.startTimeLayout);
@@ -143,6 +139,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
 
         final Spinner totalTimeHour = (Spinner) view.findViewById(R.id.totalTimeHour);
         final Spinner totalTimeMinute = (Spinner) view.findViewById(R.id.totalTimeHourMinute);
+
 
         // Validate field inputs
         title.addTextChangedListener(new TextWatcher() {
@@ -154,8 +151,6 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count,
                                           int after) {
-                // TODO Auto-generated method stub
-
             }
 
             @Override
@@ -180,10 +175,13 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
             }
         });
 
-        // Initialize Texts for startTime and endTime
+        // Initialize Texts
         final Calendar calendar = Calendar.getInstance();
-        startTime.setText(dateFormat.format(calendar.getTime()));
-        endTime.setText(dateFormat.format(addMinutesToDate(calendar, 30).getTime()));
+        calendar.setTime(date);
+
+        dateTextView.setText(dateFormat.format(calendar.getTime()));
+        startTime.setText(timeFormat.format(calendar.getTime()));
+        endTime.setText(timeFormat.format(addMinutesToDate(calendar, 30).getTime()));
 
 
         // initialize spinner items
@@ -241,7 +239,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                             }
                         }
                         NewTaskFragment.this.startTime = c.getTime();
-                        startTime.setText(dateFormat.format(c.getTime()));
+                        startTime.setText(timeFormat.format(c.getTime()));
                     }
                 }, hour, minute, android.text.format.DateFormat.is24HourFormat(getActivity()));
                 startTimePicker.show();
@@ -268,7 +266,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                             }
                         }
                         NewTaskFragment.this.endTime = c.getTime();
-                        endTime.setText(dateFormat.format(c.getTime()));
+                        endTime.setText(timeFormat.format(c.getTime()));
                     }
                 }, hour, minute, android.text.format.DateFormat.is24HourFormat(getActivity()));
                 endTimePicker.show();
