@@ -19,8 +19,8 @@
     <string name="new_task_category_hint">Pick all that apply</string>
     <string name="new_task_fixed">Fixed Task</string>
 
-    <string name="new_task_start_time_label">Start: </string>
-    <string name="new_task_end_time_label">End: </string>
+    <string name="new_task_start_time_label">From: </string>
+    <string name="new_task_end_time_label">To: </string>
 
 
     <string name="start_time_button">Change</string>
@@ -29,6 +29,9 @@
     <string name="new_task_save_button">Create Task</string>
     <string name="new_task_name_hint">Gym, Homework etc.</string>
     <string name="new_task_description_hint">Add a short description</string>
+
+    <string name="constraint_delete_button">Delete</string>
+
 
     <string-array name="new_task_default_categories_array">
         <item>School</item>

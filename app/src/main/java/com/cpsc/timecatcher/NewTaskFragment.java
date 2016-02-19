@@ -1,6 +1,7 @@
 package com.cpsc.timecatcher;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,6 +19,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -26,6 +28,7 @@ import android.widget.TimePicker;
 
 import com.cpsc.timecatcher.gui.MultiSpinner;
 import com.cpsc.timecatcher.model.Category;
+import com.cpsc.timecatcher.model.Constraint;
 import com.cpsc.timecatcher.model.Day;
 import com.cpsc.timecatcher.model.Task;
 import com.parse.FindCallback;
@@ -45,6 +48,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import adapters.ConstraintAdapter;
+
 import static com.cpsc.timecatcher.algorithm.TimeUtils.addMinutesToDate;
 
 
@@ -63,6 +68,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
     private Date date;
+    private Day day;
     private final static String DATE_TAG="DATE";
 
     private boolean fixed;
@@ -78,6 +84,8 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
     private boolean[] selected;
 
     private Task task;
+
+    private final Calendar calendar = Calendar.getInstance();
 
     public NewTaskFragment() {
         // Required empty public constructor
@@ -104,6 +112,13 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             date = new Date(getArguments().getLong(DATE_TAG));
+            Calendar c = Calendar.getInstance();
+            c.setTime(date);
+            c.set(Calendar.HOUR, 0);
+            c.set(Calendar.MINUTE, 0);
+            c.set(Calendar.SECOND, 0);
+            c.set(Calendar.MILLISECOND, 0);
+            date = c.getTime();
         }
     }
 
@@ -148,6 +163,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
         final Spinner totalTimeHour = (Spinner) view.findViewById(R.id.totalTimeHour);
         final Spinner totalTimeMinute = (Spinner) view.findViewById(R.id.totalTimeHourMinute);
         final Button saveButton = (Button) view.findViewById(R.id.save_button);
+        final Button newConstraintButton = (Button) view.findViewById(R.id.add_constraint_button);
 
 
         // Validate field inputs
@@ -176,7 +192,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                         @Override
                         public void done(List<Task> objects, ParseException e) {
                             if (e == null) {
-                                Log.e(Constants.NEW_TASK_TAG, "# tasks with same name: " + objects.size());
+                                Log.d(Constants.NEW_TASK_TAG, "# tasks with same name: " + objects.size());
 
                                 if (objects.size() > 0) {
                                     title.setError("Already have a task with the same name!");
@@ -192,14 +208,14 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
         });
 
         // Initialize Texts
-        final Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-
-        dateTextView.setText(dateFormat.format(calendar.getTime()));
         startTime.setText(timeFormat.format(calendar.getTime()));
         this.startTime = calendar.getTime();
         endTime.setText(timeFormat.format(addMinutesToDate(calendar, 30).getTime()));
         this.endTime = addMinutesToDate(calendar, 30).getTime();
+
+        calendar.setTime(date);
+        dateTextView.setText(dateFormat.format(calendar.getTime()));
+
 
         // initialize spinner items
         ArrayAdapter<CharSequence> totalTimeHourAdapter = ArrayAdapter.createFromResource(
@@ -218,6 +234,15 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
         totalTimeMinute.setAdapter(totalTimeMinuteAdapter);
 
         populateCategoriesSpinner(multiSpinner);
+
+        // Initialize Constraints List View
+        ListView listView = (ListView) view.findViewById(R.id.constraints_list);
+        final ConstraintAdapter constraintAdapter = new ConstraintAdapter(
+                getActivity().getBaseContext(),
+                R.layout.constraint_list_row,
+                new ArrayList<Constraint>()
+        );
+        listView.setAdapter(constraintAdapter);
 
         // Listeners
         fixedSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -282,6 +307,51 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                     ParseQuery<Day> dayParseQuery = Day.getQuery();
                     dayParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
                     dayParseQuery.whereEqualTo("date", date);
+                    try{
+                        List<Day> days = dayParseQuery.find();
+                        Log.d(Constants.NEW_TASK_TAG, "# of day with same date: " + days.size());
+                        if (days.size() == 0) {
+                            // no such day, create it
+                            day = new Day();
+                            day.setUser(ParseUser.getCurrentUser());
+                            day.setDate(date);
+
+                            // reasonable default: 8:30 AM to 9PM
+                            calendar.setTime(date);
+                            calendar.set(Calendar.HOUR_OF_DAY, 8);
+                            calendar.set(Calendar.MINUTE, 30);
+
+                            day.setDayStart(calendar.getTime());
+
+                            calendar.set(Calendar.HOUR_OF_DAY, 20);
+                            day.setDayEnd(calendar.getTime());
+
+                            try {
+                                day.pin();
+                            } catch (ParseException e) {
+                                // Couldn't save Day!
+
+                                // show error
+                                new AlertDialog.Builder(getActivity().getBaseContext())
+                                        .setTitle("Error")
+                                        .setMessage("Something went wrong. Please try again!")
+                                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // close fragment
+                                                getActivity().getSupportFragmentManager().beginTransaction().remove(
+                                                        NewTaskFragment.this).commit();
+                                            }
+                                        })
+                                        .setIcon(android.R.drawable.ic_dialog_alert)
+                                        .show();
+                                e.printStackTrace();
+                            }
+                        } else {
+                            day = days.get(0);
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
 
                     // Categories
                     if (selected != null) {
@@ -323,13 +393,22 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                         }
                     }
 
-                    task.saveEventually(new SaveCallback() {
+                    day.saveEventually(new SaveCallback() {
+                        // save day first
                         @Override
                         public void done(ParseException e) {
-                            // TODO: Close view
-                            saveButton.setText("Saved!");
+                            task.setDay(day);
+                            task.saveEventually(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    // TODO: Close view
+                                    saveButton.setText("Saved!");
+                                }
+                            });
                         }
                     });
+
+
                 }
             }
         });
@@ -360,6 +439,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                 startTimePicker.show();
             }
         });
+
         endTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -385,6 +465,14 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                     }
                 }, hour, minute, android.text.format.DateFormat.is24HourFormat(getActivity()));
                 endTimePicker.show();
+            }
+        });
+
+        newConstraintButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Dialog dialog = new NewConstraintDialog(getActivity());
+                dialog.show();
             }
         });
 
