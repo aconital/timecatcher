@@ -7,15 +7,27 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.cpsc.timecatcher.model.Day;
+import com.cpsc.timecatcher.model.Task;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import adapters.TaskAdapter;
-import models.Task;
+
 
 
 /**
@@ -28,6 +40,9 @@ import models.Task;
  */
 public class ScheduleFragment extends Fragment {
 
+    private String currentDate;
+    private Date date;
+    private final static String DATE_TAG="DATE";
 
     private List<Task> taskList = new ArrayList<>();
     private RecyclerView recyclerView;
@@ -35,35 +50,25 @@ public class ScheduleFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public ScheduleFragment() {
-        // Required empty public constructor
-    }
+    public ScheduleFragment() {}
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment scheduleFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ScheduleFragment newInstance(String param1, String param2) {
+    public static ScheduleFragment newInstance(String date) {
         ScheduleFragment fragment = new ScheduleFragment();
-/*        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);*/
+       Bundle args = new Bundle();
+        args.putString(DATE_TAG, date);
+        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       /* if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }*/
+       if (getArguments() != null)
+       {   //convert string to Date
+           currentDate = getArguments().getString(DATE_TAG);
+           date= Utility.StringToDate(currentDate);
+
+       }
     }
 
     @Override
@@ -80,29 +85,42 @@ public class ScheduleFragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
 
-        prepareTaskData();
+        ParseQuery<Day> query = ParseQuery.getQuery(Day.class);
+        query.whereEqualTo("user", ParseUser.getCurrentUser());
+        query.getFirstInBackground(new GetCallback<Day>() {
+            @Override
+            public void done(Day object, com.parse.ParseException e) {
+
+                if (object != null) {
+                    Day day = object;
+
+                    ParseQuery<Task> query = Task.getQuery();
+                    query.whereEqualTo("day", day);
+                    query.whereEqualTo("user", ParseUser.getCurrentUser());
+                    query.findInBackground(new FindCallback<Task>() {
+                        @Override
+                        public void done(List<Task> objects, com.parse.ParseException e) {
+                            if(objects.size()>0){
+                            for (Task t : objects) {
+                                taskList.add(t);
+                            }
+                            mAdapter.notifyDataSetChanged();
+                            }
+                            else
+                                Log.e("Parse","No tasks found");
+                        }
+                    });
+                }
+                else
+                    Log.e("Parse","No object returned");
+            }
+        });
+
+
         return view;
     }
 
-    private void prepareTaskData() {
-        Task task1 = new Task("Get Ready", "11:25", "15:23");
-        taskList.add(task1);
 
-        Task task2 = new Task("School", "9:25", "5:23");
-        taskList.add(task2);
-
-        Task task3 = new Task("Gym", "1:25", "7:23");
-        taskList.add(task3);
-
-        Task task4 = new Task("Piano", "14:5", "12:23");
-        taskList.add(task4);
-
-        Task task5 = new Task("dog walking", "5:25", "55:23");
-        taskList.add(task5);
-
-
-        mAdapter.notifyDataSetChanged();
-    }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
