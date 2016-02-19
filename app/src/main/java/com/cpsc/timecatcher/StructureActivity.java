@@ -16,7 +16,8 @@ import com.parse.ParseFacebookUtils;
 import com.parse.ui.ParseLoginBuilder;
 
 
-public class StructureActivity extends FragmentActivity implements  ScheduleFragment.OnFragmentInteractionListener{
+public class StructureActivity extends FragmentActivity implements ScheduleFragment.OnFragmentInteractionListener
+                                                        , NewTaskFragment.OnFragmentInteractionListener {
 
     private Button schedule,calendar,analytics,profile;
 
@@ -53,7 +54,13 @@ public class StructureActivity extends FragmentActivity implements  ScheduleFrag
         calendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                // TODO: REMOVE THIS
+                Fragment f = getSupportFragmentManager().findFragmentById(R.id.frame_container);
+                if (!(f instanceof NewTaskFragment))
+                {
+                    Fragment newTaskFragment = new NewTaskFragment();
+                    launchFragment(newTaskFragment, Constants.NEW_TASK_TAG);
+                }
             }
         });
         analytics=(Button)findViewById(R.id.analytics);
