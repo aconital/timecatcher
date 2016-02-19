@@ -7,10 +7,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.cpsc.timecatcher.R;
+import com.cpsc.timecatcher.model.Task;
 
 import java.util.List;
 
-import models.Task;
 
 /**
  * Created by hroshandel on 2016-02-09.
@@ -47,8 +47,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Task task = taskList.get(position);
         holder.title.setText(task.getTitle());
-        holder.end.setText(task.getEnd());
-        holder.start.setText(task.getStart());
+        holder.end.setText(task.getEndTime().toString());
+        holder.start.setText(task.getStartTime().toString());
     }
 
     @Override

@@ -21,6 +21,21 @@ import java.util.List;
 public class Day extends ParseObject {
 
     public static final String TAG = "Day";
+
+    public void setDate(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        put("date", calendar.getTime());
+    }
+
+    public Date getDate() {
+        return getDate("date");
+    }
+
     public void setDayStart(Date date) {
         put("dayStart", date);
     }

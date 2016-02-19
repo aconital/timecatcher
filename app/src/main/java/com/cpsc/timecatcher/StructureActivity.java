@@ -15,6 +15,9 @@ import com.facebook.appevents.AppEventsLogger;
 import com.parse.ParseFacebookUtils;
 import com.parse.ui.ParseLoginBuilder;
 
+import java.util.Calendar;
+import java.util.Date;
+
 
 public class StructureActivity extends FragmentActivity implements  ScheduleFragment.OnFragmentInteractionListener{
 
@@ -31,7 +34,9 @@ public class StructureActivity extends FragmentActivity implements  ScheduleFrag
 
         //    getActionBar().hide();
         if(null == savedInstanceState) {
-            Fragment scheduleFragment=new ScheduleFragment();
+            //default schedule is today
+            String todayString= Utility.getTodayString();
+            Fragment scheduleFragment=ScheduleFragment.newInstance(todayString);
             getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
                     .replace(R.id.frame_container, scheduleFragment).commit();
         }
@@ -44,8 +49,9 @@ public class StructureActivity extends FragmentActivity implements  ScheduleFrag
                 Fragment f = getSupportFragmentManager().findFragmentById(R.id.frame_container);
                 if (!(f instanceof ScheduleFragment))
                 {
-                    Fragment introFragment=new ScheduleFragment();
-                    launchFragment(introFragment,Constants.SCHEDULE_TAG);
+                    String todayString= Utility.getTodayString();
+                    Fragment scheduleFragment=ScheduleFragment.newInstance(todayString);
+                    launchFragment(scheduleFragment,Constants.SCHEDULE_TAG);
                 }
             }
         });
