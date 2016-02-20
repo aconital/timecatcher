@@ -25,7 +25,7 @@ public class Day extends ParseObject {
     public void setDate(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.HOUR, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
@@ -86,10 +86,6 @@ public class Day extends ParseObject {
         query.whereEqualTo("day", this);
         query.whereEqualTo("user", currentUser);
         return query;
-    }
-
-    public static ParseQuery<Day> getQuery() {
-        return ParseQuery.getQuery(Day.class);
     }
 
 

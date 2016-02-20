@@ -3,12 +3,10 @@ package com.cpsc.timecatcher;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +16,7 @@ import com.cpsc.timecatcher.model.Day;
 import com.cpsc.timecatcher.model.Task;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -41,21 +40,22 @@ import adapters.TaskAdapter;
  */
 public class ScheduleFragment extends Fragment {
 
+    private String currentDate;
     private Date date;
     private final static String DATE_TAG="DATE";
-    private FloatingActionButton fab;
+
     private List<Task> taskList = new ArrayList<>();
     private RecyclerView recyclerView;
     private TaskAdapter mAdapter;
-    private ItemTouchHelper mItemTouchHelper;
+
     private OnFragmentInteractionListener mListener;
 
     public ScheduleFragment() {}
 
-    public static ScheduleFragment newInstance(long date) {
+    public static ScheduleFragment newInstance(String date) {
         ScheduleFragment fragment = new ScheduleFragment();
-        Bundle args = new Bundle();
-        args.putLong(DATE_TAG, date);
+       Bundle args = new Bundle();
+        args.putString(DATE_TAG, date);
         fragment.setArguments(args);
         return fragment;
     }
@@ -64,8 +64,9 @@ public class ScheduleFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
        if (getArguments() != null)
-       {   //convert long to Date
-           date = new Date(getArguments().getLong(DATE_TAG));
+       {   //convert string to Date
+           currentDate = getArguments().getString(DATE_TAG);
+           date= Utility.StringToDate(currentDate);
 
        }
     }
@@ -75,17 +76,8 @@ public class ScheduleFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_schedule, container, false);
-        setTitle();
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-
-        fab= (FloatingActionButton) view.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                System.out.println("asdasdas");
-            }
-        });
 
         mAdapter = new TaskAdapter(taskList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -93,62 +85,42 @@ public class ScheduleFragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
 
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
-        mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(recyclerView);
-
-        return view;
-    }
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-        updateSchedule();
-    }
-    private void setTitle()
-    {       SimpleDateFormat newDateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy");
-        try {
-            date = newDateFormat.parse(date.toString());
-            newDateFormat.applyPattern("EEEE d MMM");
-            String title=newDateFormat.format(date);
-            getActivity().setTitle(title);
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-    }
-    private void updateSchedule()
-    {   taskList.clear();
-        ParseQuery<Day> query = new ParseQuery<Day>("Day");
+        ParseQuery<Day> query = ParseQuery.getQuery(Day.class);
         query.whereEqualTo("user", ParseUser.getCurrentUser());
-        query.whereEqualTo("date", date);
-        query.orderByAscending("startTime");
         query.getFirstInBackground(new GetCallback<Day>() {
             @Override
             public void done(Day object, com.parse.ParseException e) {
+
                 if (object != null) {
                     Day day = object;
-                    ParseQuery<Task> query = new ParseQuery<Task>("Task");
+
+                    ParseQuery<Task> query = Task.getQuery();
                     query.whereEqualTo("day", day);
+                    query.whereEqualTo("user", ParseUser.getCurrentUser());
                     query.findInBackground(new FindCallback<Task>() {
                         @Override
                         public void done(List<Task> objects, com.parse.ParseException e) {
-                            if (objects.size() > 0) {
-                                for (Task t : objects) {
-                                    taskList.add(t);
-                                }
-                                mAdapter.notifyDataSetChanged();
-                            } else
-                                Log.e("Parse", "No tasks found");
+                            if(objects.size()>0){
+                            for (Task t : objects) {
+                                taskList.add(t);
+                            }
+                            mAdapter.notifyDataSetChanged();
+                            }
+                            else
+                                Log.e("Parse","No tasks found");
                         }
                     });
-                } else
-                    Log.e("Parse", "No object returned");
+                }
+                else
+                    Log.e("Parse","No object returned");
             }
         });
 
 
+        return view;
     }
+
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
