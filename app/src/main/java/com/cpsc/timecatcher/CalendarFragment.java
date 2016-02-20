@@ -16,6 +16,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 
+import java.util.Calendar;
+
 /**
  * Created by junyishen on 2016-02-19.
  */
@@ -54,7 +56,11 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
 
-                date=calendar.getDate();
+                Calendar d= Calendar.getInstance();
+                d.set(year,month,dayOfMonth,0,0,0);
+                d.set(d.MILLISECOND,0);
+                date=d.getTime().getTime();
+//                Toast.makeText(getActivity(),""+d,Toast.LENGTH_LONG).show();
                 mListener.onDateSelected(date);
 
             }
