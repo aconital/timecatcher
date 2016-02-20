@@ -1,12 +1,15 @@
 package adapters;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.cpsc.timecatcher.ItemTouchHelperViewHolder;
 import com.cpsc.timecatcher.R;
+import com.cpsc.timecatcher.ItemTouchHelperAdapter;
 import com.cpsc.timecatcher.model.Task;
 
 import java.util.Calendar;
@@ -17,11 +20,25 @@ import java.util.List;
 /**
  * Created by hroshandel on 2016-02-09.
  */
-public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> {
+public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> implements ItemTouchHelperAdapter {
 
     private List<Task> taskList;
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    @Override
+    public void onItemMove(int fromPosition, int toPosition) {
+        Task prev = taskList.remove(fromPosition);
+        taskList.add(toPosition > fromPosition ? toPosition - 1 : toPosition, prev);
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+        taskList.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public class MyViewHolder extends RecyclerView.ViewHolder  implements
+            ItemTouchHelperViewHolder {
         public TextView title, end, start;
 
         public MyViewHolder(View view) {
@@ -29,6 +46,17 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
             title = (TextView) view.findViewById(R.id.title);
             end = (TextView) view.findViewById(R.id.end);
             start = (TextView) view.findViewById(R.id.start);
+        }
+
+        @Override
+        public void onItemSelected() {
+            itemView.setBackgroundColor(Color.LTGRAY);
+
+        }
+
+        @Override
+        public void onItemClear() {
+            itemView.setBackgroundColor(0);
         }
     }
 

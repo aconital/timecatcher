@@ -8,17 +8,16 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.cpsc.timecatcher.model.Day;
 import com.cpsc.timecatcher.model.Task;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -48,7 +47,7 @@ public class ScheduleFragment extends Fragment {
     private List<Task> taskList = new ArrayList<>();
     private RecyclerView recyclerView;
     private TaskAdapter mAdapter;
-
+    private ItemTouchHelper mItemTouchHelper;
     private OnFragmentInteractionListener mListener;
 
     public ScheduleFragment() {}
@@ -79,6 +78,7 @@ public class ScheduleFragment extends Fragment {
         setTitle();
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+
         fab= (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,11 +86,16 @@ public class ScheduleFragment extends Fragment {
                 System.out.println("asdasdas");
             }
         });
+
         mAdapter = new TaskAdapter(taskList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
+
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
+        mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(recyclerView);
 
         return view;
     }
