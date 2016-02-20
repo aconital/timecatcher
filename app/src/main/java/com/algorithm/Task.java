@@ -8,47 +8,37 @@ import java.util.LinkedList;
  */
 public class Task {
 	private int taskIdentifier;// identifier of each task
-	private LinkedList<Domain> domain;//a list of possible time slice 
+	private float estimatedTime;// estimated amount of time to finish a task
+	private LinkedList<TimeSlice> domain;//a list of possible time slice 
 	
-	class Domain{
-		private float startTime;// float 9.45 means 9.45am; 
-		private float endTime; // float 13.20 means 1.20pm;
-
-		Domain(float start,float end){
-			startTime=start;
-			endTime=end;
-		}
-		float getStartTime(){return startTime;}
-		float getEndTime(){return endTime;}
-		void setTimeSlice(float start,float end){
-			startTime=start;
-			endTime=end;
-		}
-	}
-	
-	Task(int indetifier){
+	Task(){}
+	Task(int indetifier,float time){
 		taskIdentifier=indetifier;
-		domain=new LinkedList<Domain>();	
+		estimatedTime=time;
+		domain=new LinkedList<TimeSlice>();	
 	}
 	
 	int getTaskIndetifier(){
 		return taskIdentifier;
 	}
 	
-	LinkedList<Domain> getDomain(){
+	LinkedList<TimeSlice> getDomain(){
 		return domain;
 	}
 	
 	void addTimeSlice(float start,float end){
-		domain.add(new Domain(start,end));
+		if((end-start-estimatedTime)>0.000001){//only add qualified time slice to domain
+			domain.add(new TimeSlice(start,end));
+		}	
 	}
+	
 	
 	void removeTimeSlice(float start,float end){
 	 //using either start or end time  to locate the time slice to be removed
 		//Iterator it=domain.listIterator();
 		for(int i=0;i< domain.size();i++){
 			if((domain.get(i).getStartTime() - start)>0.000001){// judge whether equal 
-				domain.remove(new Domain(start,end));
+				domain.remove(new TimeSlice(start,end));
 				break;
 			}//if
 		}//for
