@@ -56,11 +56,12 @@ public class StructureActivity extends FragmentActivity implements ScheduleFragm
         calendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: REMOVE THIS
+                // TODO: REMOVE THIS (JUNYI I STOLE YOUR BUTTON)
                 Fragment f = getSupportFragmentManager().findFragmentById(R.id.frame_container);
                 if (!(f instanceof NewTaskFragment))
                 {
-                    Fragment newTaskFragment = NewTaskFragment.newInstance(Calendar.getInstance().getTimeInMillis());
+                    Fragment newTaskFragment = NewTaskFragment.newInstance(
+                            Calendar.getInstance().getTimeInMillis());
                     launchFragment(newTaskFragment, Constants.NEW_TASK_TAG);
                 }
             }

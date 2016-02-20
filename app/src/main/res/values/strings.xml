@@ -31,6 +31,10 @@
     <string name="new_task_description_hint">Add a short description</string>
 
     <string name="constraint_delete_button">Delete</string>
+    <string name="constraintTitle">Constraints</string>
+    <string name="totalTimeHours">hours</string>
+    <string name="totalTimeMinutes">min</string>
+    <string name="addConstraintButton">Add Constraint</string>
 
 
     <string-array name="new_task_default_categories_array">

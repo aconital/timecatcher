@@ -1,22 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingStart="5dp">
+    android:paddingStart="5dp"
+    android:paddingEnd="5dp">
 
-    <Spinner
-        android:id="@+id/constraint_order"
+    <TextView
+        android:id="@+id/constraint_list_operator"
+        android:layout_weight="0.2"
+        android:layout_width="0dp"
+        android:textAppearance="?android:attr/textAppearanceListItem"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/constraint_list_other"
         android:layout_weight="0.4"
         android:layout_width="0dp"
-        android:layout_height="wrap_content">
-    </Spinner>
+        android:textAppearance="?android:attr/textAppearanceListItem"
+        android:layout_height="wrap_content" />
 
-    <Spinner
-        android:id="@+id/constraint_other"
-        android:layout_weight="0.5"
+    <Button
+        android:id="@+id/constraint_delete"
+        android:layout_weight="0.4"
         android:layout_width="0dp"
-        android:layout_height="wrap_content">
-    </Spinner>
+        android:layout_height="wrap_content"
+        android:text="@string/constraint_delete_button"/>
 
 
 </LinearLayout>

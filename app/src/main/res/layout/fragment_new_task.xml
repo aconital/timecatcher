@@ -1,22 +1,35 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/white"
     android:padding="20dp"
     >
 
-    <com.cengalabs.flatui.views.FlatTextView
-        android:id="@+id/title_newtask"
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
-        android:layout_marginStart="5dip"
-        android:maxLines="1"
-        android:gravity="center_vertical"
-        android:text="@string/new_task_title"
-        android:textSize="20sp">
-    </com.cengalabs.flatui.views.FlatTextView>
+        android:layout_height="wrap_content">
+
+        <com.cengalabs.flatui.views.FlatTextView
+            android:id="@+id/title_newtask"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dip"
+            android:layout_marginStart="5dip"
+            android:maxLines="1"
+            android:gravity="center_vertical"
+            android:text="@string/new_task_title"
+            android:textSize="25sp">
+        </com.cengalabs.flatui.views.FlatTextView>
+
+        <Button
+            android:id="@+id/save_button"
+            android:layout_alignParentRight="true"
+            android:text="@string/new_task_save_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
 
     <com.cengalabs.flatui.views.FlatTextView
         android:id="@+id/title_date"
@@ -36,231 +49,252 @@
         android:layout_margin="5dp"
         android:background="@android:color/darker_gray" />
 
-    <LinearLayout
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="5dp">
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="0.33"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/new_task_name" />
-
-        <EditText
-            android:id="@+id/edit_task_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.67"
-            android:singleLine="true"
-            android:colorControlHighlight="@color/grape_dark"
-            android:hint="@string/new_task_name_hint" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="5dp">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="0.33"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/new_task_description" />
-
-        <EditText
-            android:id="@+id/edit_task_description"
-            android:layout_weight="0.67"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:colorControlHighlight="@color/grape_dark"
-            android:hint="@string/new_task_description_hint" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="5dp"
-        android:paddingTop="10dp">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="0.33"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/new_task_category" />
-
-        <com.cpsc.timecatcher.gui.MultiSpinner
-            android:id="@+id/categories"
-            android:layout_weight="0.67"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" />
-
-    </LinearLayout>
-
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:background="@android:color/darker_gray" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/new_task_fixed"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:paddingStart="5dp"/>
-
-        <Switch
-            android:id="@+id/fixed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:checked="false"/>
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/startTimeLayout"
-        android:padding="5dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:paddingStart="5dp"
-            android:paddingTop="5dp"
-            android:text="@string/new_task_start_time_label"/>
-
-        <TextView
-            android:id="@+id/startTime"
-            android:paddingTop="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:layout_alignParentEnd="true"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/endTimeLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:paddingStart="5dp"
-            android:paddingTop="5dp"
-            android:gravity="bottom"
-            android:text="@string/new_task_end_time_label"/>
-        <TextView
-            android:id="@+id/endTime"
-            android:paddingTop="10dp"
-            android:clickable="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            />
-    </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/totalTimeLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp">
-
-        <TextView
-            android:id="@+id/totalTimeLabel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="0.33"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/new_task_TotalTime" />
-
-        <Spinner
-            android:id="@+id/totalTimeHour"
-            android:layout_weight="0.2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.135"
-            android:text="hours"/>
-
-        <Spinner
-            android:id="@+id/totalTimeHourMinute"
-            android:layout_weight="0.2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="0.135"
-            android:layout_height="wrap_content"
-            android:text="min"/>
-
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="10dp"
-        android:background="@android:color/darker_gray" />
-
-    <LinearLayout
         android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
-        <Button
-            android:id="@+id/addBtn"
-            android:text="Add New Constraint"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:onClick="addConstraint"/>
-        <ListView
-            android:id="@+id/constraints_list"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:drawSelectorOnTop="false"
-            />
-    </LinearLayout>
+        android:fillViewport="true">
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:id="@+id/save_button"
-            android:layout_alignParentRight="true"
-            android:text="@string/new_task_save_button"
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </RelativeLayout>
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="0.33"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/new_task_name" />
+
+                <EditText
+                    android:id="@+id/edit_task_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.67"
+                    android:singleLine="true"
+                    android:hint="@string/new_task_name_hint" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="0.33"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/new_task_description" />
+
+                <EditText
+                    android:id="@+id/edit_task_description"
+                    android:layout_weight="0.67"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/new_task_description_hint" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
+                android:paddingTop="10dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="0.33"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/new_task_category" />
+
+                <com.cpsc.timecatcher.gui.MultiSpinner
+                    android:id="@+id/categories"
+                    android:layout_weight="0.67"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@android:color/darker_gray" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/new_task_fixed"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"/>
+
+                <Switch
+                    android:id="@+id/fixed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:checked="false"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/startTimeLayout"
+                android:padding="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:paddingTop="5dp"
+                    android:text="@string/new_task_start_time_label"/>
+
+                <TextView
+                    android:id="@+id/startTime"
+                    android:paddingTop="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:layout_alignParentEnd="true"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/endTimeLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:paddingTop="5dp"
+                    android:gravity="bottom"
+                    android:text="@string/new_task_end_time_label"/>
+                <TextView
+                    android:id="@+id/endTime"
+                    android:paddingTop="10dp"
+                    android:clickable="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    />
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/totalTimeLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/totalTimeLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="0.33"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/new_task_TotalTime" />
+
+                <Spinner
+                    android:id="@+id/totalTimeHour"
+                    android:layout_weight="0.2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.135"
+                    android:text="@string/totalTimeHours"/>
+
+                <Spinner
+                    android:id="@+id/totalTimeHourMinute"
+                    android:layout_weight="0.2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="0.135"
+                    android:layout_height="wrap_content"
+                    android:text="@string/totalTimeMinutes"/>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="10dp"
+                android:background="@android:color/darker_gray" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.cengalabs.flatui.views.FlatTextView
+                    android:text="@string/constraintTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dip"
+                    android:layout_marginStart="5dip"
+                    android:maxLines="1"
+                    android:gravity="center_vertical"
+                    android:textSize="20sp">
+                </com.cengalabs.flatui.views.FlatTextView>
+
+                <Button
+                    android:id="@+id/add_constraint_button"
+                    android:text="@string/addConstraintButton"
+                    android:layout_alignParentRight="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+
+            <ListView
+                android:id="@+id/constraints_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawSelectorOnTop="false"
+                />
+
+        </LinearLayout>
+
+    </ScrollView>
 </LinearLayout>
+
+

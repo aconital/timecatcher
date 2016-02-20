@@ -1,7 +1,6 @@
 package com.cpsc.timecatcher;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -87,6 +86,8 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
 
     private final Calendar calendar = Calendar.getInstance();
 
+    private List<Constraint> constraints;
+
     public NewTaskFragment() {
         // Required empty public constructor
     }
@@ -165,6 +166,8 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
         final Button saveButton = (Button) view.findViewById(R.id.save_button);
         final Button newConstraintButton = (Button) view.findViewById(R.id.add_constraint_button);
 
+        // Day
+        getOrCreateDay();
 
         // Validate field inputs
         title.addTextChangedListener(new TextWatcher() {
@@ -236,13 +239,14 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
         populateCategoriesSpinner(multiSpinner);
 
         // Initialize Constraints List View
-        ListView listView = (ListView) view.findViewById(R.id.constraints_list);
+        ListView constraintsListView = (ListView) view.findViewById(R.id.constraints_list);
+        constraints = new ArrayList<>();
         final ConstraintAdapter constraintAdapter = new ConstraintAdapter(
-                getActivity().getBaseContext(),
+                getContext(),
                 R.layout.constraint_list_row,
-                new ArrayList<Constraint>()
+                constraints
         );
-        listView.setAdapter(constraintAdapter);
+        constraintsListView.setAdapter(constraintAdapter);
 
         // Listeners
         fixedSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -290,6 +294,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                 } else {
                     task = new Task();
                     saveButton.setEnabled(false);
+                    saveButton.setText("Saving...");
                     task.setTitle(title.getText().toString());
                     task.setDescription(description.getText().toString());
                     task.setFixed(fixed);
@@ -302,57 +307,6 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                     } else {
                         task.setTotalTime(totalTime);
                     }
-
-                    // Day
-                    ParseQuery<Day> dayParseQuery = Day.getQuery();
-                    dayParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
-                    dayParseQuery.whereEqualTo("date", date);
-                    try{
-                        List<Day> days = dayParseQuery.find();
-                        Log.d(Constants.NEW_TASK_TAG, "# of day with same date: " + days.size());
-                        if (days.size() == 0) {
-                            // no such day, create it
-                            day = new Day();
-                            day.setUser(ParseUser.getCurrentUser());
-                            day.setDate(date);
-
-                            // reasonable default: 8:30 AM to 9PM
-                            calendar.setTime(date);
-                            calendar.set(Calendar.HOUR_OF_DAY, 8);
-                            calendar.set(Calendar.MINUTE, 30);
-
-                            day.setDayStart(calendar.getTime());
-
-                            calendar.set(Calendar.HOUR_OF_DAY, 20);
-                            day.setDayEnd(calendar.getTime());
-
-                            try {
-                                day.pin();
-                            } catch (ParseException e) {
-                                // Couldn't save Day!
-
-                                // show error
-                                new AlertDialog.Builder(getActivity().getBaseContext())
-                                        .setTitle("Error")
-                                        .setMessage("Something went wrong. Please try again!")
-                                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                // close fragment
-                                                getActivity().getSupportFragmentManager().beginTransaction().remove(
-                                                        NewTaskFragment.this).commit();
-                                            }
-                                        })
-                                        .setIcon(android.R.drawable.ic_dialog_alert)
-                                        .show();
-                                e.printStackTrace();
-                            }
-                        } else {
-                            day = days.get(0);
-                        }
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-
                     // Categories
                     if (selected != null) {
                         for (int i = 0; i < selected.length; i++) {
@@ -393,22 +347,36 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                         }
                     }
 
-                    day.saveEventually(new SaveCallback() {
+                    // save constraints
+                    for (final Constraint c : constraints) {
+                        Log.d(Constants.NEW_TASK_TAG, "Adding constraint: " + c.toString());
+                        c.saveInBackground();
+                        task.addConstraint(c);
+                    }
+
+                    day.saveInBackground(new SaveCallback() {
                         // save day first
                         @Override
                         public void done(ParseException e) {
-                            task.setDay(day);
-                            task.saveEventually(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    // TODO: Close view
-                                    saveButton.setText("Saved!");
-                                }
-                            });
+                            if (e == null) {
+                                task.setDay(day);
+                                task.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e == null) {
+                                            // TODO: Close view
+                                            saveButton.setText("Saved!");
+                                        } else {
+                                            Log.e(Constants.NEW_TASK_TAG, e.getMessage());
+                                        }
+                                    }
+                                });
+                            } else {
+                                Log.e(Constants.NEW_TASK_TAG, e.getMessage());
+                            }
+
                         }
                     });
-
-
                 }
             }
         });
@@ -471,12 +439,76 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
         newConstraintButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Dialog dialog = new NewConstraintDialog(getActivity());
-                dialog.show();
+                final NewConstraintDialog constraintDialog = new NewConstraintDialog(
+                        getActivity(), day, constraints);
+                // Constraint needs to be based on current day only
+                // pass in day so it knows which day.
+                constraintDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        Log.d(Constants.NEW_TASK_TAG,
+                                "Dialog dismissed, notifying data change: " + constraints.size());
+                        constraintAdapter.notifyDataSetChanged();
+                    }
+                });
+                constraintDialog.show();
+
             }
         });
 
         return view;
+
+    }
+
+    public void getOrCreateDay(){
+        ParseQuery<Day> dayParseQuery = Day.getQuery();
+        dayParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+        dayParseQuery.whereEqualTo("date", date);
+        try{
+            List<Day> days = dayParseQuery.find();
+            Log.d(Constants.NEW_TASK_TAG, "# of day with same date: " + days.size());
+            if (days.size() == 0) {
+                // no such day, create it
+                day = new Day();
+                day.setUser(ParseUser.getCurrentUser());
+                day.setDate(date);
+
+                // reasonable default: 8:30 AM to 9PM
+                calendar.setTime(date);
+                calendar.set(Calendar.HOUR_OF_DAY, 8);
+                calendar.set(Calendar.MINUTE, 30);
+
+                day.setDayStart(calendar.getTime());
+
+                calendar.set(Calendar.HOUR_OF_DAY, 20);
+                day.setDayEnd(calendar.getTime());
+
+                try {
+                    day.pin();
+                } catch (ParseException e) {
+                    // Couldn't save Day!
+
+                    // show error
+                    new AlertDialog.Builder(getActivity().getBaseContext())
+                            .setTitle("Error")
+                            .setMessage("Something went wrong. Please try again!")
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // close fragment
+                                    getActivity().getSupportFragmentManager().beginTransaction().remove(
+                                            NewTaskFragment.this).commit();
+                                }
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+                    e.printStackTrace();
+                }
+            } else {
+                day = days.get(0);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
     }
 
