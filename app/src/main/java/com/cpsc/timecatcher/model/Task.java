@@ -126,15 +126,14 @@ public class Task extends ParseObject implements ITimeSlot {
     }
 
     public void addConstraint(final Constraint constraint) {
-        final ParseObject that = this;
         constraint.saveInBackground(new SaveCallback() {
             public void done(ParseException e) {
                 if (e != null) {
                     Log.d(TAG, e.getMessage());
                 } else {
-                    ParseRelation relation = that.getRelation("constraints");
+                    ParseRelation relation = Task.this.getRelation("constraints");
                     relation.add(constraint);
-                    that.saveInBackground(new SaveCallback() {
+                    Task.this.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
                             if (e != null) {

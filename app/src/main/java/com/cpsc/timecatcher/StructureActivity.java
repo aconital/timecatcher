@@ -19,8 +19,8 @@ import com.parse.ui.ParseLoginBuilder;
 import java.util.Calendar;
 import java.util.Date;
 
-
-public class StructureActivity extends AppCompatActivity implements  ScheduleFragment.OnFragmentInteractionListener{
+public class StructureActivity extends FragmentActivity
+        implements ScheduleFragment.OnFragmentInteractionListener, NewTaskFragment.OnFragmentInteractionListener {
 
     private Button schedule,calendar,analytics,profile;
 
@@ -29,12 +29,12 @@ public class StructureActivity extends AppCompatActivity implements  ScheduleFra
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.structure_activity);
-
+        final long todayLong= Utility.getTodayLong();
         //    getActionBar().hide();
         if(null == savedInstanceState) {
             //default schedule is today
-            String todayString= Utility.getTodayString();
-            Fragment scheduleFragment=ScheduleFragment.newInstance(todayString);
+
+            Fragment scheduleFragment=ScheduleFragment.newInstance(todayLong);
             getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
                     .replace(R.id.frame_container, scheduleFragment).commit();
         }
@@ -47,8 +47,7 @@ public class StructureActivity extends AppCompatActivity implements  ScheduleFra
                 Fragment f = getSupportFragmentManager().findFragmentById(R.id.frame_container);
                 if (!(f instanceof ScheduleFragment))
                 {
-                    String todayString= Utility.getTodayString();
-                    Fragment scheduleFragment=ScheduleFragment.newInstance(todayString);
+                    Fragment scheduleFragment=ScheduleFragment.newInstance(todayLong);
                     launchFragment(scheduleFragment,Constants.SCHEDULE_TAG);
                 }
             }
@@ -57,7 +56,13 @@ public class StructureActivity extends AppCompatActivity implements  ScheduleFra
         calendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                // TODO: REMOVE THIS (JUNYI I STOLE YOUR BUTTON)
+                Fragment f = getSupportFragmentManager().findFragmentById(R.id.frame_container);
+                if (!(f instanceof NewTaskFragment))
+                {
+                    Fragment newTaskFragment = NewTaskFragment.newInstance(todayLong);
+                    launchFragment(newTaskFragment, Constants.NEW_TASK_TAG);
+                }
             }
         });
         analytics=(Button)findViewById(R.id.analytics);

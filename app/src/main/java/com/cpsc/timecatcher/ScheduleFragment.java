@@ -41,7 +41,6 @@ import adapters.TaskAdapter;
  */
 public class ScheduleFragment extends Fragment {
 
-    private String currentDate;
     private Date date;
     private final static String DATE_TAG="DATE";
     private FloatingActionButton fab;
@@ -53,10 +52,10 @@ public class ScheduleFragment extends Fragment {
 
     public ScheduleFragment() {}
 
-    public static ScheduleFragment newInstance(String date) {
+    public static ScheduleFragment newInstance(long date) {
         ScheduleFragment fragment = new ScheduleFragment();
-       Bundle args = new Bundle();
-        args.putString(DATE_TAG, date);
+        Bundle args = new Bundle();
+        args.putLong(DATE_TAG, date);
         fragment.setArguments(args);
         return fragment;
     }
@@ -65,9 +64,8 @@ public class ScheduleFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
        if (getArguments() != null)
-       {   //convert string to Date
-           currentDate = getArguments().getString(DATE_TAG);
-           date= Utility.StringToDate(currentDate);
+       {   //convert long to Date
+           date = new Date(getArguments().getLong(DATE_TAG));
 
        }
     }
@@ -135,21 +133,17 @@ public class ScheduleFragment extends Fragment {
                     query.findInBackground(new FindCallback<Task>() {
                         @Override
                         public void done(List<Task> objects, com.parse.ParseException e) {
-                            if(objects.size()>0)
-                            {
-                                for (Task t : objects)
-                                {
+                            if (objects.size() > 0) {
+                                for (Task t : objects) {
                                     taskList.add(t);
                                 }
                                 mAdapter.notifyDataSetChanged();
-                            }
-                            else
-                                Log.e("Parse","No tasks found");
+                            } else
+                                Log.e("Parse", "No tasks found");
                         }
                     });
-                }
-                else
-                    Log.e("Parse","No object returned");
+                } else
+                    Log.e("Parse", "No object returned");
             }
         });
 
