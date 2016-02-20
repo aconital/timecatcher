@@ -1,6 +1,7 @@
 package com.cpsc.timecatcher;
 
 
+import android.app.Activity;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -21,18 +22,20 @@ import android.view.View;
 public class CalendarFragment extends Fragment {
     private CalendarView calendar;
     private OnFragmentInteractionListener mListener;
-    private FragmentManager fm;
-    private FragmentTransaction ft;
+//    private FragmentManager fm;
+//    private FragmentTransaction ft;
+    long date;
+
     public CalendarFragment(){}
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try{
+            mListener=(OnFragmentInteractionListener) activity;
+        }catch (ClassCastException e){
+            throw new ClassCastException(activity.toString()
+                    +"must implement OnFragmentInteractionListener");
         }
     }
 
@@ -40,7 +43,7 @@ public class CalendarFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState){
 
         super.onCreate(savedInstanceState);
-        fm = getFragmentManager();
+//        fm = getFragmentManager();
     }
 
     @Override
@@ -51,15 +54,8 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
 
-                ft=fm.beginTransaction();
-                ScheduleFragment sf= new ScheduleFragment();
-                Bundle bundle=new Bundle();
-                bundle.putLong("date", calendar.getDate());
-                sf.setArguments(bundle);
-                ft.replace(R.id.calendarView, sf);
-                ft.addToBackStack(null);
-                ft.commit();
-
+                date=calendar.getDate();
+                mListener.onDateSelected(date);
 
             }
         });
@@ -67,7 +63,7 @@ public class CalendarFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener{
-        void onFragmentInteractionListener(Uri uri);
+        public void onDateSelected(long date);
     }
 
 }

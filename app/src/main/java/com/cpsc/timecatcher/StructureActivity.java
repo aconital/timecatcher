@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.facebook.appevents.AppEventsLogger;
 import com.parse.ParseFacebookUtils;
@@ -20,7 +21,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class StructureActivity extends FragmentActivity
-        implements ScheduleFragment.OnFragmentInteractionListener, NewTaskFragment.OnFragmentInteractionListener {
+        implements ScheduleFragment.OnFragmentInteractionListener, NewTaskFragment.OnFragmentInteractionListener, CalendarFragment.OnFragmentInteractionListener {
 
     private Button schedule,calendar,analytics,profile;
 
@@ -56,15 +57,17 @@ public class StructureActivity extends FragmentActivity
         calendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: REMOVE THIS (JUNYI I STOLE YOUR BUTTON)
                 Fragment f = getSupportFragmentManager().findFragmentById(R.id.frame_container);
-                if (!(f instanceof NewTaskFragment))
+                if (!(f instanceof CalendarFragment))
                 {
-                    Fragment newTaskFragment = NewTaskFragment.newInstance(todayLong);
-                    launchFragment(newTaskFragment, Constants.NEW_TASK_TAG);
+                    Fragment calendarFragment=new CalendarFragment();
+                    launchFragment(calendarFragment,Constants.CALENDAR_TAG);
                 }
             }
         });
+
+
+
         analytics=(Button)findViewById(R.id.analytics);
 /*        search.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,6 +84,16 @@ public class StructureActivity extends FragmentActivity
 
 
     }
+
+    public void onDateSelected(long date){
+        Fragment scheduleFragment=ScheduleFragment.newInstance(date);
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
+                .replace(R.id.frame_container, scheduleFragment).commit();
+        String d=String.valueOf(date);
+        Toast.makeText(getApplication(),d,Toast.LENGTH_LONG).show();
+
+    }
+
     @Override
     public void onDestroy()
     {
