@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -18,8 +19,8 @@ import com.parse.ui.ParseLoginBuilder;
 import java.util.Calendar;
 import java.util.Date;
 
-
-public class StructureActivity extends FragmentActivity implements  ScheduleFragment.OnFragmentInteractionListener{
+public class StructureActivity extends FragmentActivity
+        implements ScheduleFragment.OnFragmentInteractionListener, NewTaskFragment.OnFragmentInteractionListener {
 
     private Button schedule,calendar,analytics,profile;
 
@@ -28,15 +29,12 @@ public class StructureActivity extends FragmentActivity implements  ScheduleFrag
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.structure_activity);
-        ParseLoginBuilder builder = new ParseLoginBuilder(StructureActivity.this);
-        startActivityForResult(builder.build(), 0);
-
-
+        final long todayLong= Utility.getTodayLong();
         //    getActionBar().hide();
         if(null == savedInstanceState) {
             //default schedule is today
-            String todayString= Utility.getTodayString();
-            Fragment scheduleFragment=ScheduleFragment.newInstance(todayString);
+
+            Fragment scheduleFragment=ScheduleFragment.newInstance(todayLong);
             getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
                     .replace(R.id.frame_container, scheduleFragment).commit();
         }
@@ -49,8 +47,7 @@ public class StructureActivity extends FragmentActivity implements  ScheduleFrag
                 Fragment f = getSupportFragmentManager().findFragmentById(R.id.frame_container);
                 if (!(f instanceof ScheduleFragment))
                 {
-                    String todayString= Utility.getTodayString();
-                    Fragment scheduleFragment=ScheduleFragment.newInstance(todayString);
+                    Fragment scheduleFragment=ScheduleFragment.newInstance(todayLong);
                     launchFragment(scheduleFragment,Constants.SCHEDULE_TAG);
                 }
             }
@@ -59,7 +56,13 @@ public class StructureActivity extends FragmentActivity implements  ScheduleFrag
         calendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                // TODO: REMOVE THIS (JUNYI I STOLE YOUR BUTTON)
+                Fragment f = getSupportFragmentManager().findFragmentById(R.id.frame_container);
+                if (!(f instanceof NewTaskFragment))
+                {
+                    Fragment newTaskFragment = NewTaskFragment.newInstance(todayLong);
+                    launchFragment(newTaskFragment, Constants.NEW_TASK_TAG);
+                }
             }
         });
         analytics=(Button)findViewById(R.id.analytics);
@@ -96,10 +99,7 @@ public class StructureActivity extends FragmentActivity implements  ScheduleFrag
             Log.e("MainActivity", "Error in creating fragment");
         }
     }
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
-    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu items for use in the action bar
