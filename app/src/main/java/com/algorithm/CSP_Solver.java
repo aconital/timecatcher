@@ -26,93 +26,88 @@ public class CSP_Solver {
 		graphMatrix=constraints.getMatrix(); // reference to original object
 	}
 	
-	// check whether domains of related tasks are consistent.  
+/*
+ * check whether domains of related tasks are consistent.  
+ */
 	void constraintConsistencyCheck(){
 		LinkedList<Acr> queue= new LinkedList<Acr>(acrs);//create new copy of acrs 
 		Acr edge;
 		while((edge = queue.peekFirst())!=null ){// retrieve the fist element
 			int u,v;
 			u=edge.getU();
-			v=edge.getV();
-			if(graphMatrix[u][v] >0){//even through initial acrs are directed but new edges will push into queue in future whose direction is arbitrary 
-				// check from u to v 
-				if(removeInconsistentValues1(u, v)==true){
-					LinkedList<AdjListNode> vertexList=undirectedAdj[u];
-					for(int i=0;i<vertexList.size();i++){
-						int v1=vertexList.get(i).getVertex();
-						queue.add(new Acr(v1 , u, 0));
-					}
-				}//if
-			}
-			else{
-				// check from u to v 
-				if(removeInconsistentValues2(v, u)==true){
-					LinkedList<AdjListNode> vertexList=undirectedAdj[u];
-					for(int i=0;i<vertexList.size();i++){
-						int v1=vertexList.get(i).getVertex();
-						queue.add(new Acr(v1 , u, 0));
-					}
-				}//if
+			v=edge.getV();		
+			// edges can be u->v or v->u
+			// check from u to v  and remove inconsistent domain value of vertex u 
+			if(removeInconsistentValues(u, v)==true){
+				LinkedList<AdjListNode> vertexList=undirectedAdj[u];
+				for(int i=0;i<vertexList.size();i++){
+					int v1=vertexList.get(i).getVertex();
+					queue.add(new Acr(v1 , u, 0));
+				}
 			}//if
 			queue.remove();//remove the first element of this list 
 		}//while
 	}
 	
-	//return true if at least one inconsistent value is removed 
-	//check inconsistency from u to v for edge u->v
-	boolean removeInconsistentValues1(int u,int v){
+	
+/*
+ * return true if at least one inconsistent value is removed from domain of u 
+ * check constraint from u to v for edge u->v or edge v->u 
+ * constraint from u to v is valid iff for every domain value of u there exists some allowed domain value of v
+ */	
+	boolean removeInconsistentValues(int u,int v){
 		boolean inconsistent=false;
-		// making sure edge direction is from u to v;
 		LinkedList<TimeSlice> domainU=taskMap.get(u).getDomain();
 		LinkedList<TimeSlice> domainV=taskMap.get(v).getDomain();
 		
-		for(int i=0;i<domainU.size();i++){
-			float startU=domainU.get(i).getStartTime();
-			boolean remove=true;
-			for(int j=domainV.size()-1;j>=0;j--){
-				float startV=domainV.get(j).getStartTime();
-				if(startU < startV){// there exists at least one startV making startU can keep staying in domainU 
-					remove=false;
-					break;
-				}//if
+		//check constraint from u to v
+		if(graphMatrix[u][v] >0){// edge is u->v 
+			for(int i=0;i<domainU.size();){
+				float startU=domainU.get(i).getStartTime();
+				boolean remove=true;
+				for(int j=domainV.size()-1;j>=0;j--){
+					float startV=domainV.get(j).getStartTime();
+					if(startU < startV){// there exists at least one startV making startU can keep staying in domainU 
+						remove=false;
+						break;
+					}//if
+				}//for
+				if(remove==true){
+					inconsistent=true;
+					domainU.remove(i);//remove timeSlice i from u's domain  
+					//domainU.size() changed, next new element is still at index i;
+				}
+				else{
+					i++;
+				}
 			}//for
-			if(remove==true){
-				inconsistent=true;
-				domainU.remove(i);//remove timeSlice i from u's domain  
-				i--;//  domainU.size() changed, next new element is still at place i;
-			}
-		}//for
+		}
+		else{// edge is v->u 
+			//check constraint from u to v
+			for(int i=domainU.size()-1;i>=0;){
+				float startU=domainU.get(i).getStartTime();
+				boolean remove=true;
+				for(int j=0;j<domainV.size();j++){
+					float startV=domainV.get(j).getStartTime();
+					if(startU > startV){// there exists at least one startV making startU can keep staying in domainU 
+						remove=false;
+						break;
+					}//if
+				}//for
+				if(remove==true){
+					inconsistent=true;
+					domainU.remove(i);//remove timeSlice i from u's domain 
+					//domainU.size() changed, next new element is still at index i;
+				}//if
+				else{
+					i--;
+				}
+			}//for
+		}//if
 		return inconsistent;
 	}
 	
-	//return true if at least one inconsistent value is removed 
-	//check inconsistency from v to u for edge u->v
-	boolean removeInconsistentValues2(int u,int v){
-		boolean inconsistent=false;
-
-		LinkedList<TimeSlice> domainU=taskMap.get(u).getDomain();
-		LinkedList<TimeSlice> domainV=taskMap.get(v).getDomain();
-		
-		for(int i=0;i<domainV.size();i++){
-			float startV=domainV.get(i).getStartTime();
-			boolean remove=true;
-			for(int j=0;j<domainU.size();j++){
-				float startU=domainU.get(j).getStartTime();
-				if(startU < startV){// there exists at least one startV making startU can keep staying in domainU 
-					remove=false;
-					break;
-				}//if
-			}//for
-			if(remove==true){
-				inconsistent=true;
-				domainV.remove(i);//remove timeSlice i from u's domain  
-				i--;
-			}
-		}//for
-		return inconsistent;
-	}
-	
-	void searchSolution(){
+	void searchSolutions(){
 		
 	}
 	
@@ -121,30 +116,3 @@ public class CSP_Solver {
 		return false;// failure
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
