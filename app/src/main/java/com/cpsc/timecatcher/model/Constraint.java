@@ -31,9 +31,4 @@ public class Constraint extends ParseObject {
         ParseObject task = ParseObject.createWithoutData("Task", taskId);
         put("other", task);
     }
-
-    @Override
-    public String toString() {
-        return getOperator().toString() + ": " + getOther().getTitle();
-    }
 }
