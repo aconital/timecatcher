@@ -4,7 +4,7 @@ import java.util.*;
 
 import com.algorithm.ConstraintGraph;
 import com.algorithm.Task;
-import com.algorithm.Acr;
+import com.algorithm.Arc;
 import com.algorithm.AdjListNode;
 
 public class CSP_Solver {
@@ -13,7 +13,7 @@ public class CSP_Solver {
 	private ConstraintGraph constraints;
 	private HashMap<Integer, Task> taskMap;// <indetifier, task>
 	private LinkedList<AdjListNode> undirectedAdj[];
-	private LinkedList<Acr> acrs;
+	private LinkedList<Arc> arcs;
 	private int[][] graphMatrix;
 	
 	CSP_Solver(){}
@@ -22,7 +22,7 @@ public class CSP_Solver {
 		constraints=problem.getConstraints();
 		taskMap=problem.getTask();
 		undirectedAdj=constraints.getUndirectedAdjcentList();// reference to original object
-		acrs=constraints.getAcrs();// reference to original object
+		arcs=constraints.getArcs();// reference to original object
 		graphMatrix=constraints.getMatrix(); // reference to original object
 	}
 	
@@ -30,8 +30,8 @@ public class CSP_Solver {
  * check whether domains of related tasks are consistent.  
  */
 	void constraintConsistencyCheck(){
-		LinkedList<Acr> queue= new LinkedList<Acr>(acrs);//create new copy of acrs 
-		Acr edge;
+		LinkedList<Arc> queue= new LinkedList<Arc>(arcs);//create new copy of arcs 
+		Arc edge;
 		while((edge = queue.peekFirst())!=null ){// retrieve the fist element
 			int u,v;
 			u=edge.getU();
@@ -42,7 +42,7 @@ public class CSP_Solver {
 				LinkedList<AdjListNode> vertexList=undirectedAdj[u];
 				for(int i=0;i<vertexList.size();i++){
 					int v1=vertexList.get(i).getVertex();
-					queue.add(new Acr(v1 , u, 0));
+					queue.add(new Arc(v1 , u, 0));
 				}
 			}//if
 			queue.remove();//remove the first element of this list 

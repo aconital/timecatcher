@@ -2,7 +2,7 @@ package com.algorithm;
 
 import java.util.*;
 import com.algorithm.AdjListNode;
-import com.algorithm.Acr;
+import com.algorithm.Arc;
 
 /*
  * Class ConstraintGraph is used to represent graph as 
@@ -13,7 +13,7 @@ public class ConstraintGraph {
 	private int V;// the number of vertices in total of this graph
     private LinkedList<AdjListNode> adj[];// adjacency list used to store this  graph as directed one 
     private LinkedList<AdjListNode> undirectedAdj[];// adjacency list used to store this graph as undirected one
-    private LinkedList<Acr> acrs;// used to store all the directed acrs of this graph 
+    private LinkedList<Arc> arcs;// used to store all the directed arcs of this graph 
     private int [][] graphMatrix;// using matrix to store this graph
     
     ConstraintGraph(){}
@@ -22,7 +22,7 @@ public class ConstraintGraph {
         V=v;
         adj = new LinkedList[V];
         undirectedAdj =new LinkedList [V];
-        acrs= new LinkedList<Acr>();
+        arcs= new LinkedList<Arc>();
         graphMatrix=new int[v][v];
         
         for (int i=0; i<v; ++i){
@@ -35,7 +35,7 @@ public class ConstraintGraph {
     
     LinkedList<AdjListNode>[] getUndirectedAdjcentList()	{	return undirectedAdj;}
     
-    LinkedList<Acr> getAcrs()  {	return acrs; }
+    LinkedList<Arc> getArcs()  {	return arcs; }
     
     int[][] getMatrix()	{	return graphMatrix;}
     
@@ -49,7 +49,7 @@ public class ConstraintGraph {
         undirectedAdj[u].add(node);
         undirectedAdj[v].add( new AdjListNode(u,weight));
         
-        acrs.add(new Acr(u,v,weight));
+        arcs.add(new Arc(u,v,weight));
         graphMatrix[u][v]=1; // >0 indicating the edge is from u to v;
         graphMatrix[v][u]=-1;// <0 indicating the edge is from u to v;
     }

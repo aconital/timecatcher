@@ -1,12 +1,12 @@
 package com.algorithm;
 
-public class Acr {
+public class Arc {
 	private int u;
 	private int v;
 	private int weight;
 	
-	Acr(){}
-	Acr(int _v, int _u, int _weight){
+	Arc(){}
+	Arc(int _v, int _u, int _weight){
 		v=_v;
 		u=_u;
 		weight=_weight;

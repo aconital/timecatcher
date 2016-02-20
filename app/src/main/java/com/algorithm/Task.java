@@ -18,7 +18,7 @@ public class Task {
 		domain=new LinkedList<TimeSlice>();	
 	}
 	
-	int getTaskIndetifier(){
+	int getTaskIdentifier(){
 		return taskIdentifier;
 	}
 	
@@ -31,7 +31,6 @@ public class Task {
 			domain.add(new TimeSlice(start,end));
 		}	
 	}
-	
 	
 	void removeTimeSlice(float start,float end){
 	 //using either start or end time  to locate the time slice to be removed

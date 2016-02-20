@@ -34,7 +34,7 @@ public class CSP {
 	}
 	
 	void addTasks(Task task){
-		taskMap.put(task.getTaskIndetifier(), task);
+		taskMap.put(task.getTaskIdentifier(), task);
 	}
 	
 	void removeTask(int id ){
@@ -51,9 +51,9 @@ public class CSP {
 		return constraints.getUndirectedAdjcentList(); // reference to original object
 	}
 	
-	// used to return all the directed acrs of the constraint graph
-	LinkedList<Acr> getConstraintAcrs(){
-		return constraints.getAcrs(); // reference to original object
+	// used to return all the directed arcs of the constraint graph
+	LinkedList<Arc> getConstraintArcs(){
+		return constraints.getArcs(); // reference to original object
 	}
 	
 	// used to return  matrix representation of constraint graph
