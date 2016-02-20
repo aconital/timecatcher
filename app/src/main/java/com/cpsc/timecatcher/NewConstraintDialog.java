@@ -91,8 +91,15 @@ public class NewConstraintDialog extends Dialog {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Operator operator = Operator.valueOf(
+                operator = Operator.valueOf(
                         operatorSpinner.getSelectedItem().toString().toUpperCase());
+
+                if (otherTaskSpinner.getSelectedItem() == null) {
+                    // there was no other task to select from. silently exit
+                    // TODO: error dialog?
+                    dismiss();
+                    return;
+                }
                 String otherTaskTitle = otherTaskSpinner.getSelectedItem().toString();
                 Task other = null;
                 for (Task task : taskList) {
@@ -101,7 +108,7 @@ public class NewConstraintDialog extends Dialog {
                     }
                 }
                 if (other == null) {
-                    // there was no other task to select from. silently exit
+                    // TODO: error dialog?
                     dismiss();
                     return;
                 }

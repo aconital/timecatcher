@@ -64,12 +64,10 @@ import static com.cpsc.timecatcher.algorithm.TimeUtils.addMinutesToDate;
 
 
 public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinnerListener {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-
     private Date date;
     private Day day;
     private final static String DATE_TAG="DATE";
+    private final String OTHER_TASK_LABEL = "otherTasksInDay";
 
     private boolean fixed;
     private Date startTime;
@@ -78,15 +76,10 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
     private final DateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.CANADA);
     private final DateFormat dateFormat = new SimpleDateFormat("EEE, MMM d", Locale.CANADA);
     private OnFragmentInteractionListener mListener;
-
     private List<String> categories;
-
     private boolean[] selected;
-
     private Task task;
-
     private final Calendar calendar = Calendar.getInstance();
-
     private List<Constraint> constraints;
 
     public NewTaskFragment() {
@@ -114,18 +107,12 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             date = new Date(getArguments().getLong(DATE_TAG));
-            Calendar c = Calendar.getInstance();
-            c.setTime(date);
-            c.set(Calendar.HOUR, 0);
-            c.set(Calendar.MINUTE, 0);
-            c.set(Calendar.SECOND, 0);
-            c.set(Calendar.MILLISECOND, 0);
-            date = c.getTime();
         }
     }
 
     private void populateCategoriesSpinner(final MultiSpinner spinner) {
-        final String[] defaultCategories = getResources().getStringArray(R.array.new_task_default_categories_array);
+        final String[] defaultCategories = getResources().getStringArray(
+                R.array.new_task_default_categories_array);
 
         final Set<String> allCategories = new HashSet<>(Arrays.asList(defaultCategories));
         final ParseQuery<Category> categoryQuery = Category.getQuery();
@@ -141,8 +128,10 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                     Log.e(Constants.NEW_TASK_TAG, "Could not fetch categories!");
                 }
                 NewTaskFragment.this.categories = new ArrayList<>(allCategories);
-                spinner.setItems(new ArrayList<>(NewTaskFragment.this.categories),
-                        getResources().getString(R.string.new_task_category_hint), NewTaskFragment.this);
+                spinner.setItems(
+                        new ArrayList<>(NewTaskFragment.this.categories),
+                        getResources().getString(R.string.new_task_category_hint),
+                        NewTaskFragment.this);
             }
         });
     }
@@ -168,11 +157,11 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
         final Button newConstraintButton = (Button) view.findViewById(R.id.add_constraint_button);
 
         // Day
-        getOrCreateDay();
+        day = getOrCreateDay();
+        assert (day != null);
 
         // Validate field inputs
         title.addTextChangedListener(new TextWatcher() {
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
@@ -187,26 +176,6 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                 Log.d(Constants.NEW_TASK_TAG, "text changed: " + s.toString().length());
                 if (s.toString().length() == 0) {
                     title.setError("Name can't be empty");
-                } else {
-                    String taskTitle = s.toString();
-                    ParseQuery<Task> query= Task.getQuery();
-                    query.whereEqualTo("user", ParseUser.getCurrentUser());
-                    query.whereEqualTo("title", taskTitle);
-                    query.findInBackground(new FindCallback<Task>() {
-                        @Override
-                        public void done(List<Task> objects, ParseException e) {
-                            if (e == null) {
-                                Log.d(Constants.NEW_TASK_TAG, "# tasks with same name: " + objects.size());
-
-                                if (objects.size() > 0) {
-                                    title.setError("Already have a task with the same name!");
-                                }
-                            } else {
-                                Log.e(Constants.NEW_TASK_TAG, e.getMessage());
-                            }
-
-                        }
-                    });
                 }
             }
         });
@@ -219,8 +188,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
 
         calendar.setTime(date);
         dateTextView.setText(dateFormat.format(calendar.getTime()));
-
-
+        
         // initialize spinner items
         ArrayAdapter<CharSequence> totalTimeHourAdapter = ArrayAdapter.createFromResource(
                 getActivity().getBaseContext(),
@@ -263,121 +231,6 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                     startTimeLayout.setVisibility(View.GONE);
                     endTimeLayout.setVisibility(View.GONE);
                     totalTimeLayout.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CharSequence error = title.getError();
-                int totalHours = Integer.parseInt(totalTimeHour.getSelectedItem().toString());
-                int totalMinutes = Integer.parseInt(totalTimeMinute.getSelectedItem().toString());
-                int totalTime = totalHours * 60 + totalMinutes;
-                if (error != null) {
-                    // If title is empty
-                    title.requestFocus();
-                } else if (title.getText().toString().matches("")) {
-                    // The title error only shows if user edits the field
-                    // this check is still necessary
-                    title.setError("Task name cannot be empty!");
-                    title.requestFocus();
-                } else if (totalTime == 0 && !fixed) {
-                    // Total time shouldn't be zero
-                    new AlertDialog.Builder(getContext())
-                            .setTitle("Save Task Error")
-                            .setMessage("Can't create a task with no total time!")
-                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    totalTimeMinute.requestFocus();
-                                }
-                            }).show();
-                } else {
-                    task = new Task();
-                    saveButton.setEnabled(false);
-                    saveButton.setText("Saving...");
-                    task.setTitle(title.getText().toString());
-                    task.setDescription(description.getText().toString());
-                    task.setFixed(fixed);
-                    task.setUser(ParseUser.getCurrentUser());
-
-                    // Time
-                    if (fixed) {
-                        task.setStartTime(NewTaskFragment.this.startTime);
-                        task.setEndTime(NewTaskFragment.this.endTime);
-                    } else {
-                        task.setTotalTime(totalTime);
-                    }
-                    // Categories
-                    if (selected != null) {
-                        for (int i = 0; i < selected.length; i++) {
-                            if (selected[i]) {
-                                // this category is selected, look it up on Parse
-                                ParseQuery<Category> categoryParseQuery = Category.getQuery();
-                                categoryParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
-                                categoryParseQuery.whereEqualTo("title", categories.get(i));
-                                final String title = categories.get(i);
-                                categoryParseQuery.findInBackground(new FindCallback<Category>() {
-                                    @Override
-                                    public void done(List<Category> objects, ParseException e) {
-                                        if (e == null) {
-                                            if (objects.size() == 0) {
-                                                // no objects fetched, create category
-                                                // This is for one of the 5 default categories each
-                                                // user has.
-                                                final Category c = new Category();
-                                                c.setTitle(title);
-                                                c.setUser(ParseUser.getCurrentUser());
-                                                c.saveEventually(new SaveCallback() {
-                                                    @Override
-                                                    public void done(ParseException e) {
-                                                        task.addCategory(c);
-                                                    }
-                                                });
-                                            } else if (objects.size() == 1) {
-                                                task.addCategory(objects.get(0));
-                                            } else {
-                                                Log.e(Constants.NEW_TASK_TAG, "Multiple categories returned!");
-                                            }
-                                        } else {
-                                            Log.e(Constants.NEW_TASK_TAG, "Could not fetch categories!");
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    }
-
-                    // save constraints
-                    for (final Constraint c : constraints) {
-                        Log.d(Constants.NEW_TASK_TAG, "Adding constraint: " + c.toString());
-                        c.saveInBackground();
-                        task.addConstraint(c);
-                    }
-
-                    day.saveInBackground(new SaveCallback() {
-                        // save day first
-                        @Override
-                        public void done(ParseException e) {
-                            if (e == null) {
-                                task.setDay(day);
-                                task.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        if (e == null) {
-                                            // TODO: Close view
-                                            saveButton.setText("Saved!");
-                                        } else {
-                                            Log.e(Constants.NEW_TASK_TAG, e.getMessage());
-                                        }
-                                    }
-                                });
-                            } else {
-                                Log.e(Constants.NEW_TASK_TAG, e.getMessage());
-                            }
-
-                        }
-                    });
                 }
             }
         });
@@ -457,14 +310,147 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
             }
         });
 
-        return view;
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CharSequence error = title.getError();
+                int totalHours = Integer.parseInt(totalTimeHour.getSelectedItem().toString());
+                int totalMinutes = Integer.parseInt(totalTimeMinute.getSelectedItem().toString());
+                final int totalTime = totalHours * 60 + totalMinutes;
+                if (error != null) {
+                    // If title is empty
+                    title.requestFocus();
+                } else if (title.getText().toString().matches("")) {
+                    // The title error only shows if user edits the field
+                    // this check is still necessary
+                    title.setError("Task name cannot be empty!");
+                    title.requestFocus();
+                } else if (totalTime == 0 && !fixed) {
+                    // Total time shouldn't be zero
+                    new AlertDialog.Builder(getContext())
+                            .setTitle("Save Task Error")
+                            .setMessage("Can't create a task with no total time!")
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    totalTimeMinute.requestFocus();
+                                }
+                            }).show();
+                } else {
+                    // Check if other task with same name
+                    String taskTitle = title.getText().toString();
+                    ParseQuery<Task> query = Task.getQuery();
+                    query.whereEqualTo("user", ParseUser.getCurrentUser());
+                    query.whereEqualTo("title", taskTitle);
+                    query.whereEqualTo("day", day);
+                    query.findInBackground(new FindCallback<Task>() {
+                        @Override
+                        public void done(List<Task> objects, ParseException e) {
+                            if (e == null) {
+                                Log.d(Constants.NEW_TASK_TAG, "# tasks with same name: " + objects.size());
+                                if (objects.size() > 0) {
+                                    title.setError("Already have a task with the same name!");
+                                } else {
+                                    task = new Task();
+                                    saveButton.setEnabled(false);
+                                    saveButton.setText("Saving...");
+                                    task.setTitle(title.getText().toString());
+                                    task.setDescription(description.getText().toString());
+                                    task.setFixed(fixed);
+                                    task.setUser(ParseUser.getCurrentUser());
 
+                                    // Time
+                                    if (fixed) {
+                                        task.setStartTime(NewTaskFragment.this.startTime);
+                                        task.setEndTime(NewTaskFragment.this.endTime);
+                                    } else {
+                                        task.setTotalTime(totalTime);
+                                    }
+                                    // Categories
+                                    if (selected != null) {
+                                        for (int i = 0; i < selected.length; i++) {
+                                            if (selected[i]) {
+                                                // this category is selected, look it up on Parse
+                                                ParseQuery<Category> categoryParseQuery = Category.getQuery();
+                                                categoryParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+                                                categoryParseQuery.whereEqualTo("title", categories.get(i));
+                                                final String title = categories.get(i);
+                                                categoryParseQuery.findInBackground(new FindCallback<Category>() {
+                                                    @Override
+                                                    public void done(List<Category> objects, ParseException e) {
+                                                        if (e == null) {
+                                                            if (objects.size() == 0) {
+                                                                // no objects fetched, create category
+                                                                // This is for one of the 5 default categories each
+                                                                // user has.
+                                                                final Category c = new Category();
+                                                                c.setTitle(title);
+                                                                c.setUser(ParseUser.getCurrentUser());
+                                                                c.saveEventually(new SaveCallback() {
+                                                                    @Override
+                                                                    public void done(ParseException e) {
+                                                                        task.addCategory(c);
+                                                                    }
+                                                                });
+                                                            } else if (objects.size() == 1) {
+                                                                task.addCategory(objects.get(0));
+                                                            } else {
+                                                                Log.e(Constants.NEW_TASK_TAG, "Multiple categories returned!");
+                                                            }
+                                                        } else {
+                                                            Log.e(Constants.NEW_TASK_TAG, "Could not fetch categories!");
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    }
+
+                                    // save constraints
+                                    for (final Constraint c : constraints) {
+                                        Log.d(Constants.NEW_TASK_TAG, "Adding constraint: " + c.toString());
+                                        c.saveInBackground();
+                                        task.addConstraint(c);
+                                    }
+
+                                    day.saveInBackground(new SaveCallback() {
+                                        // save day first
+                                        @Override
+                                        public void done(ParseException e) {
+                                            if (e == null) {
+                                                task.setDay(day);
+                                                task.saveInBackground(new SaveCallback() {
+                                                    @Override
+                                                    public void done(ParseException e) {
+                                                        if (e == null) {
+                                                            // TODO: Close view
+                                                            saveButton.setText("Saved!");
+                                                        } else {
+                                                            Log.e(Constants.NEW_TASK_TAG, e.getMessage());
+                                                        }
+                                                    }
+                                                });
+                                            } else {
+                                                Log.e(Constants.NEW_TASK_TAG, e.getMessage());
+                                            }
+                                        }
+                                    });
+                                }
+                            } else {
+                                Log.e(Constants.NEW_TASK_TAG, e.getMessage());
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        return view;
     }
 
-    public void getOrCreateDay(){
+    public Day getOrCreateDay(){
         ParseQuery<Day> dayParseQuery = Day.getQuery();
         dayParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
         dayParseQuery.whereEqualTo("date", date);
+        Day day;
         try{
             List<Day> days = dayParseQuery.find();
             Log.d(Constants.NEW_TASK_TAG, "# of day with same date: " + days.size());
@@ -484,33 +470,38 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                 calendar.set(Calendar.HOUR_OF_DAY, 20);
                 day.setDayEnd(calendar.getTime());
 
+                // reset time
+                calendar.setTime(new Date());
+
                 try {
                     day.pin();
                 } catch (ParseException e) {
                     // Couldn't save Day!
-
-                    // show error
-                    new AlertDialog.Builder(getActivity().getBaseContext())
-                            .setTitle("Error")
-                            .setMessage("Something went wrong. Please try again!")
-                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // close fragment
-                                    getActivity().getSupportFragmentManager().beginTransaction().remove(
-                                            NewTaskFragment.this).commit();
-                                }
-                            })
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show();
-                    e.printStackTrace();
+                    // Propagate error up to the outer try
+                    throw e;
                 }
             } else {
                 day = days.get(0);
             }
         } catch (ParseException e) {
             e.printStackTrace();
+            // Couldn't save Day!
+            // show error
+            new AlertDialog.Builder(getActivity().getBaseContext())
+                    .setTitle("Error")
+                    .setMessage("Something went wrong. Please try again!")
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // close fragment
+                            getActivity().getSupportFragmentManager().beginTransaction().remove(
+                                    NewTaskFragment.this).commit();
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+            return null;
         }
-
+        return day;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
