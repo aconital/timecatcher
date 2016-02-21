@@ -1,7 +1,10 @@
-package com.cpsc.timecatcher;
+package com.cpsc.timecatcher.helper;
 
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+
+import com.cpsc.timecatcher.helper.ItemTouchHelperAdapter;
+import com.cpsc.timecatcher.helper.ItemTouchHelperViewHolder;
 
 /**
  * An implementation of {@link ItemTouchHelper.Callback} that enables basic drag & drop and

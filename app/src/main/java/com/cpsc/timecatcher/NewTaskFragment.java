@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.cpsc.timecatcher.gui.MultiSpinner;
+import com.cpsc.timecatcher.helper.Constants;
 import com.cpsc.timecatcher.model.Category;
 import com.cpsc.timecatcher.model.Constraint;
 import com.cpsc.timecatcher.model.Day;

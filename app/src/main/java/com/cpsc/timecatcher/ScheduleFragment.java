@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.cpsc.timecatcher.helper.SimpleItemTouchHelperCallback;
 import com.cpsc.timecatcher.model.Day;
 import com.cpsc.timecatcher.model.Task;
 import com.parse.FindCallback;

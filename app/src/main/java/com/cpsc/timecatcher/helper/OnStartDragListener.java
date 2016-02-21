@@ -1,4 +1,4 @@
-package com.cpsc.timecatcher;
+package com.cpsc.timecatcher.helper;
 
 import android.support.v7.widget.RecyclerView;
 

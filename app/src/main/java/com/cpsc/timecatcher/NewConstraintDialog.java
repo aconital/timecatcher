@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 
+import com.cpsc.timecatcher.helper.Constants;
 import com.cpsc.timecatcher.model.Constraint;
 import com.cpsc.timecatcher.model.Day;
 import com.cpsc.timecatcher.model.Operator;
@@ -18,7 +19,6 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.util.List;
 

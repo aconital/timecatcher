@@ -7,9 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.cpsc.timecatcher.ItemTouchHelperViewHolder;
+import com.cpsc.timecatcher.helper.ItemTouchHelperViewHolder;
 import com.cpsc.timecatcher.R;
-import com.cpsc.timecatcher.ItemTouchHelperAdapter;
+import com.cpsc.timecatcher.helper.ItemTouchHelperAdapter;
 import com.cpsc.timecatcher.model.Task;
 
 import java.util.Calendar;
@@ -33,6 +33,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
 
     @Override
     public void onItemDismiss(int position) {
+        //remove task
         taskList.remove(position);
         notifyItemRemoved(position);
     }

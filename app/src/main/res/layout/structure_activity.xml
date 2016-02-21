@@ -42,13 +42,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent" />
 
-        <ImageButton
-            android:textColor="@color/white"
-            android:background="@color/pale_purple"
-            android:layout_weight="1"
-            android:id="@+id/action"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent" />
+
         <com.joanzapata.iconify.widget.IconButton
             android:textColor="@color/white"
             android:background="@color/grape_dark"

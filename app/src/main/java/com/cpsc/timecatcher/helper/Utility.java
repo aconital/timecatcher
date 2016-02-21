@@ -1,4 +1,4 @@
-package com.cpsc.timecatcher;
+package com.cpsc.timecatcher.helper;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

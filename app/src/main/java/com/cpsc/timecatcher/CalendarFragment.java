@@ -3,12 +3,14 @@ package com.cpsc.timecatcher;
 
 import android.app.Activity;
 import android.net.Uri;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityManager;
 import android.widget.CalendarView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.support.v4.app.FragmentManager;
 import android.content.Context;
@@ -31,27 +33,34 @@ public class CalendarFragment extends Fragment {
     public CalendarFragment(){}
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try{
-            mListener=(OnFragmentInteractionListener) activity;
-        }catch (ClassCastException e){
-            throw new ClassCastException(activity.toString()
-                    +"must implement OnFragmentInteractionListener");
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
         }
+    }
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState){
 
         super.onCreate(savedInstanceState);
+        getActivity().setTitle("TimeCatcher");
 //        fm = getFragmentManager();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState){
         View view=inflater.inflate(R.layout.fragment_calendar,container,false);
-        calendar=(CalendarView)view.findViewById(R.id.calendarView);
+        LinearLayout calLayout= (LinearLayout) view.findViewById(R.id.calendarView);
+        calendar=(CalendarView)calLayout.findViewById(R.id.calendar);
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {

@@ -1,4 +1,4 @@
-package com.cpsc.timecatcher;
+package com.cpsc.timecatcher.helper;
 
 /**
  * Created by hroshandel on 2016-02-19.

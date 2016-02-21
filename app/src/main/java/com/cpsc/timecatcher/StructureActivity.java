@@ -1,6 +1,5 @@
 package com.cpsc.timecatcher;
 
-import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -10,17 +9,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.Toast;
 
+import com.cpsc.timecatcher.helper.Constants;
+import com.cpsc.timecatcher.helper.Utility;
 import com.facebook.appevents.AppEventsLogger;
-import com.parse.ParseFacebookUtils;
-import com.parse.ui.ParseLoginBuilder;
 
-import java.util.Calendar;
-import java.util.Date;
-
-public class StructureActivity extends FragmentActivity
+public class StructureActivity extends AppCompatActivity
         implements ScheduleFragment.OnFragmentInteractionListener, NewTaskFragment.OnFragmentInteractionListener, CalendarFragment.OnFragmentInteractionListener {
 
     private Button schedule,calendar,analytics,profile;
@@ -49,7 +43,7 @@ public class StructureActivity extends FragmentActivity
                 if (!(f instanceof ScheduleFragment))
                 {
                     Fragment scheduleFragment=ScheduleFragment.newInstance(todayLong);
-                    launchFragment(scheduleFragment,Constants.SCHEDULE_TAG);
+                    launchFragment(scheduleFragment, Constants.SCHEDULE_TAG);
                 }
             }
         });

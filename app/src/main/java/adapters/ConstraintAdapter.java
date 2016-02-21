@@ -9,7 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.cpsc.timecatcher.Constants;
+import com.cpsc.timecatcher.helper.Constants;
 import com.cpsc.timecatcher.R;
 import com.cpsc.timecatcher.model.Constraint;
 
