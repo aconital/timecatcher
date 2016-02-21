@@ -122,10 +122,10 @@ public class CSP_Solver {
 		return solutions;
 	}
 	
-	boolean searchSolutions(int count,int [] traverseOrder){
+	void searchSolutions(int count,int [] traverseOrder){
 		if(count == taskCount){// one set of task time slice assignment is complete
 			solutions.add(assignment);
-			return true;
+			return;
 		}//if
 		
 		//if(domain of any task is empty){
@@ -147,10 +147,8 @@ public class CSP_Solver {
 				// modify(id);
 				
 				count++;
-				if(true == searchSolutions(count, traverseOrder)){//search valid assignment for next variable 
-					return true;
-				}
-				
+				//search valid assignment for next variable 
+				searchSolutions(count, traverseOrder);
 				//if current assignment does not lead to a solution then repeal this assignment
 				count--;
 				// repeal previous modification of domain of other tasks including those have constrains with this task and any task containing this time slice 
@@ -158,7 +156,6 @@ public class CSP_Solver {
 				// repeal(id);
 			}//if
 		}//for
-		return false;
 	}
 	
 	//return true if task with id can choose this time slice without violating  constraints
