@@ -97,7 +97,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param long Date MAKE SURE THIS DATE IS THE STRIPED DATE WITH 0h:0m:0s:00
+     * @param date  MAKE SURE THIS DATE IS THE STRIPED DATE WITH 0h:0m:0s:00
      * @return A new instance of fragment NewTaskFragment.
      */
     // TODO: Rename and change types and number of parameters

@@ -41,7 +41,7 @@ import adapters.TaskAdapter;
  * create an instance of this fragment.
  */
 public class ScheduleFragment extends Fragment {
-
+    private  long longDate;
     private Date date;
     private final static String DATE_TAG="DATE";
     private FloatingActionButton fab;
@@ -66,7 +66,8 @@ public class ScheduleFragment extends Fragment {
         super.onCreate(savedInstanceState);
        if (getArguments() != null)
        {   //convert long to Date
-           date = new Date(getArguments().getLong(DATE_TAG));
+           longDate=getArguments().getLong(DATE_TAG);
+           date = new Date(longDate);
 
        }
     }
@@ -84,7 +85,11 @@ public class ScheduleFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("asdasdas");
+
+                Fragment scheduleFragment=NewTaskFragment.newInstance(longDate);
+                getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
+                        .replace(R.id.frame_container, scheduleFragment).commit();
+
             }
         });
 
@@ -151,12 +156,8 @@ public class ScheduleFragment extends Fragment {
 
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
+
+
 
     @Override
     public void onAttach(Context context) {
@@ -187,6 +188,6 @@ public class ScheduleFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+         public void addTask(long date);
     }
 }

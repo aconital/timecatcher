@@ -85,6 +85,13 @@ public class StructureActivity extends AppCompatActivity
                 .replace(R.id.frame_container, scheduleFragment).commit();
 
     }
+    public void addTask(long date)
+    {
+        Fragment scheduleFragment=NewTaskFragment.newInstance(date);
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
+                .replace(R.id.frame_container, scheduleFragment).commit();
+
+    }
 
     @Override
     public void onDestroy()
