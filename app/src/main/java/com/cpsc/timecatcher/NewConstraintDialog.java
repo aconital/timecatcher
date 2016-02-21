@@ -63,28 +63,32 @@ public class NewConstraintDialog extends Dialog {
         operatorAdaptor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         operatorSpinner.setAdapter(operatorAdaptor);
 
-        ParseQuery<Task> categoryParseQuery = Task.getQuery();
-        categoryParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+        ParseQuery<Task> taskParseQuery = Task.getQuery();
+        taskParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
         if (day != null) {
-            categoryParseQuery.whereEqualTo("day", day);
+            taskParseQuery.whereEqualTo("day", day);
         } else {
             Log.d(Constants.NEW_CONSTRAINT_TAG, "Warning: null day, getting all user's tasks");
         }
 
-        categoryParseQuery.findInBackground(new FindCallback<Task>() {
+        taskParseQuery.findInBackground(new FindCallback<Task>() {
             @Override
             public void done(List<Task> objects, ParseException e) {
-                String[] taskNames = new String[objects.size()];
-                int i = 0;
-                taskList = objects;
+                if (e == null) {
+                    String[] taskNames = new String[objects.size()];
+                    int i = 0;
+                    taskList = objects;
 
-                for (Task task : objects) {
-                    taskNames[i++] = task.getTitle();
+                    for (Task task : objects) {
+                        taskNames[i++] = task.getTitle();
+                    }
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
+                            android.R.layout.simple_spinner_item, taskNames);
+                    otherTaskSpinner.setAdapter(adapter);
+                } else {
+                    Log.d(Constants.NEW_CONSTRAINT_TAG, "Couldn't find other tasks!");
                 }
-
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
-                        android.R.layout.simple_spinner_item, taskNames);
-                otherTaskSpinner.setAdapter(adapter);
             }
         });
 

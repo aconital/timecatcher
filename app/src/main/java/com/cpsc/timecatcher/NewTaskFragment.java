@@ -65,6 +65,7 @@ import static com.cpsc.timecatcher.algorithm.TimeUtils.addMinutesToDate;
 
 public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinnerListener {
     private Date date;
+    private boolean newDate = false;
     private Day day;
     private final static String DATE_TAG="DATE";
     private final String OTHER_TASK_LABEL = "otherTasksInDay";
@@ -156,6 +157,11 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
         final Button saveButton = (Button) view.findViewById(R.id.save_button);
         final Button newConstraintButton = (Button) view.findViewById(R.id.add_constraint_button);
 
+        // Check if user is logged in
+        if (ParseUser.getCurrentUser() == null) {
+            Log.e(Constants.NEW_TASK_TAG, "USER IS NULL! SAVING WILL NOT WORK");
+        }
+
         // Day
         day = getOrCreateDay();
         assert (day != null);
@@ -173,7 +179,6 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
 
             @Override
             public void afterTextChanged(Editable s) {
-                Log.d(Constants.NEW_TASK_TAG, "text changed: " + s.toString().length());
                 if (s.toString().length() == 0) {
                     title.setError("Name can't be empty");
                 }
@@ -336,18 +341,21 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                                 }
                             }).show();
                 } else {
-                    // Check if other task with same name
+                    // Check if other task with same name in the same day
                     String taskTitle = title.getText().toString();
                     ParseQuery<Task> query = Task.getQuery();
                     query.whereEqualTo("user", ParseUser.getCurrentUser());
                     query.whereEqualTo("title", taskTitle);
-                    query.whereEqualTo("day", day);
+                    // TODO: avoid this call completely if newDate
+                    if (!newDate){
+                        query.whereEqualTo("day", day);
+                    }
                     query.findInBackground(new FindCallback<Task>() {
                         @Override
                         public void done(List<Task> objects, ParseException e) {
                             if (e == null) {
                                 Log.d(Constants.NEW_TASK_TAG, "# tasks with same name: " + objects.size());
-                                if (objects.size() > 0) {
+                                if (objects.size() > 0 && !newDate) {
                                     title.setError("Already have a task with the same name!");
                                 } else {
                                     task = new Task();
@@ -425,12 +433,12 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                                                             // TODO: Close view
                                                             saveButton.setText("Saved!");
                                                         } else {
-                                                            Log.e(Constants.NEW_TASK_TAG, e.getMessage());
+                                                            Log.e(Constants.NEW_TASK_TAG + "SaveTask", e.getMessage());
                                                         }
                                                     }
                                                 });
                                             } else {
-                                                Log.e(Constants.NEW_TASK_TAG, e.getMessage());
+                                                Log.e(Constants.NEW_TASK_TAG + "SaveDay", e.getMessage());
                                             }
                                         }
                                     });
@@ -456,6 +464,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
             Log.d(Constants.NEW_TASK_TAG, "# of day with same date: " + days.size());
             if (days.size() == 0) {
                 // no such day, create it
+                newDate = true;
                 day = new Day();
                 day.setUser(ParseUser.getCurrentUser());
                 day.setDate(date);
