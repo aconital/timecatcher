@@ -7,13 +7,13 @@ import java.util.LinkedList;
  * 
  */
 public class Task {
-	private int taskIdentifier;// identifier of each task
+	private static int taskIdentifier=0;// identifier of each task
 	private float estimatedTime;// estimated amount of time to finish a task
 	private LinkedList<TimeSlice> domain;//a list of possible time slice 
 	
 	Task(){}
-	Task(int indetifier,float time){
-		taskIdentifier=indetifier;
+	Task(float time){
+		taskIdentifier++;
 		estimatedTime=time;
 		domain=new LinkedList<TimeSlice>();	
 	}
@@ -22,6 +22,9 @@ public class Task {
 		return taskIdentifier;
 	}
 	
+	float getEstimatedTime(){
+		return estimatedTime;
+	}
 	LinkedList<TimeSlice> getDomain(){
 		return domain;
 	}

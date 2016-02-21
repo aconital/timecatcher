@@ -9,6 +9,7 @@ import java.util.*;
 public class CSP {
 	private ConstraintGraph constraints;
 	private HashMap<Integer, Task> taskMap;// <indetifier, task>
+	private int taskCount;
 	
 	CSP(){
 		constraints=new ConstraintGraph();
@@ -17,6 +18,7 @@ public class CSP {
 	CSP(ConstraintGraph c,HashMap<Integer, Task> t){
 		constraints=c;
 		taskMap=t;
+		taskCount=0;
 	}
 		
 	void setConstraints(ConstraintGraph c) {constraints = c;}
@@ -24,6 +26,8 @@ public class CSP {
 	
 	void setTask(HashMap<Integer, Task> t)	{taskMap=t;}
 	HashMap<Integer, Task> getTask() {return taskMap; }
+	
+	int getTaskCount()	{	return taskCount;}
 	
 	void addConstraint(int u, int v, int weight){// a directed edge  u->v
 		constraints.addConstraint(u, v, weight);
@@ -35,6 +39,7 @@ public class CSP {
 	
 	void addTasks(Task task){
 		taskMap.put(task.getTaskIdentifier(), task);
+		taskCount++;
 	}
 	
 	void removeTask(int id ){

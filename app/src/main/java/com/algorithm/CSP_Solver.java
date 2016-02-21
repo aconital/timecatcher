@@ -16,6 +16,11 @@ public class CSP_Solver {
 	private LinkedList<Arc> arcs;
 	private int[][] graphMatrix;
 	
+	private int taskCount;
+	private TaskAssignment[] assignment;
+	private LinkedList<TaskAssignment[] >solutions;
+	
+	
 	CSP_Solver(){}
 	
 	CSP_Solver(CSP problem){
@@ -24,6 +29,9 @@ public class CSP_Solver {
 		undirectedAdj=constraints.getUndirectedAdjcentList();// reference to original object
 		arcs=constraints.getArcs();// reference to original object
 		graphMatrix=constraints.getMatrix(); // reference to original object
+		assignment=new TaskAssignment[problem.getTaskCount()] ;
+		solutions=new LinkedList<TaskAssignment[] >();
+		taskCount=problem.getTaskCount();
 	}
 	
 /*
@@ -48,8 +56,7 @@ public class CSP_Solver {
 			queue.remove();//remove the first element of this list 
 		}//while
 	}
-	
-	
+		
 /*
  * return true if at least one inconsistent value is removed from domain of u 
  * check constraint from u to v for edge u->v or edge v->u 
@@ -107,12 +114,62 @@ public class CSP_Solver {
 		return inconsistent;
 	}
 	
-	void searchSolutions(){
-		
+	LinkedList<TaskAssignment[] > getSolutions(){
+		// other traverse order is also possible, should consider in the future
+		int[] traverseOrder=constraints.GetTopologicalSort();
+		searchSolutions(0,traverseOrder);
+		constraintConsistencyCheck();// preprocess the domain of each task 
+		return solutions;
 	}
 	
-	boolean searchHelper(){
+	boolean searchSolutions(int count,int [] traverseOrder){
+		if(count == taskCount){// one set of task time slice assignment is complete
+			solutions.add(assignment);
+			return true;
+		}//if
 		
-		return false;// failure
+		//if(domain of any task is empty){
+		//	return false;
+		//}
+		
+		// choose the task to be considered
+		int id=traverseOrder[count];//except topological sort, we can have other choose strategies regarding which variable should be considered next 
+		LinkedList<TimeSlice> domain=taskMap.get(id).getDomain();
+		
+		for(int i=0;i<domain.size();i++){
+			TimeSlice time=domain.get(i);
+			if(isSafe(time,id) == true){// if this time slice can cover this task and this choice conforms to other constraints 
+				assignment[count]=new TaskAssignment(time,id);
+				// after each assignment to a task, run domain consistency check for tasks have constraints with this task
+				// write a new constraint consistency check for a given task,then invoke it here.
+				
+				// modify domain of other tasks including those have constrains with this task and any task containing this time slice 
+				// modify(id);
+				
+				count++;
+				if(true == searchSolutions(count, traverseOrder)){//search valid assignment for next variable 
+					return true;
+				}
+				
+				//if current assignment does not lead to a solution then repeal this assignment
+				count--;
+				// repeal previous modification of domain of other tasks including those have constrains with this task and any task containing this time slice 
+				// modify(id);
+				// repeal(id);
+			}//if
+		}//for
+		return false;
+	}
+	
+	//return true if task with id can choose this time slice without violating  constraints
+	boolean isSafe(TimeSlice time, int id){
+		//as we traverse task according to topological sort of constraints,
+		//higher preference tasks have already get an assignment, we do not need to consider domain constraints here;
+		//if we do not traverse task according to topological sort of constraints, we do need to consider domain constraints;
+		
+		if((time.getEndTime()-time.getStartTime()-taskMap.get(id).getEstimatedTime())>0.000001){
+			return true;
+		}		
+		return false;
 	}
 }
