@@ -89,8 +89,6 @@ public class StructureActivity extends FragmentActivity
         Fragment scheduleFragment=ScheduleFragment.newInstance(date);
         getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
                 .replace(R.id.frame_container, scheduleFragment).commit();
-        String d=String.valueOf(date);
-        Toast.makeText(getApplication(),d,Toast.LENGTH_LONG).show();
 
     }
 
