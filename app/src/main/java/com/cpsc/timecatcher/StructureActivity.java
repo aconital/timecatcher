@@ -100,7 +100,7 @@ public class StructureActivity extends AppCompatActivity
         InputMethodManager inputMethodManager=(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         if(event.getAction()==MotionEvent.ACTION_DOWN){
             if(getCurrentFocus()!=null && getCurrentFocus().getWindowToken()!=null){
-                boolean isShow=inputMethodManager.isActive();
+//                boolean isShow=inputMethodManager.isActive();
                 View view=getCurrentFocus();
                 if(view!=null){
                     inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(),0);
