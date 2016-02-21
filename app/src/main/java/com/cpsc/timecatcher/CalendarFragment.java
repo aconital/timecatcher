@@ -28,7 +28,7 @@ public class CalendarFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 //    private FragmentManager fm;
 //    private FragmentTransaction ft;
-    long date;
+    long date,currentDate;
 
     public CalendarFragment(){}
 
@@ -61,17 +61,19 @@ public class CalendarFragment extends Fragment {
         View view=inflater.inflate(R.layout.fragment_calendar,container,false);
         LinearLayout calLayout= (LinearLayout) view.findViewById(R.id.calendarView);
         calendar=(CalendarView)calLayout.findViewById(R.id.calendar);
+        currentDate=calendar.getDate();
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
-
-                Calendar d= Calendar.getInstance();
-                d.set(year,month,dayOfMonth,0,0,0);
-                d.set(d.MILLISECOND,0);
-                date=d.getTime().getTime();
+            if(calendar.getDate() != currentDate ) {
+                currentDate=calendar.getDate();
+                Calendar d = Calendar.getInstance();
+                d.set(year, month, dayOfMonth, 0, 0, 0);
+                d.set(d.MILLISECOND, 0);
+                date = d.getTime().getTime();
 //                Toast.makeText(getActivity(),""+d,Toast.LENGTH_LONG).show();
                 mListener.onDateSelected(date);
-
+              }
             }
         });
         return view;
