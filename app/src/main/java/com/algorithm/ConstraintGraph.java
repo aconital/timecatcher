@@ -31,6 +31,9 @@ public class ConstraintGraph {
         }//for
             
     }
+	
+	int getVertexCnt()	{	return V;	}
+	
     LinkedList<AdjListNode>[] getAdjcentList()	{	return adj;	}
     
     LinkedList<AdjListNode>[] getUndirectedAdjcentList()	{	return undirectedAdj;}
