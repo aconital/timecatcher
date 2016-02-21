@@ -10,26 +10,36 @@
     android:clickable="true"
     android:background="?android:attr/selectableItemBackground"
     android:orientation="vertical">
+
+
+    <TextView
+        android:id="@+id/start"
+        android:background="@color/sand"
+        android:layout_alignParentTop="true"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
     <TextView
         android:id="@+id/title"
         android:textColor="@color/title"
         android:textSize="16dp"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:gravity="center"
         android:textStyle="bold"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/start"
+        android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <TextView
-        android:id="@+id/start"
-        android:layout_below="@id/title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <TextView
+        android:background="@color/sand"
         android:id="@+id/end"
-        android:textColor="@color/year"
-        android:layout_width="wrap_content"
-        android:layout_alignParentRight="true"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:layout_width="fill_parent"
+        android:layout_below="@+id/title"
         android:layout_height="wrap_content" />
 
 </RelativeLayout>
