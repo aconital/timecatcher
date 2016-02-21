@@ -4,6 +4,7 @@ package com.cpsc.timecatcher;
 import android.app.Activity;
 import android.net.Uri;
 
+import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
@@ -65,7 +66,8 @@ public class CalendarFragment extends Fragment {
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
-//            if(calendar.getDate() != currentDate ) {
+            if(calendar.getDate() != currentDate
+                    || android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 currentDate=calendar.getDate();
                 Calendar d = Calendar.getInstance();
                 d.set(year, month, dayOfMonth, 0, 0, 0);
@@ -73,7 +75,7 @@ public class CalendarFragment extends Fragment {
                 date = d.getTime().getTime();
 //                Toast.makeText(getActivity(),""+d,Toast.LENGTH_LONG).show();
                 mListener.onDateSelected(date);
-//              }
+              }
             }
         });
         return view;
