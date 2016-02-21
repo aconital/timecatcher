@@ -1,5 +1,6 @@
 package com.cpsc.timecatcher;
 
+import android.content.Context;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -7,7 +8,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 
 import com.cpsc.timecatcher.helper.Constants;
@@ -91,6 +94,20 @@ public class StructureActivity extends AppCompatActivity
         getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
                 .replace(R.id.frame_container, scheduleFragment).commit();
 
+    }
+
+    public boolean onTouchEvent(MotionEvent event){
+        InputMethodManager inputMethodManager=(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if(event.getAction()==MotionEvent.ACTION_DOWN){
+            if(getCurrentFocus()!=null && getCurrentFocus().getWindowToken()!=null){
+                boolean isShow=inputMethodManager.isActive();
+                View view=getCurrentFocus();
+                if(view!=null){
+                    inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(),0);
+                }
+            }
+        }
+        return super.onTouchEvent(event);
     }
 
     @Override

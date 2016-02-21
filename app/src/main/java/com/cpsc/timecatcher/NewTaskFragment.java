@@ -11,8 +11,10 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -156,6 +158,14 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
         final Spinner totalTimeMinute = (Spinner) view.findViewById(R.id.totalTimeHourMinute);
         final Button saveButton = (Button) view.findViewById(R.id.save_button);
         final Button newConstraintButton = (Button) view.findViewById(R.id.add_constraint_button);
+
+        view.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                NewTaskFragment.this.getActivity().onTouchEvent(event);
+                return false;
+            }
+        });
 
         // Check if user is logged in
         if (ParseUser.getCurrentUser() == null) {
@@ -555,4 +565,6 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
     public void onItemsSelected(boolean[] selected) {
         this.selected = selected;
     }
+
+
 }
