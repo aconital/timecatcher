@@ -92,14 +92,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
             calendar.setTime(endtime);   // assigns calendar to given date
             String minute= Integer.toString(calendar.get(Calendar.MINUTE));
             String hour=Integer.toString(calendar.get(Calendar.HOUR_OF_DAY));
-            if(calendar.get(Calendar.MINUTE) == 0)
+            if(calendar.get(Calendar.MINUTE) < 10)
             {
-                minute= "00";
+                minute= "0"+calendar.get(Calendar.MINUTE);
             }
-            if(calendar.get(Calendar.HOUR) == 0)
-            {
-                hour= "00";
-            }
+  
             holder.end.setText(hour+":"+ minute);
         }
         else
@@ -111,13 +108,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
             calendar.setTime(starttime);   // assigns calendar to given date
             String minute= Integer.toString(calendar.get(Calendar.MINUTE));
             String hour=Integer.toString(calendar.get(Calendar.HOUR_OF_DAY));
-            if(calendar.get(Calendar.MINUTE) == 0)
+
+            if(calendar.get(Calendar.MINUTE) < 10)
             {
-                minute= "00";
-            }
-            if(calendar.get(Calendar.HOUR) == 0)
-            {
-                hour= "00";
+                minute= "0"+calendar.get(Calendar.MINUTE);
             }
 
             holder.start.setText(hour+":"+minute);
