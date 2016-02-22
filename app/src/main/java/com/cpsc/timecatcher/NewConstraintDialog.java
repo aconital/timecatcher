@@ -1,7 +1,9 @@
 package com.cpsc.timecatcher;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -100,7 +102,6 @@ public class NewConstraintDialog extends Dialog {
 
                 if (otherTaskSpinner.getSelectedItem() == null) {
                     // there was no other task to select from. silently exit
-                    // TODO: error dialog?
                     dismiss();
                     return;
                 }
@@ -112,15 +113,32 @@ public class NewConstraintDialog extends Dialog {
                     }
                 }
                 if (other == null) {
-                    // TODO: error dialog?
                     dismiss();
                     return;
                 }
-                Constraint constraint = new Constraint();
-                constraint.setOperator(operator);
-                constraint.setOther(other);
-                constraintList.add(constraint);
-                saveButton.setEnabled(false);
+
+                boolean duplicate = false;
+
+                for (Constraint c : constraintList) {
+                    if (c.getOperator() == operator && c.getOther() == other) {
+                        duplicate = true;
+                        new AlertDialog.Builder(getContext())
+                            .setTitle("Save Constraint Error")
+                            .setMessage("You already have this constraint!")
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            }).show();
+                    }
+                }
+                if (!duplicate) {
+                    Constraint constraint = new Constraint();
+                    constraint.setOperator(operator);
+                    constraint.setOther(other);
+                    constraintList.add(constraint);
+                    saveButton.setEnabled(false);
+                }
                 dismiss();
             }
         });

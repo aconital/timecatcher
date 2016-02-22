@@ -285,7 +285,7 @@
                     android:layout_height="wrap_content" />
             </RelativeLayout>
 
-            <ListView
+            <com.cpsc.timecatcher.gui.NoScrollListView
                 android:id="@+id/constraints_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

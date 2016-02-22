@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.cpsc.timecatcher.gui.MultiSpinner;
+import com.cpsc.timecatcher.gui.NoScrollListView;
 import com.cpsc.timecatcher.helper.Constants;
 import com.cpsc.timecatcher.model.Category;
 import com.cpsc.timecatcher.model.Constraint;
@@ -223,7 +224,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
         populateCategoriesSpinner(multiSpinner);
 
         // Initialize Constraints List View
-        ListView constraintsListView = (ListView) view.findViewById(R.id.constraints_list);
+        ListView constraintsListView = (NoScrollListView) view.findViewById(R.id.constraints_list);
         constraints = new ArrayList<>();
         final ConstraintAdapter constraintAdapter = new ConstraintAdapter(
                 getContext(),
@@ -231,6 +232,14 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                 constraints
         );
         constraintsListView.setAdapter(constraintAdapter);
+        constraintsListView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+                return false;
+            }
+        });
+
 
         // Listeners
         fixedSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
