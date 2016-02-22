@@ -10,15 +10,18 @@ public class CSP {
 	private ConstraintGraph constraints;
 	private HashMap<Integer, Task> taskMap;// <indetifier, task>
 	private int taskCount;
+	private float totalFlexibleWorkingTime;
+	static private float accumulatedWorkingTime=0;
 	
 	CSP(){
 		constraints=new ConstraintGraph();
 	}
 	
-	CSP(ConstraintGraph c,HashMap<Integer, Task> t){
+	CSP(ConstraintGraph c,HashMap<Integer, Task> t,float time){
 		constraints=c;
 		taskMap=t;
 		taskCount=0;
+		totalFlexibleWorkingTime=time;
 	}
 		
 	void setConstraints(ConstraintGraph c) {constraints = c;}
@@ -26,6 +29,14 @@ public class CSP {
 	
 	void setTask(HashMap<Integer, Task> t)	{taskMap=t;}
 	HashMap<Integer, Task> getTask() {return taskMap; }
+	
+	void setTotalFlexibleWorkingTime(float time){
+		totalFlexibleWorkingTime=time;
+	}
+	
+	float getTotalFlexibleWorkingTime(){
+		return totalFlexibleWorkingTime;
+	}
 	
 	int getTaskCount()	{	return taskCount;}
 	
@@ -38,6 +49,13 @@ public class CSP {
 	}
 	
 	void addTasks(Task task){
+		if(Float.compare(accumulatedWorkingTime+ task.getEstimatedTime(),totalFlexibleWorkingTime)>0){
+			return;
+		} 	
+		else{
+			accumulatedWorkingTime +=task.getEstimatedTime();
+		}
+		
 		taskMap.put(task.getTaskIdentifier(), task);
 		taskCount++;
 	}
