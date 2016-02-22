@@ -66,16 +66,24 @@ public class CalendarFragment extends Fragment {
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
-            if(calendar.getDate() != currentDate
-                    || android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                currentDate=calendar.getDate();
-                Calendar d = Calendar.getInstance();
-                d.set(year, month, dayOfMonth, 0, 0, 0);
-                d.set(d.MILLISECOND, 0);
-                date = d.getTime().getTime();
+
+                if(android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+                    Calendar d = Calendar.getInstance();
+                    d.set(year, month, dayOfMonth, 0, 0, 0);
+                    d.set(d.MILLISECOND, 0);
+                    date = d.getTime().getTime();
 //                Toast.makeText(getActivity(),""+d,Toast.LENGTH_LONG).show();
-                mListener.onDateSelected(date);
-              }
+                    mListener.onDateSelected(date);
+                } else {
+                    if(calendar.getDate() != currentDate) {
+                        currentDate=calendar.getDate();
+                        Calendar d = Calendar.getInstance();
+                        d.set(year, month, dayOfMonth, 0, 0, 0);
+                        d.set(d.MILLISECOND, 0);
+                        date = d.getTime().getTime();
+                        mListener.onDateSelected(date);
+                    }
+                }
             }
         });
         return view;

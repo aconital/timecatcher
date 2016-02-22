@@ -90,7 +90,14 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
         if(endtime !=null) {
             Calendar calendar = Calendar.getInstance(); // creates a new calendar instance
             calendar.setTime(endtime);   // assigns calendar to given date
-            holder.end.setText(calendar.get(Calendar.HOUR_OF_DAY)+":"+ calendar.get(Calendar.MINUTE));
+            String minute= Integer.toString(calendar.get(Calendar.MINUTE));
+            String hour=Integer.toString(calendar.get(Calendar.HOUR_OF_DAY));
+            if(calendar.get(Calendar.MINUTE) < 10)
+            {
+                minute= "0"+calendar.get(Calendar.MINUTE);
+            }
+  
+            holder.end.setText(hour+":"+ minute);
         }
         else
             holder.end.setText("No EndTime");
@@ -99,7 +106,15 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
         {
             Calendar calendar = Calendar.getInstance(); // creates a new calendar instance
             calendar.setTime(starttime);   // assigns calendar to given date
-            holder.start.setText(calendar.get(Calendar.HOUR_OF_DAY)+":"+ calendar.get(Calendar.MINUTE));
+            String minute= Integer.toString(calendar.get(Calendar.MINUTE));
+            String hour=Integer.toString(calendar.get(Calendar.HOUR_OF_DAY));
+
+            if(calendar.get(Calendar.MINUTE) < 10)
+            {
+                minute= "0"+calendar.get(Calendar.MINUTE);
+            }
+
+            holder.start.setText(hour+":"+minute);
         }
         else
             holder.start.setText("No StartTime");
