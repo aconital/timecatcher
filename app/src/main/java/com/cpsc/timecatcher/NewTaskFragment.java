@@ -263,6 +263,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
             @Override
             public void onClick(View v) {
                 final Calendar c = Calendar.getInstance();
+                c.setTime(NewTaskFragment.this.startTime);
                 int hour = c.get(Calendar.HOUR_OF_DAY);
                 int minute = c.get(Calendar.MINUTE);
                 TimePickerDialog startTimePicker;
@@ -289,10 +290,11 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
         endTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Calendar c = addMinutesToDate(calendar, 30);
+                final Calendar c = Calendar.getInstance();
+                c.setTime(NewTaskFragment.this.endTime);
+
                 int hour = c.get(Calendar.HOUR_OF_DAY);
                 int minute = c.get(Calendar.MINUTE);
-
                 TimePickerDialog endTimePicker;
                 endTimePicker = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
                     @Override
