@@ -120,8 +120,13 @@ public class CSP_Solver {
 		return inconsistent;
 	}
 	
+	/*
+	 * this method return final solutions of all possible schedule 
+	 */
 	LinkedList<TaskAssignment[] > getSolutions(){
 		// other traverse order is also possible, should consider in the future
+		if(constraints.isCyclic()==true) return solutions;
+		
 		int[] traverseOrder=constraints.GetTopologicalSort();
 		HashMap<Integer, Boolean> visited= new HashMap<Integer, Boolean>();// <indetifier, true/false>
 		int taskCount=problem.getTaskCount();
@@ -208,8 +213,7 @@ public class CSP_Solver {
 		queue=getRelatedArcs(id,visited);
 		return  constraintConsistencyCheck(queue);
 	}
-	
-	
+		
 /*
  *  get a list of acrs connected with vector u
  */	
