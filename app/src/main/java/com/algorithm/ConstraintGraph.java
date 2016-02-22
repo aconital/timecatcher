@@ -44,6 +44,7 @@ public class ConstraintGraph {
     
     void addConstraint(int u, int v, int weight)// a directed edge  u->v
     {
+    	if(u==v) return;
         AdjListNode node = new AdjListNode(v,weight);
         if(adj[u].contains(node)== true) return; // don't add an duplicate edge
         
