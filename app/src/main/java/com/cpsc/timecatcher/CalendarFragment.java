@@ -67,8 +67,7 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
 
-                if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    currentDate=calendar.getDate();
+                if(android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
                     Calendar d = Calendar.getInstance();
                     d.set(year, month, dayOfMonth, 0, 0, 0);
                     d.set(d.MILLISECOND, 0);
