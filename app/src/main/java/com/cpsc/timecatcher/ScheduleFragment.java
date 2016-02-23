@@ -25,6 +25,8 @@ import com.parse.ParseUser;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -128,7 +130,7 @@ public class ScheduleFragment extends Fragment {
         ParseQuery<Day> query = new ParseQuery<Day>("Day");
         query.whereEqualTo("user", ParseUser.getCurrentUser());
         query.whereEqualTo("date", date);
-        query.orderByAscending("startTime");
+
         query.getFirstInBackground(new GetCallback<Day>() {
             @Override
             public void done(Day object, com.parse.ParseException e) {
@@ -136,13 +138,17 @@ public class ScheduleFragment extends Fragment {
                     Day day = object;
                     ParseQuery<Task> query = new ParseQuery<Task>("Task");
                     query.whereEqualTo("day", day);
+                    query.whereExists("startTime");
+                    query.whereExists("endTime");
+                    query.addAscendingOrder("startTime");
                     query.findInBackground(new FindCallback<Task>() {
                         @Override
                         public void done(List<Task> objects, com.parse.ParseException e) {
                             if (objects.size() > 0) {
                                 for (Task t : objects) {
-                                    taskList.add(t);
+                                        taskList.add(t);
                                 }
+                             //   taskList=sortTasks(taskList);
                                 mAdapter.notifyDataSetChanged();
                             } else
                                 Log.e("Parse", "No tasks found");
@@ -157,8 +163,21 @@ public class ScheduleFragment extends Fragment {
     }
 
 
-
-
+    private List<Task> sortTasks(List<Task> tasks) {
+        int n = tasks.size();
+        int k;
+        for (int m = n; m >= 0; m--) {
+            for (int i = 0; i < n - 1; i++) {
+                k = i + 1;
+                if (tasks.get(k).getStartTime().getTime() < tasks.get(i).getStartTime().getTime()) {
+                    Task temp = tasks.get(i);
+                    tasks.set(i, tasks.get(k));
+                    tasks.set(k, temp);
+                }
+            }
+        }
+        return  tasks;
+    }
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

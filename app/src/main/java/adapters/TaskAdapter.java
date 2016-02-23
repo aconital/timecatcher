@@ -96,7 +96,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
             {
                 minute= "0"+calendar.get(Calendar.MINUTE);
             }
-  
+            if(calendar.get(Calendar.HOUR_OF_DAY) < 10)
+            {
+                hour= "0"+calendar.get(Calendar.HOUR_OF_DAY);
+            }
             holder.end.setText(hour+":"+ minute);
         }
         else
