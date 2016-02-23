@@ -78,6 +78,14 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Task task = taskList.get(position);
 
+        boolean isFixed = task.getFixed();
+        //different color for fixed tasks
+        if(isFixed)
+        {
+            holder.start.setBackgroundResource(R.color.deep);
+            holder.end.setBackgroundResource(R.color.deep);
+        }
+
         Date endtime= task.getEndTime();
         Date starttime=task.getStartTime();
 
@@ -92,6 +100,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
             calendar.setTime(endtime);   // assigns calendar to given date
             String minute= Integer.toString(calendar.get(Calendar.MINUTE));
             String hour=Integer.toString(calendar.get(Calendar.HOUR_OF_DAY));
+            //changing 0 to 00
             if(calendar.get(Calendar.MINUTE) < 10)
             {
                 minute= "0"+calendar.get(Calendar.MINUTE);
@@ -100,6 +109,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
             {
                 hour= "0"+calendar.get(Calendar.HOUR_OF_DAY);
             }
+
             holder.end.setText(hour+":"+ minute);
         }
         else
@@ -115,6 +125,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
             if(calendar.get(Calendar.MINUTE) < 10)
             {
                 minute= "0"+calendar.get(Calendar.MINUTE);
+            }
+            if(calendar.get(Calendar.HOUR_OF_DAY) < 10)
+            {
+                hour= "0"+calendar.get(Calendar.HOUR_OF_DAY);
             }
 
             holder.start.setText(hour+":"+minute);
