@@ -82,8 +82,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
         //different color for fixed tasks
         if(isFixed)
         {
-            holder.start.setBackgroundResource(R.color.deep);
-            holder.end.setBackgroundResource(R.color.deep);
+            holder.start.setBackgroundResource(R.color.holo_blue_dark);
+            holder.end.setBackgroundResource(R.color.holo_blue_dark);
         }
 
         Date endtime= task.getEndTime();

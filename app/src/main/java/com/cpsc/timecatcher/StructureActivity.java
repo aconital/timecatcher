@@ -18,7 +18,10 @@ import com.cpsc.timecatcher.helper.Utility;
 import com.facebook.appevents.AppEventsLogger;
 
 public class StructureActivity extends AppCompatActivity
-        implements ScheduleFragment.OnFragmentInteractionListener, NewTaskFragment.OnFragmentInteractionListener, CalendarFragment.OnFragmentInteractionListener {
+        implements ScheduleFragment.OnFragmentInteractionListener,
+        NewTaskFragment.OnFragmentInteractionListener,
+        CalendarFragment.OnFragmentInteractionListener,
+        TasklistFragment.OnFragmentInteractionListener{
 
     private Button schedule,calendar,analytics,profile;
 

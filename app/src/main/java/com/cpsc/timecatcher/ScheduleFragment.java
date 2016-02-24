@@ -138,8 +138,8 @@ public class ScheduleFragment extends Fragment {
                     Day day = object;
                     ParseQuery<Task> query = new ParseQuery<Task>("Task");
                     query.whereEqualTo("day", day);
-                    query.whereExists("startTime");
-                    query.whereExists("endTime");
+                 //   query.whereExists("startTime");
+                 //   query.whereExists("endTime");
                     query.addAscendingOrder("startTime");
                     query.findInBackground(new FindCallback<Task>() {
                         @Override
@@ -148,7 +148,6 @@ public class ScheduleFragment extends Fragment {
                                 for (Task t : objects) {
                                         taskList.add(t);
                                 }
-                             //   taskList=sortTasks(taskList);
                                 mAdapter.notifyDataSetChanged();
                             } else
                                 Log.e("Parse", "No tasks found");
@@ -158,26 +157,8 @@ public class ScheduleFragment extends Fragment {
                     Log.e("Parse", "No object returned");
             }
         });
-
-
     }
 
-
-    private List<Task> sortTasks(List<Task> tasks) {
-        int n = tasks.size();
-        int k;
-        for (int m = n; m >= 0; m--) {
-            for (int i = 0; i < n - 1; i++) {
-                k = i + 1;
-                if (tasks.get(k).getStartTime().getTime() < tasks.get(i).getStartTime().getTime()) {
-                    Task temp = tasks.get(i);
-                    tasks.set(i, tasks.get(k));
-                    tasks.set(k, temp);
-                }
-            }
-        }
-        return  tasks;
-    }
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
