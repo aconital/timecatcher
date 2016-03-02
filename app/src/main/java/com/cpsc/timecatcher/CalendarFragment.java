@@ -72,7 +72,6 @@ public class CalendarFragment extends Fragment {
                     d.set(year, month, dayOfMonth, 0, 0, 0);
                     d.set(d.MILLISECOND, 0);
                     date = d.getTime().getTime();
-//                Toast.makeText(getActivity(),""+d,Toast.LENGTH_LONG).show();
                     mListener.onDateSelected(date);
                 } else {
                     if(calendar.getDate() != currentDate) {

@@ -1,10 +1,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:flatui="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@color/white"
-    android:padding="20dp"
-    >
+    android:padding="20dp">
 
 
     <RelativeLayout
@@ -23,8 +23,12 @@
             android:textSize="25sp">
         </com.cengalabs.flatui.views.FlatTextView>
 
-        <Button
+        <com.cengalabs.flatui.views.FlatButton
             android:id="@+id/save_button"
+            android:textStyle="bold"
+            flatui:fl_touchEffect="fl_ripple"
+            flatui:fl_theme="@array/candy"
+            flatui:fl_blockButtonEffectHeight="3dp"
             android:layout_alignParentRight="true"
             android:text="@string/new_task_save_button"
             android:layout_width="wrap_content"
@@ -277,9 +281,13 @@
                     android:textSize="20sp">
                 </com.cengalabs.flatui.views.FlatTextView>
 
-                <Button
+                <com.cengalabs.flatui.views.FlatButton
+                    flatui:fl_theme="@array/candy"
+                    flatui:fl_touchEffect="fl_ripple"
+                    flatui:fl_blockButtonEffectHeight="3dp"
                     android:id="@+id/add_constraint_button"
                     android:text="@string/addConstraintButton"
+                    android:textStyle="bold"
                     android:layout_alignParentRight="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
