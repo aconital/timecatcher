@@ -1,17 +1,35 @@
 package com.algorithm;
 
 public class TimeSlice{
-	private float startTime;// float 9.45 means 9.45am; 
-	private float endTime; // float 13.20 means 1.20pm;
-
-	TimeSlice(float start,float end){
+	
+	private Time startTime;
+	private Time endTime; 
+	
+	TimeSlice(Time start,Time end){
+		if(start.compareTime(end) <=0){
+			startTime=start;
+			endTime=end;
+		}
+	}
+	Time getStartTime(){return startTime;}
+	Time getEndTime(){return endTime;}
+	
+	void setTimeSlice(Time start,Time end){
 		startTime=start;
 		endTime=end;
 	}
-	float getStartTime(){return startTime;}
-	float getEndTime(){return endTime;}
-	void setTimeSlice(float start,float end){
-		startTime=start;
-		endTime=end;
+	
+	/*
+	 * check if calling object timeSlice slice1 is before argument slice
+	 * result 1  => slice1 is before slice 
+	 * return -1 => overlapping or slice1 is 
+	 */
+	int isBefore(TimeSlice slice){
+		if(endTime.compareTime(slice.getStartTime()) <0){
+			return 1;
+		}
+		else{
+			return -1;
+		}
 	}
 }

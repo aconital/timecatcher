@@ -5,13 +5,12 @@ public class Domain {
 	private TimeSlice time;
 	private boolean available; 
 	
-	Domain(){}
 	Domain(TimeSlice t, boolean a){
 		time=t;
 		available=a;
 	}
 	
-	void setTime(TimeSlice t){
+	void setTimeSlice(TimeSlice t){
 		time=t;
 	}
 	
