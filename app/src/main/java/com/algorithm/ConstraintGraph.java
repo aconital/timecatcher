@@ -63,11 +63,11 @@ public class ConstraintGraph {
     	
     }
      
- /**
+ /*
   * 
   * isCyclic() is used to detect if this graph has a cycle
   * 
- */
+  */
     boolean isCyclic(){
     	boolean visited[] =new boolean[V];
     	boolean recursiveStack[]=new boolean[V];
