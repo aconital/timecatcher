@@ -1,6 +1,6 @@
 package com.algorithm;
 
-import java.util.LinkedList;
+import java.util.*;
 
 /*
  * Class Task is used to describe a task and associated possible assigned time slice 
@@ -8,49 +8,59 @@ import java.util.LinkedList;
  */
 public class Task {
 	private static int taskIdentifier=0;// identifier of each task
-	private float estimatedTime;// estimated amount of time to finish a task
-	private LinkedList<Domain> domain;//a list of possible time slice 
+	protected Domain domain;//a list of possible time slice 
 	
-	Task(){}
-	Task(float time){
+	Task(){
+		domain=new Domain();
+	}
+	
+	protected static void increaseTaskIdentifier(){
 		taskIdentifier++;
-		estimatedTime=time;
-		domain=new LinkedList<Domain>();	
 	}
 	
 	int getTaskIdentifier(){
 		return taskIdentifier;
 	}
 	
-	float getEstimatedTime(){
-		return estimatedTime;
-	}
-	LinkedList<Domain> getDomain(){
-		return domain;
+	Set<TimeSlice> getDomain(){
+		return domain.getDomainSet();
 	}
 	
-	void addTimeSlice(float start,float end){
-		while(Float.compare(end-start, estimatedTime)>=0){//only add qualified time slice to domain
-			TimeSlice time= new TimeSlice(start,end);
-			domain.add(new Domain(time,true));
-			start+=estimatedTime+0.01;
-		}	
+	void initializeDomainSet(Time dayStart, Time dayEnd,Time step) { 
+		//System.out.println(" call at here super Task ");
 	}
-	
-	void removeTimeSlice(float start,float end){
-	 //using either start or end time  to locate the time slice to be removed
-		//Iterator it=domain.listIterator();
-		for(int i=0;i< domain.size();i++){
-			if((Float.compare(domain.get(i).getTimeSlice().getStartTime() , start) == 0)){// judge whether equal 
-				domain.remove(new TimeSlice(start,end));
-				break;
-			}//if
-		}//for
+	void initializeDomainSet(){}
+}
+
+class FlexibleTask extends Task{
+	private Time estimatedTime;// estimated amount of time to finish a task
+	FlexibleTask(Time t){
+		domain=new Domain();
+		estimatedTime=t;
+		Task.increaseTaskIdentifier();
+	}
+
+	void initializeDomainSet(Time dayStart, Time dayEnd,Time step){
+		domain.initializeDomainSet(dayStart, dayEnd, estimatedTime, step);
+		//System.out.println(" call at here flexible ");
 	}
 }
 
-
-
+class FixedTask extends Task{
+	private Time startTime;
+	private Time endTime; 
+	
+	FixedTask(Time s, Time e){
+		domain=new Domain();
+		startTime=s;
+		endTime=e;
+		Task.increaseTaskIdentifier();
+	}
+	
+	void initializeDomainSet(){
+		domain.initializeDomainSet(startTime, endTime);
+	}
+}
 
 
 
