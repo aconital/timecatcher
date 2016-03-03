@@ -7,26 +7,23 @@ import java.util.*;
  * 
  */
 public class Task {
-	private static int taskIdentifier=0;// identifier of each task
+	public static int taskCount=0;// the number of task 
 	protected Domain domain;//a list of possible time slice 
 	
 	Task(){
 		domain=new Domain();
 	}
 	
-	protected static void increaseTaskIdentifier(){
-		taskIdentifier++;
+	protected static void increaseTaskCount(){
+		taskCount++;
 	}
 	
-	int getTaskIdentifier(){
-		return taskIdentifier;
-	}
-	
-	Set<TimeSlice> getDomain(){
+	Set<TimeSlice> getDomainSet(){
 		return domain.getDomainSet();
 	}
+	int getTaskId(){return -1;}
 	
-	void initializeDomainSet(Time dayStart, Time dayEnd,Time step) { 
+	void initializeDomainSet(Time step) { 
 		//System.out.println(" call at here super Task ");
 	}
 	void initializeDomainSet(){}
@@ -34,13 +31,24 @@ public class Task {
 
 class FlexibleTask extends Task{
 	private Time estimatedTime;// estimated amount of time to finish a task
-	FlexibleTask(Time t){
+	private Time dayStart;
+	private Time dayEnd;
+	private int taskId; 
+	
+	FlexibleTask(Time t,Time dayStart, Time dayEnd){
 		domain=new Domain();
 		estimatedTime=t;
-		Task.increaseTaskIdentifier();
+		this.dayStart=dayStart;
+		this.dayEnd=dayEnd;
+		taskId=Task.taskCount;
+		Task.increaseTaskCount();
+	}
+	
+	int getTaskId(){
+		return taskId;
 	}
 
-	void initializeDomainSet(Time dayStart, Time dayEnd,Time step){
+	void initializeDomainSet(Time step){
 		domain.initializeDomainSet(dayStart, dayEnd, estimatedTime, step);
 		//System.out.println(" call at here flexible ");
 	}
@@ -49,14 +57,19 @@ class FlexibleTask extends Task{
 class FixedTask extends Task{
 	private Time startTime;
 	private Time endTime; 
+	private int taskId; 
 	
 	FixedTask(Time s, Time e){
 		domain=new Domain();
 		startTime=s;
 		endTime=e;
-		Task.increaseTaskIdentifier();
+		taskId=Task.taskCount;
+		Task.increaseTaskCount();
 	}
 	
+	int getTaskId(){
+		return taskId;
+	}
 	void initializeDomainSet(){
 		domain.initializeDomainSet(startTime, endTime);
 	}

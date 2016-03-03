@@ -108,13 +108,13 @@ public class TestJunit1 {
    public void testTask(){
 	   
 	   // test for FlexibleTask
-	   Time time=new Time(2,0);// 1h and 10 minutes
-	   Task task1=new FlexibleTask(time);
-
 	   Time dayStart,dayEnd,step;
 	   dayStart=new Time (0,0);// this is point in time instead of a duration 
 	   dayEnd=new Time (5,0);// this is point in time instead of a duration 
 	   step=new Time (1,0);
+	   Time time=new Time(2,0);// 1h and 10 minutes
+	   Task task1=new FlexibleTask(time,dayStart,dayEnd);
+
 	   Set<TimeSlice> domainSet1= new HashSet<TimeSlice>();
 	   domainSet1.clear();
 	   domainSet1.add(new TimeSlice(new Time(0,0),new Time(2,0),true));
@@ -122,9 +122,22 @@ public class TestJunit1 {
 	   domainSet1.add(new TimeSlice(new Time(1,0),new Time(3,0),true));
 	   domainSet1.add(new TimeSlice(new Time(3,0),new Time(5,0),true));
 		
-	   task1.initializeDomainSet(dayStart,dayEnd,step);
-	   Set<TimeSlice> domainSet2=task1.getDomain();
+	   task1.initializeDomainSet(step);
+	   Set<TimeSlice> domainSet2=task1.getDomainSet();
 	   assertEquals(true,domainSet1.containsAll(domainSet2) && domainSet2.containsAll(domainSet1));
+	  
+	   
+	   // test for FixedTask
+	   Task task2=new FixedTask(new Time (3,0),new Time (4,0));
+	   task2.initializeDomainSet();
+	   domainSet2=task2.getDomainSet(); 
+	   domainSet1.clear();
+	   domainSet1.add(new TimeSlice(new Time(3,0),new Time(4,0),true));
+	   
+	   
+	   assertEquals(0,task1.getTaskId());
+	   assertEquals(1,task2.getTaskId());
+	   assertEquals(2,Task.taskCount);
    }
 }
 
