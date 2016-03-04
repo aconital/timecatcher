@@ -20,26 +20,29 @@ public class Task {
 	
 	Set<TimeSlice> getDomainSet(){
 		return domain.getDomainSet();
+		
 	}
 	int getTaskId(){return -1;}
 	
-	void initializeDomainSet(Time step) { 
+	Time getDuration(){
+		//System.out.println(" call at here Super Task ");
+		return new Time (0,0);
+	}
+	
+	void initializeDomainSet(Time dayStart,Time dayEnd, Time step) { 
 		//System.out.println(" call at here super Task ");
 	}
 	void initializeDomainSet(){}
 }
 
 class FlexibleTask extends Task{
-	private Time estimatedTime;// estimated amount of time to finish a task
-	private Time dayStart;
-	private Time dayEnd;
 	private int taskId; 
+	private Time duration;// planed working time for this flexible task
 	
-	FlexibleTask(Time t,Time dayStart, Time dayEnd){
+	FlexibleTask(Time duration){
 		domain=new Domain();
-		estimatedTime=t;
-		this.dayStart=dayStart;
-		this.dayEnd=dayEnd;
+		this.duration= duration;
+		
 		taskId=Task.taskCount;
 		Task.increaseTaskCount();
 	}
@@ -47,24 +50,35 @@ class FlexibleTask extends Task{
 	int getTaskId(){
 		return taskId;
 	}
+	
+	Time getDuration(){
+		//System.out.println(" call at here Flexible Task ");
+		return duration;
+	}
 
-	void initializeDomainSet(Time step){
-		domain.initializeDomainSet(dayStart, dayEnd, estimatedTime, step);
+	void initializeDomainSet(Time dayStart,Time dayEnd, Time step){
+		domain.initializeDomainSet(dayStart, dayEnd, duration, step);
 		//System.out.println(" call at here flexible ");
 	}
 }
 
 class FixedTask extends Task{
 	private Time startTime;
-	private Time endTime; 
+	private Time endTime;
 	private int taskId; 
 	
 	FixedTask(Time s, Time e){
-		domain=new Domain();
-		startTime=s;
-		endTime=e;
-		taskId=Task.taskCount;
-		Task.increaseTaskCount();
+		if(s.compareTime(e) <0){
+			domain=new Domain();
+			startTime=s;
+			endTime=e;
+			taskId=Task.taskCount;
+			Task.increaseTaskCount();
+		}
+	}
+	
+	Time getDuration(){
+		return endTime.substractTime(startTime);
 	}
 	
 	int getTaskId(){

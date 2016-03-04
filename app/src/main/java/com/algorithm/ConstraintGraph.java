@@ -55,6 +55,18 @@ public class ConstraintGraph {
         graphMatrix[u][v]=1; // >0 indicating the edge is from u to v;
         graphMatrix[v][u]=-1;// <0 indicating the edge is from u to v;
     }
+    
+    void deleteConstraint(int u, int v, int weight){// delete edge u->v 
+    	AdjListNode node = new AdjListNode(v,weight);
+    	adj[u].remove(node);
+    	
+        undirectedAdj[u].remove(node);
+        undirectedAdj[v].remove(new AdjListNode(u,weight));
+        
+        arcs.remove(new Arc(u,v,weight));
+        graphMatrix[u][v]=0; 
+        graphMatrix[v][u]=0;
+    }
          
  /*
   * 

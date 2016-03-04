@@ -38,6 +38,20 @@ public class Time{
 		return time;
 	}
 	
+	// return t1-t2
+	Time substractTime(Time t2){
+		Time t1=this;
+		Time time =new Time(0,0);
+		if(t1.getMinute()>=t2.getMinute()){
+			time.setMinute( t1.getMinute()- t2.getMinute());
+		}
+		else{
+			time.setMinute( t1.getMinute()+60- t2.getMinute());
+			time.setHour(t1.getHour()-1-t2.getHour());
+		}
+		return time;
+	}
+	
 	/*
 	 * regard calling object time as t1, compare t1 with t
 	 * return -1 =>  t1<t

@@ -4,6 +4,10 @@ import java.util.*;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
+
+/*
+ *  TestJunit1 tests for Time.java, TimeSlice.java, Domain.java, Task.java
+ */
 public class TestJunit1 {   
 		
    @Test
@@ -12,7 +16,7 @@ public class TestJunit1 {
 	   int minute =30;
 	   Time time= new Time(hour,minute);
 	   
-	   System.out.println("Test Time Class: "); 
+	   System.out.println("TestJunit1 Result: "); 
 	   assertEquals(hour, time.getHour()); 
 	   assertEquals(minute, time.getMinute()); 
 	   
@@ -34,14 +38,16 @@ public class TestJunit1 {
 	   assertEquals(-1, t3.compareTime(t4)); // t2 < t4
 	   assertEquals(1, t4.compareTime(t3)); //  t4> t3  
 	   
+	   //test addTime
 	   Time t5=new Time(1,45);
 	   Time t6=new Time(1,15);
-	   assertEquals(3, t5.addTime(t6).getHour()); 
-	   assertEquals(0, t5.addTime(t6).getMinute()); 
-
+	   assertEquals(new Time(3,0),t5.addTime(t6));
 	   t6=new Time(2,10);
-	   assertEquals(3, t5.addTime(t6).getHour()); 
-	   assertEquals(55, t5.addTime(t6).getMinute()); 
+	   
+	   assertEquals(new Time(3,55),t5.addTime(t6));
+	   
+	   //test substractTime
+	   assertEquals(new Time(0,30),new Time(1,45).substractTime(new Time(1,15)));
 	   
 	   // test equal method 
 	   assertEquals(true, new Time(1,4).equals(new Time(1,4))); 
@@ -112,9 +118,11 @@ public class TestJunit1 {
 	   dayStart=new Time (0,0);// this is point in time instead of a duration 
 	   dayEnd=new Time (5,0);// this is point in time instead of a duration 
 	   step=new Time (1,0);
-	   Time time=new Time(2,0);// 1h and 10 minutes
-	   Task task1=new FlexibleTask(time,dayStart,dayEnd);
+	   Time duration=new Time(2,0);// 1h and 10 minutes
+	   Task task1=new FlexibleTask(duration);
 
+	   assertEquals(true,duration.equals(task1.getDuration()));
+	   
 	   Set<TimeSlice> domainSet1= new HashSet<TimeSlice>();
 	   domainSet1.clear();
 	   domainSet1.add(new TimeSlice(new Time(0,0),new Time(2,0),true));
@@ -122,18 +130,20 @@ public class TestJunit1 {
 	   domainSet1.add(new TimeSlice(new Time(1,0),new Time(3,0),true));
 	   domainSet1.add(new TimeSlice(new Time(3,0),new Time(5,0),true));
 		
-	   task1.initializeDomainSet(step);
+	   task1.initializeDomainSet(dayStart,dayEnd,step);
 	   Set<TimeSlice> domainSet2=task1.getDomainSet();
 	   assertEquals(true,domainSet1.containsAll(domainSet2) && domainSet2.containsAll(domainSet1));
-	  
+	   
 	   
 	   // test for FixedTask
 	   Task task2=new FixedTask(new Time (3,0),new Time (4,0));
+	   duration=new Time (4,0).substractTime(new Time (3,0));
+	   assertEquals(true,duration.equals(task2.getDuration()));
+	   
 	   task2.initializeDomainSet();
 	   domainSet2=task2.getDomainSet(); 
 	   domainSet1.clear();
 	   domainSet1.add(new TimeSlice(new Time(3,0),new Time(4,0),true));
-	   
 	   
 	   assertEquals(0,task1.getTaskId());
 	   assertEquals(1,task2.getTaskId());
