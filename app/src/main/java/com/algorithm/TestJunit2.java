@@ -14,8 +14,8 @@ public class TestJunit2 {
 	   public void testArc(){
 		   System.out.println("TestJunit2  Result: "); 
 		   Arc arc= new Arc(0,1,2);
-		   assertEquals(0, arc.getV()); 
-		   assertEquals(1, arc.getU()); 
+		   assertEquals(0, arc.getU()); 
+		   assertEquals(1, arc.getV()); 
 		   assertEquals(2, arc.getWeight()); 
 	   }
 	   

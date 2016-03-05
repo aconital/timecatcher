@@ -53,6 +53,10 @@ public class Time{
 		return time;
 	}
 	
+	String getTimeString(){
+		return ""+ hour+":"+minute;
+	}
+	
 	/*
 	 * regard calling object time as t1, compare t1 with t
 	 * return -1 =>  t1<t

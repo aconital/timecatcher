@@ -1,13 +1,17 @@
 package com.algorithm;
 
+
+/*
+ * directed Arc u->v
+ */
 public class Arc {
 	private int u;
 	private int v;
 	private int weight;
 	
-	Arc(int _v, int _u, int _weight){
-		v=_v;
+	Arc(int _u, int _v, int _weight){
 		u=_u;
+		v=_v;
 		weight=_weight;
 	}
 	

@@ -50,7 +50,7 @@ public class CSP {
 			System.out.println("not enough remaining woking time for this flexible task");
 		}
 	}
-		
+	
 	void addFixedTask(Time startTime,Time endTime){
 		if(startTime.compareTime(dayStart)<0 || endTime.compareTime(dayEnd)>0) return;
 		
@@ -95,6 +95,7 @@ public class CSP {
 	}
 	
 	//detect whether initial constraints conflict with each other 
+	// return true if conflict, otherwise false;
 	boolean isConstraintsConflict(){
 		return constraints.isCyclic();
 	}
@@ -112,35 +113,6 @@ public class CSP {
 	// used to return  matrix representation of constraint graph
 	int[][] getGraphMatrix(){
 		return constraints.getMatrix(); // this is a  reference reference to original object
-	}
-	
-	/*
-	 *  
-		//detect whether total working time exceed the planed working time 
-		boolean isWorkTimeExceed(){
-			Time start,end;
-			Task task;
-			int count=0;
-			start=new Time(dayStart);
-			end=new Time(dayEnd);
-			for (Integer key : taskMap.keySet()){
-				task=taskMap.get(key);
-				if(start.compareTime(end)<=0){
-					start=start.addTime(task.getDuration());
-					count++;
-				}
-				else{
-					break;
-				}
-			}//for
-			
-			if(count==taskMap.size()){
-				return false;// to much work,  planed work time is insufficient 
-			} 
-			else{
-				return true;// planed work time is sufficient 
-			}
-		}
-	*/	
+	}	
 }
 	

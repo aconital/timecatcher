@@ -27,6 +27,7 @@ public class Domain {
 	void initializeDomainSet(Time startTime,Time endTime){
 		domainSet.clear();
 		insertTimeSlice(startTime,endTime,true);
+		domainArrayList.clear();
 		domainArrayList=new ArrayList<TimeSlice>(domainSet);
 	}//function 
 	
@@ -54,6 +55,7 @@ public class Domain {
 			}//if
 			 //System.out.println("---------------------------------------------------------" );
 		}//for
+		domainArrayList.clear();
 		domainArrayList=new ArrayList<TimeSlice>(domainSet);
 	}//function	
 
