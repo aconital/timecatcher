@@ -10,6 +10,13 @@ public class Arc {
 		u=_u;
 		weight=_weight;
 	}
+	
+	Arc(Arc a){
+		v=a.getV();
+		u=a.getU();
+		weight=a.getWeight();
+	}
+	
 	int getV()	{ return v; }
 	int getU()  { return u; }
 	int getWeight()  {return weight;}

@@ -49,6 +49,8 @@ public class TestJunit1 {
 	   //test substractTime
 	   assertEquals(new Time(0,30),new Time(1,45).substractTime(new Time(1,15)));
 	   
+	   assertEquals(new Time(2,0),new Time(9,0).substractTime(new Time(7,0)));
+	   
 	   // test equal method 
 	   assertEquals(true, new Time(1,4).equals(new Time(1,4))); 
 	   assertEquals(false, new Time(2,4).equals(new Time(1,4))); 
@@ -148,6 +150,10 @@ public class TestJunit1 {
 	   assertEquals(0,task1.getTaskId());
 	   assertEquals(1,task2.getTaskId());
 	   assertEquals(2,Task.taskCount);
+	   
+	   // test for TaskCount
+	   Task.setTaskCount(10);
+	   assertEquals(10,Task.taskCount);   
    }
 }
 

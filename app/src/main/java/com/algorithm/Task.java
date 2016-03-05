@@ -7,11 +7,15 @@ import java.util.*;
  * 
  */
 public class Task {
-	public static int taskCount=0;// the number of task 
+	static int taskCount=0;// the number of task including both flexible and fixed task 
 	protected Domain domain;//a list of possible time slice 
 	
 	Task(){
 		domain=new Domain();
+	}
+	
+	static void setTaskCount(int cnt){
+		taskCount=cnt;
 	}
 	
 	protected static void increaseTaskCount(){
@@ -20,19 +24,20 @@ public class Task {
 	
 	Set<TimeSlice> getDomainSet(){
 		return domain.getDomainSet();
-		
 	}
-	int getTaskId(){return -1;}
+	
+	ArrayList<TimeSlice> getDomainArrayList(){
+		return domain.getDomainArrayList();
+	}
+	
+	int getTaskId(){return -1;}// overridden by subclass 
 	
 	Time getDuration(){
-		//System.out.println(" call at here Super Task ");
 		return new Time (0,0);
 	}
 	
-	void initializeDomainSet(Time dayStart,Time dayEnd, Time step) { 
-		//System.out.println(" call at here super Task ");
-	}
-	void initializeDomainSet(){}
+	void initializeDomainSet(Time dayStart,Time dayEnd, Time step) {}// overridden by subclass
+	void initializeDomainSet(){}// overridden by subclass	
 }
 
 class FlexibleTask extends Task{
@@ -52,14 +57,12 @@ class FlexibleTask extends Task{
 	}
 	
 	Time getDuration(){
-		//System.out.println(" call at here Flexible Task ");
 		return duration;
 	}
 
 	void initializeDomainSet(Time dayStart,Time dayEnd, Time step){
 		domain.initializeDomainSet(dayStart, dayEnd, duration, step);
-		//System.out.println(" call at here flexible ");
-	}
+	}	
 }
 
 class FixedTask extends Task{
@@ -86,7 +89,7 @@ class FixedTask extends Task{
 	}
 	void initializeDomainSet(){
 		domain.initializeDomainSet(startTime, endTime);
-	}
+	}	
 }
 
 

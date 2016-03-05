@@ -5,7 +5,7 @@ import com.algorithm.TimeSlice;
 
 public class Domain {
 	private Set<TimeSlice> domainSet;//a set of possible time slice 
-	
+	private ArrayList<TimeSlice> domainArrayList;//  possible time slice stored in an array list
 	Domain(){
 		domainSet= new HashSet<TimeSlice>();
 	}
@@ -14,18 +14,21 @@ public class Domain {
 		return domainSet;
 	}
 	
+	ArrayList<TimeSlice> getDomainArrayList(){
+		return domainArrayList;
+	}
+	
 	private void insertTimeSlice (Time start,Time end,boolean available){
 		TimeSlice slice= new TimeSlice(start,end,available);
 		domainSet.add(slice);	
 	}//function 
 	
-	
 	//for fixed task domain initialization 
 	void initializeDomainSet(Time startTime,Time endTime){
 		domainSet.clear();
 		insertTimeSlice(startTime,endTime,true);
+		domainArrayList=new ArrayList<TimeSlice>(domainSet);
 	}//function 
-	
 	
 	//for flexible task domain initialization 
 	void initializeDomainSet(Time dayStart, Time dayEnd,Time duration,Time step){
@@ -51,6 +54,35 @@ public class Domain {
 			}//if
 			 //System.out.println("---------------------------------------------------------" );
 		}//for
+		domainArrayList=new ArrayList<TimeSlice>(domainSet);
 	}//function	
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((domainSet == null) ? 0 : domainSet.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final Domain other = (Domain) obj;
+		if (domainSet == null) {
+			if (other.domainSet != null)
+				return false;
+		} else if (!domainSet.equals(other.domainSet))
+			return false;
+		return true;
+	}
+	
+	
 }
 

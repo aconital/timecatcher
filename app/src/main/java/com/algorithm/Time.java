@@ -44,6 +44,7 @@ public class Time{
 		Time time =new Time(0,0);
 		if(t1.getMinute()>=t2.getMinute()){
 			time.setMinute( t1.getMinute()- t2.getMinute());
+			time.setHour(t1.getHour()-t2.getHour());
 		}
 		else{
 			time.setMinute( t1.getMinute()+60- t2.getMinute());

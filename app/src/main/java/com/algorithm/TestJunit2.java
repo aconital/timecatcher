@@ -7,7 +7,7 @@ import static org.junit.Assert.assertEquals;
 
 
 /*
- *  TestJunit2 test2 for  Arc.java, AdjListNode.java, ConstraintGraph.java
+ *  TestJunit2 tests for  Arc.java, AdjListNode.java, ConstraintGraph.java
  */
 public class TestJunit2 {
 	   @Test
@@ -42,7 +42,7 @@ public class TestJunit2 {
 		   graph.addConstraint(0,2,0);// 0->2
 		    
 		   /*
-		    * test for adj, undirectedAdj,arcs,graphMatrix
+		    * test for addConstraint()  and realted vairalbes adj, undirectedAdj,arcs,graphMatrix
 		    */
 		   LinkedList<AdjListNode> adj[];// adjacency list used to store this  graph as directed one 
 		   LinkedList<AdjListNode> undirectedAdj[];// adjacency list used to store this graph as undirected one
@@ -79,23 +79,46 @@ public class TestJunit2 {
 	        for(int i=0;i<vertexCnt;i++){
 	        	assertEquals(true,adj[i].equals(graph.getAdjcentList()[i]));
 		        assertEquals(true,undirectedAdj[i].equals(graph.getUndirectedAdjcentList()[i]));
-		        
 	        }//for
 	        assertEquals(true,arcs.equals(graph.getArcs()));
-	        
 	        for(int i=0; i<vertexCnt;i++){
 	        	for(int j=0; j<vertexCnt;j++){
 	        		assertEquals(graphMatrix[i][j],graph.getMatrix()[i][j]);
 	        		//System.out.print("   "+graphMatrix[i][j]+", ");
 	        	}//for
 	        	//System.out.println("");
-	        }//for  
+	        }//for 
+	        
+	        
+	     // delete edge 0->1
+	        adj[0].remove(new AdjListNode(1,0));// remove vertex 1 to 0's Linked List
+	        undirectedAdj[0].remove(new AdjListNode(1,0));
+	        undirectedAdj[1].remove(new AdjListNode(0,0));
+	        arcs.remove(new Arc(0,1,0));
+	        graphMatrix[0][1]=0;
+	        graphMatrix[1][0]=0;
+	        
+	        graph.deleteConstraint(0, 1, 0);
+	        for(int i=0;i<vertexCnt;i++){
+	        	assertEquals(true,adj[i].equals(graph.getAdjcentList()[i]));
+		        assertEquals(true,undirectedAdj[i].equals(graph.getUndirectedAdjcentList()[i]));
+	        }//for
+	        assertEquals(true,arcs.equals(graph.getArcs()));
+	        for(int i=0; i<vertexCnt;i++){
+	        	for(int j=0; j<vertexCnt;j++){
+	        		assertEquals(graphMatrix[i][j],graph.getMatrix()[i][j]);
+	        		//System.out.print("   "+graphMatrix[i][j]+", ");
+	        	}//for
+	        	//System.out.println("");
+	        }//for 
+	        
 	        
 	      /*
 	       * test for isCyclic() & GetTopologicalSort()
 	       */
+	      graph.addConstraint(0,1,0);// add edge 0->1
 	      assertEquals(false,graph.isCyclic());//has no cycle 
-	      int []vertexList={0,2,1};
+	      int []vertexList={0,1,2};
 	      //System.out.println(Arrays.toString(graph.GetTopologicalSort()));
 	      assertEquals(true,Arrays.equals(vertexList,graph.GetTopologicalSort()));  
 	      

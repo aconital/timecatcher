@@ -11,24 +11,28 @@ public class CSP {
 	private HashMap<Integer, Task> taskMap;// <taskId, task>
 	private Time dayStart;
 	private Time dayEnd;
-	private Time accumulatedTime;//used to track accumulated working time point
+	private Time accumulatedTime;//used to trace accumulated working time point
 
-	
 	CSP(Time dayStart,Time dayEnd){
 		this.dayStart=dayStart;
 		this.dayEnd=dayEnd;
 		accumulatedTime=new Time(dayStart);
+		taskMap=new HashMap<Integer, Task>();
 	}
 		
 	void setConstraints(ConstraintGraph c) {constraints = c;}
 	ConstraintGraph getConstraints() { return constraints;}
 	
-	void setTask(HashMap<Integer, Task> t)	{taskMap=t;}
-	HashMap<Integer, Task> getTask() {return taskMap; }
+	void setTaskMap(HashMap<Integer, Task> t)	{taskMap=t;}
+	HashMap<Integer, Task> getTaskMap() {return taskMap; }
+	
+	Time getDayStart() {return dayStart;}
+	Time getDayEnd() {return dayEnd;}
+	Time getAccumulatedTime(){return accumulatedTime;}
 	
 	int getTaskCount(){
 		if(taskMap.size()!=0){
-			return Task.taskCount;
+			return taskMap.size();
 		}
 		else{
 			return 0;
@@ -43,12 +47,15 @@ public class CSP {
 			taskMap.put(task.getTaskId(),task);// (id, task)
 		}
 		else{
-			System.out.println("not enough remaining woking time this task");
+			System.out.println("not enough remaining woking time for this flexible task");
 		}
 	}
 		
 	void addFixedTask(Time startTime,Time endTime){
+		if(startTime.compareTime(dayStart)<0 || endTime.compareTime(dayEnd)>0) return;
+		
 		Time duration= endTime.substractTime(startTime);
+		//System.out.println("duration: "+duration.getHour()+ ":"+ duration.getMinute());
 		// if the remaining working time is sufficient for this duration
 		if(accumulatedTime.addTime(duration).compareTime(dayEnd) <=0){
 			accumulatedTime=accumulatedTime.addTime(duration);
@@ -56,26 +63,23 @@ public class CSP {
 			taskMap.put(task.getTaskId(),task);// (id, task)
 		}
 		else{
-			System.out.println("not enough remaining woking time this task");
+			System.out.println("not enough remaining woking time for this  fixed task");
 		}
-	}
-	
-	void deleteTask(int taskId){
-		Task task;
-		if(taskMap.get(taskId) !=null){
-			task=taskMap.get(taskId);
-			accumulatedTime=accumulatedTime.addTime(task.getDuration());
-			taskMap.remove(taskId);
-		}
-		else{
-			System.out.println("this task doesn't exist");
-		}		
 	}
 	
 	/*
-	 * all constraint related  methods must be called after 
-	 * addFlexibleTask & addFixedTask & deleteTask methods;
-	 * if a task is deleted  of added,then applicable constraint  methods must be called 
+	 * Only provide delete All Tasks method and do not provide delete a task method
+	 */	
+	void deleteAllTasks(){
+		accumulatedTime=new Time(dayStart);
+		Task.setTaskCount(0);
+		taskMap.clear();
+	}
+	
+	/*
+	 * if deleteAllTasks() method are called, then createConstraintGraph() method must be called after that;  
+	 * only when the number of tasks are determinate, then you can try to create constraint graph
+	 * and add or delete constraints 
 	 */
 
 	void createConstraintGraph(){
@@ -90,36 +94,6 @@ public class CSP {
 		constraints.deleteConstraint(id1, id2, weight);
 	}
 	
-/*
- * 
- 
-	//detect whether total working time exceed the planed working time 
-	boolean isWorkTimeExceed(){
-		Time start,end;
-		Task task;
-		int count=0;
-		start=new Time(dayStart);
-		end=new Time(dayEnd);
-		for (Integer key : taskMap.keySet()){
-			task=taskMap.get(key);
-			if(start.compareTime(end)<=0){
-				start=start.addTime(task.getDuration());
-				count++;
-			}
-			else{
-				break;
-			}
-		}//for
-		
-		if(count==taskMap.size()){
-			return false;// to much work,  planed work time is insufficient 
-		} 
-		else{
-			return true;// planed work time is sufficient 
-		}
-	}
-*/	
-	
 	//detect whether initial constraints conflict with each other 
 	boolean isConstraintsConflict(){
 		return constraints.isCyclic();
@@ -127,17 +101,46 @@ public class CSP {
 	
 	// adjacency list used to return constraint graph as undirected one
 	LinkedList<AdjListNode>[] getUndirectedAdjList(){
-		return constraints.getUndirectedAdjcentList(); // reference to original object
+		return constraints.getUndirectedAdjcentList(); // this is a  reference to original object
 	}
 	
 	// used to return all the directed arcs of the constraint graph
 	LinkedList<Arc> getConstraintArcs(){
-		return constraints.getArcs(); // reference to original object
+		return constraints.getArcs(); //this is a  reference reference to original object
 	}
 	
 	// used to return  matrix representation of constraint graph
 	int[][] getGraphMatrix(){
-		return constraints.getMatrix(); // reference to original object
+		return constraints.getMatrix(); // this is a  reference reference to original object
 	}
+	
+	/*
+	 *  
+		//detect whether total working time exceed the planed working time 
+		boolean isWorkTimeExceed(){
+			Time start,end;
+			Task task;
+			int count=0;
+			start=new Time(dayStart);
+			end=new Time(dayEnd);
+			for (Integer key : taskMap.keySet()){
+				task=taskMap.get(key);
+				if(start.compareTime(end)<=0){
+					start=start.addTime(task.getDuration());
+					count++;
+				}
+				else{
+					break;
+				}
+			}//for
+			
+			if(count==taskMap.size()){
+				return false;// to much work,  planed work time is insufficient 
+			} 
+			else{
+				return true;// planed work time is sufficient 
+			}
+		}
+	*/	
 }
 	

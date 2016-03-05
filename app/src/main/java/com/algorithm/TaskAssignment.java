@@ -2,13 +2,11 @@ package com.algorithm;
 
 public class TaskAssignment {
 	private TimeSlice assignment;// specific assigned TimeSlice for current task 
-	private int taskIdentifier;// identifier of each task
-	
-	TaskAssignment(){}
+	private int taskId;// identifier of each task
 	
 	TaskAssignment(TimeSlice assign,int id){
 		assignment=assign;
-		taskIdentifier=id;
+		taskId=id;
 	}
 	
 	void setAssignment(TimeSlice assign){
@@ -16,7 +14,7 @@ public class TaskAssignment {
 	}
 	
 	void setTaskIdentifier(int id){
-		taskIdentifier=id;
+		taskId=id;
 	}
 	
 	TimeSlice getAssignment(){
@@ -24,7 +22,7 @@ public class TaskAssignment {
 	}
 	
 	int getTaskIdentifier(){
-		return taskIdentifier;
+		return taskId;
 	}
 	
 }
