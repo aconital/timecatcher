@@ -162,9 +162,7 @@ public class CSP_Solver  {
 		int id=traverseOrder[count];//except topological sort, we can have other choose strategies regarding which variable should be considered next 
 		ArrayList<TimeSlice> domainArrayList=taskMap.get(id).getDomainArrayList();
 		
-		for(int i=0;i< domainArrayList.size() 
-			&& domainArrayList.get(i).getAvailable();
-			i++ ){
+		for(int i=0;i< domainArrayList.size() && domainArrayList.get(i).getAvailable();i++ ){
 			TimeSlice slice=domainArrayList.get(i);
 			if(assignment.size()<=count){
 				assignment.add(new TaskAssignment(id,slice));

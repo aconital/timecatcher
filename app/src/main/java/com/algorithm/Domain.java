@@ -8,6 +8,7 @@ public class Domain {
 	private ArrayList<TimeSlice> domainArrayList;//  possible time slice stored in an array list
 	Domain(){
 		domainSet= new HashSet<TimeSlice>();
+		domainArrayList=new ArrayList<TimeSlice>();
 	}
 	
 	Set<TimeSlice> getDomainSet(){
