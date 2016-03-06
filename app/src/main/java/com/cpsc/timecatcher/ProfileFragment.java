@@ -79,6 +79,9 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
+
+
+
             }
 
         });
@@ -90,9 +93,6 @@ public class ProfileFragment extends Fragment {
                 if(ParseUser.getCurrentUser()==null){
                     mListener.onUserLogOut();
                 }
-
-
-
             }
         });
 
