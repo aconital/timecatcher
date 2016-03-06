@@ -83,7 +83,6 @@ class FixedTask extends Task{
 	Time getDuration(){
 		return endTime.substractTime(startTime);
 	}
-	
 	int getTaskId(){
 		return taskId;
 	}

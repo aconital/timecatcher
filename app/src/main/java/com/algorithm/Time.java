@@ -54,7 +54,12 @@ public class Time{
 	}
 	
 	String getTimeString(){
-		return ""+ hour+":"+minute;
+		if(minute == 0){
+			return ""+ hour+":"+"00";
+		}
+		else{
+			return ""+ hour+":"+minute;
+		}
 	}
 	
 	/*

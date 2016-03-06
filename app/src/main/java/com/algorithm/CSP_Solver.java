@@ -1,11 +1,13 @@
 package com.algorithm;
 
-import java.util.*;
-
-import com.algorithm.ConstraintGraph;
-import com.algorithm.Task;
-import com.algorithm.Arc;
-import com.algorithm.AdjListNode;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 
 public class CSP_Solver  {
 	private CSP problem;
@@ -103,9 +105,9 @@ public class CSP_Solver  {
 			}//for
 		}//for
 		return inconsistent;
-	}//method 
-	
-	
+	}//method
+
+
 	/*
 	 * input argument q is a list of arcs say from u to v,where v has got an assignment and u haven't 
 	 * check constraint from u to v 
@@ -150,14 +152,12 @@ public class CSP_Solver  {
 			boolean unavailable=true;	
 			if(graphMatrix[u][v] >0){// edge is u->v 
 				if(timeSliceOfU.isBefore(timeSliceOfV)){// there exists at least one timeSliceOfV making timeSliceOfU can keep staying in domainU as available  
-					unavailable=false;// found a timeSliceOfV making  timeSliceOfU available 
-					break;
+					unavailable=false;// found a timeSliceOfV making  timeSliceOfU available
 				}//if
 			}
 			else{// edge is v->u 
 				if(timeSliceOfV.isBefore(timeSliceOfU)){// there exists at least one timeSliceOfV making timeSliceOfU can keep staying in domainU as available  
-					unavailable=false;// found a timeSliceOfV making  timeSliceOfU available 
-					break;
+					unavailable=false;// found a timeSliceOfV making  timeSliceOfU available
 				}//if
 			}//if
 			if(unavailable==true){
@@ -214,7 +214,8 @@ public class CSP_Solver  {
 				domainArrayList.get(i).setAvailable(true); // making sure this  setting is on the original domain of the task instead of the copy one
 			}//for
 		}//for
-	}//method 
+	}//method
+
 	/*
 	 * this method is used to initialize domain for all tasks based on given step 
 	 */
@@ -230,7 +231,33 @@ public class CSP_Solver  {
 			}
 		}//for 
 	}
-	
+
+	/*
+	 * return true if any two fixed task overlap with each other
+	 *
+	 */
+
+	boolean isFixedTaskOverlap(){
+		ArrayList<TimeSlice> sliceArrayList=new ArrayList<TimeSlice>();
+		Set<Integer> fixedTaskIdSet=problem.getFlexibleTaskIdSet();
+
+		for(Integer id: fixedTaskIdSet){
+			TimeSlice slice=taskMap.get(id).getDomainArrayList().get(0);
+			sliceArrayList.add(slice);
+		}
+		//Ascending order
+		Collections.sort(sliceArrayList);
+
+		for(int i=0;i<sliceArrayList.size()-1;i++){
+			TimeSlice slice1,slice2;
+			slice1=sliceArrayList.get(i);
+			slice2=sliceArrayList.get(i+1);
+			if(slice1.isOverlap(slice2)==true ){
+				return true;
+			}
+		}//for
+		return true;
+	}
 	/*
 	 * this method is used to mark time slices in domains of flexible tasks that overlap with that of Fixed Tasks;
 	 * this method should be called after method domainInitializationForAllTasks(step)  
@@ -257,7 +284,7 @@ public class CSP_Solver  {
 	}
 		
 	/*
-	 * search one possible solutions for the under given traverseOrder
+	 * search one possible solutions for the given traverseOrder
 	 */
 	boolean  searchSolutions(int count,int [] traverseOrder,HashMap<Integer, Boolean> visited){
 		if(count == taskCount){// one set of task time slice assignment is complete
@@ -299,13 +326,15 @@ public class CSP_Solver  {
 		}//for
 		return false;
 	}//method 
-	
 
-	
+
 	/*
 	 * this method return  a final solution of  possible schedule 
 	 */
 	List<ArrayList<TaskAssignment> > getSolutions(){
+		if(isFixedTaskOverlap()==true){
+			return solutions;
+		}
 		// other traverse order is also possible, should consider in the future
 		int[] traverseOrder=constraints.GetTopologicalSort();
 		if(traverseOrder == null){//constraint graph has graph, cannot get TopologicalSort
@@ -348,8 +377,8 @@ public class CSP_Solver  {
 			ArrayList<TaskAssignment> AssignList=it.next();
 			for(int i=0; i<Task.taskCount;i++){
 				TaskAssignment assign =AssignList.get(i);
-				System.out.println("   "+ assign.getTaskId()+ "         "+assign.getAssignment().getStartTime().getTimeString()
-						+"	   "+ assign.getAssignment().getEndTime().getTimeString());
+				System.out.println("   "+ assign.getTaskId()+ "		 "+assign.getAssignment().getStartTime().getTimeString()
+						+"	  		 "+ assign.getAssignment().getEndTime().getTimeString());
 			}
 			System.out.println("-------------------------------------------");
 		}//while

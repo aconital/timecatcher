@@ -45,8 +45,7 @@ public class CSP_SolverTest {
     }
     @Test
     public void testPrintSolutions() throws Exception {
-        assertEquals(4, 2 + 2);
-        if(false == problem.isConstraintsConflict()){// constraints not conflict
+        if(false == problem.isConstraintsConflict()){// constraints are not conflict
             CSP_Solver solver= new CSP_Solver(problem);
             solutions=solver.getSolutions();
             solver.printSolutions();
