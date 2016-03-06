@@ -21,7 +21,8 @@ public class StructureActivity extends AppCompatActivity
         implements ScheduleFragment.OnFragmentInteractionListener,
         NewTaskFragment.OnFragmentInteractionListener,
         CalendarFragment.OnFragmentInteractionListener,
-        TasklistFragment.OnFragmentInteractionListener{
+        TasklistFragment.OnFragmentInteractionListener,
+        ProfileFragment.OnFragmentInteractionListener{
 
     private Button schedule,calendar,analytics,profile;
 
@@ -100,6 +101,13 @@ public class StructureActivity extends AppCompatActivity
                 .replace(R.id.frame_container, scheduleFragment).commit();
 
     }
+
+    public void onUserLogOut(){
+        Fragment ParseLoginFragment=new com.parse.ui.ParseLoginFragment();
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
+        .replace(R.id.frame_container, ParseLoginFragment).commit();
+    }
+
     public void addTask(long date)
     {
         Fragment scheduleFragment=NewTaskFragment.newInstance(date);

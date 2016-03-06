@@ -76,6 +76,6 @@
     </string-array>
 
     <string name="push_notification">Notification</string>
-    <string name="invitation">Send Invitation</string>
+    <string name="invitation">SEND INVITATION</string>
 
 </resources>
