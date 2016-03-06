@@ -81,7 +81,16 @@ public class StructureActivity extends AppCompatActivity
             }
         });*/
         profile=(Button)findViewById(R.id.profile);
-
+        profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment f = getSupportFragmentManager().findFragmentById(R.id.frame_container);
+                if (!(f instanceof ProfileFragment)) {
+                    Fragment profileFragment = new ProfileFragment();
+                    launchFragment(profileFragment, Constants.PROFILE_TAG);
+                }
+            }
+        });
 
     }
 
