@@ -37,7 +37,7 @@ public class CSP_Solver  {
 	 * input argument q is a list of arcs need to check  
 	 * return a hash map recording indices of new unavailable time slice in domain of each considered task
 	 */
-	HashMap<Integer, Set<Integer> > constraintConsistencyCheck(LinkedList<Arc> q){
+	HashMap<Integer, Set<Integer> > constraintConsistencyCheck(LinkedList<Arc> q,HashMap<Integer, Boolean> visited){
 		LinkedList<Arc> queue=new LinkedList<Arc>(q); 
 		Arc edge;
 		// <task id, indices of new unavailable time slice in domain of corresponding task >
@@ -46,16 +46,22 @@ public class CSP_Solver  {
 			int u,v;
 			u=edge.getU();
 			v=edge.getV();	
+			if(visited.get(v) == true){//indicate task v has already assigned, do not need to be considered 
+				queue.remove();//remove the first element of this list 
+				continue; 
+			}
+				
 			Set<Integer> domainChangedSet = new HashSet<Integer>();
-			
 			// edges's direction can be u->v or v->u
 			// check from u to v  and mark inconsistent domain value of vertex u 
 			if(markInconsistentValues(u, v,domainChangedSet)==true){
 				taskDomainChangedSet.put(u, domainChangedSet);
 				LinkedList<AdjListNode> vertexList=undirectedAdj[u];
 				ListIterator<AdjListNode> it = vertexList.listIterator();
-				while(it.hasNext()){
+				while(it.hasNext()){// explore adjacent vertex/task 
 					int v1=it.next().getVertex();
+					if(visited.get(v1) == true)//indicate task v1 has already assigned, do not need to be considered 
+						continue; 
 					queue.add(new Arc(v1 , u, 0));
 				}//while
 			}//if
@@ -132,7 +138,7 @@ public class CSP_Solver  {
 	HashMap<Integer, Set<Integer>> updateRelatedDomainMark(int id, HashMap<Integer, Boolean> visited){
 		LinkedList<Arc> queue;
 		queue=getRelatedArcs(id,visited);
-		return  constraintConsistencyCheck(queue);// return task DomainChanged Set
+		return  constraintConsistencyCheck(queue,visited);// return task DomainChanged Set
 	}//method 
 	
 	/*
@@ -150,6 +156,47 @@ public class CSP_Solver  {
 		}//for
 	}//method 
 	
+	/*
+	 * this method is used to initialize domain for all tasks based on given step 
+	 */
+	void domainInitializationForAllTasks(Time step){
+		//HashMap<Integer, Task> taskMap;// <indetifier, task>
+		for (Integer key : taskMap.keySet()){
+			Task task=taskMap.get(key);
+			if(task instanceof FlexibleTask){
+				task.initializeDomainSet(problem.getDayStart(), problem.getDayEnd(), step);
+			}
+			else{// FixedTask 
+				task.initializeDomainSet();
+			}
+		}//for 
+	}
+	
+	/*
+	 * this method is used to mark time slices in domains of flexible tasks that overlap with that of Fixed Tasks;
+	 * this method should be called after method domainInitializationForAllTasks(step)  
+	 */
+	void markOverlappingDomain(){
+		Set<Integer> fixedTaskIdSet;
+		Set<Integer> flexibleTaskIdSet;
+		fixedTaskIdSet=problem.getFixedTaskIdSet();
+		flexibleTaskIdSet=problem.getFlexibleTaskIdSet();
+		ArrayList<TimeSlice> domain2;
+		
+		for(Integer id1: fixedTaskIdSet){
+			TimeSlice slice1=taskMap.get(id1).getDomainArrayList().get(0);// fixed task only has one domain variable
+			for(Integer id2: flexibleTaskIdSet){
+				domain2=taskMap.get(id2).getDomainArrayList();
+				for(int i=0;i<domain2.size();i++){
+					TimeSlice slice2=domain2.get(i);
+					if(slice1.isOverlap(slice2)){//overlap 
+						slice2.setAvailable(false);
+					}
+				}//for
+			}//for
+		}//for
+	}
+		
 	/*
 	 * search one possible solutions for the under given traverseOrder
 	 */
@@ -193,21 +240,7 @@ public class CSP_Solver  {
 		return false;
 	}//method 
 	
-	/*
-	 * this method is used to initialize domain for all tasks based on given step 
-	 */
-	void domainInitializationForAllTasks(Time step){
-		//HashMap<Integer, Task> taskMap;// <indetifier, task>
-		for (Integer key : taskMap.keySet()){
-			Task task=taskMap.get(key);
-			if(task instanceof FlexibleTask){
-				task.initializeDomainSet(problem.getDayStart(), problem.getDayEnd(), step);
-			}
-			else{// FixedTask 
-				task.initializeDomainSet();
-			}
-		}//for 
-	}
+
 	
 	/*
 	 * this method return  a final solution of  possible schedule 
@@ -233,7 +266,8 @@ public class CSP_Solver  {
 		
 		for(Time step: stepList){
 			domainInitializationForAllTasks(step);
-			constraintConsistencyCheck(arcs);// preprocess the domain constraints 
+			markOverlappingDomain();
+			constraintConsistencyCheck(arcs,visited);// preprocess the domain constraints 
 			if(true == searchSolutions(0,traverseOrder,visited)){
 				return solutions;
 			}			

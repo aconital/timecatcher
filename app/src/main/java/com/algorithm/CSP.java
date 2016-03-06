@@ -12,12 +12,16 @@ public class CSP {
 	private Time dayStart;
 	private Time dayEnd;
 	private Time accumulatedTime;//used to trace accumulated working time point
-
+	private Set<Integer> fixedTaskIdSet;
+	private Set<Integer> flexibleTaskIdSet;
+	
 	CSP(Time dayStart,Time dayEnd){
 		this.dayStart=dayStart;
 		this.dayEnd=dayEnd;
 		accumulatedTime=new Time(dayStart);
 		taskMap=new HashMap<Integer, Task>();
+		fixedTaskIdSet =new HashSet<Integer>();
+		flexibleTaskIdSet =new HashSet<Integer>();
 	}
 		
 	void setConstraints(ConstraintGraph c) {constraints = c;}
@@ -29,6 +33,14 @@ public class CSP {
 	Time getDayStart() {return dayStart;}
 	Time getDayEnd() {return dayEnd;}
 	Time getAccumulatedTime(){return accumulatedTime;}
+	
+	Set<Integer> getFixedTaskIdSet(){
+		return fixedTaskIdSet;
+	}
+	
+	Set<Integer> getFlexibleTaskIdSet(){
+		return flexibleTaskIdSet;
+	}
 	
 	int getTaskCount(){
 		if(taskMap.size()!=0){
@@ -45,6 +57,7 @@ public class CSP {
 			accumulatedTime=accumulatedTime.addTime(duration);
 			Task task=new FlexibleTask(duration);
 			taskMap.put(task.getTaskId(),task);// (id, task)
+			flexibleTaskIdSet.add(task.getTaskId());
 		}
 		else{
 			System.out.println("not enough remaining woking time for this flexible task");
@@ -61,6 +74,7 @@ public class CSP {
 			accumulatedTime=accumulatedTime.addTime(duration);
 			Task task=new FixedTask(startTime,endTime);
 			taskMap.put(task.getTaskId(),task);// (id, task)
+			fixedTaskIdSet.add(task.getTaskId());
 		}
 		else{
 			System.out.println("not enough remaining woking time for this  fixed task");

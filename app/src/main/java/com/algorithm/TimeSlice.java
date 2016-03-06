@@ -47,6 +47,20 @@ public class TimeSlice{
 			return false;
 		}
 	}
+	
+	/*
+	 * check if calling object timeSlice slice1  overlap  with slice
+	 * result true  => overlapping 
+	 * return false => separate  
+	 */
+	boolean isOverlap(TimeSlice slice){
+		if(this.isBefore(slice) || slice.isBefore(this)){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
 
 	@Override
 	public int hashCode() {
