@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -204,7 +203,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
 
         calendar.setTime(date);
         dateTextView.setText(dateFormat.format(calendar.getTime()));
-        
+
         // initialize spinner items
         ArrayAdapter<CharSequence> totalTimeHourAdapter = ArrayAdapter.createFromResource(
                 getActivity().getBaseContext(),
@@ -272,13 +271,6 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                     public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
                         c.set(Calendar.HOUR_OF_DAY, selectedHour);
                         c.set(Calendar.MINUTE, selectedMinute);
-                        if (NewTaskFragment.this.endTime != null) {
-                            if (NewTaskFragment.this.endTime.before(c.getTime())) {
-                                // endTime < startTime!
-                                // silent fail the change
-                                return;
-                            }
-                        }
                         NewTaskFragment.this.startTime = c.getTime();
                         startTime.setText(timeFormat.format(c.getTime()));
                     }
@@ -301,13 +293,6 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                     public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
                         c.set(Calendar.HOUR_OF_DAY, selectedHour);
                         c.set(Calendar.MINUTE, selectedMinute);
-                        if (NewTaskFragment.this.startTime != null) {
-                            if (NewTaskFragment.this.startTime.after(c.getTime())) {
-                                // startTime > endTime !
-                                // silent fail the change
-                                return;
-                            }
-                        }
                         NewTaskFragment.this.endTime = c.getTime();
                         endTime.setText(timeFormat.format(c.getTime()));
                     }
@@ -378,6 +363,14 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                                 Log.d(Constants.NEW_TASK_TAG, "# tasks with same name: " + objects.size());
                                 if (objects.size() > 0 && !newDate) {
                                     title.setError("Already have a task with the same name!");
+                                } else if (NewTaskFragment.this.endTime.before(
+                                        NewTaskFragment.this.startTime
+                                )){
+                                    new AlertDialog.Builder(getContext())
+                                            .setTitle("Error")
+                                            .setMessage("Start time cannot be after end time!")
+                                            .setIcon(android.R.drawable.ic_dialog_alert)
+                                            .show();
                                 } else {
                                     task = new Task();
                                     saveButton.setEnabled(false);
