@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.cpsc.timecatcher.helper.Constants;
 import com.cpsc.timecatcher.R;
 import com.cpsc.timecatcher.model.Constraint;
+import com.parse.ParseException;
 
 import java.util.List;
 
@@ -51,7 +52,12 @@ public class ConstraintAdapter extends ArrayAdapter<Constraint> {
                     break;
             }
             operatorTextView.setText(operatorText);
-            otherTaskTextView.setText(constraint.getOther().getTitle());
+            try {
+                otherTaskTextView.setText(constraint.getOther().getTitle());
+            } catch (ParseException e) {
+                Log.e(Constants.NEW_CONSTRAINT_TAG, "Invalid state: Other cannot be found! " );
+                Log.e(Constants.NEW_CONSTRAINT_TAG, e.getLocalizedMessage());
+            }
 
             constraintDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -61,7 +67,7 @@ public class ConstraintAdapter extends ArrayAdapter<Constraint> {
                 }
             });
         } else {
-            Log.w(Constants.NEW_TASK_TAG, "Constraint was null");
+            Log.w(Constants.NEW_EDIT_TASK_TAG, "Constraint was null");
         }
         return v;
     }

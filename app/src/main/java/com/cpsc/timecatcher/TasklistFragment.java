@@ -67,7 +67,7 @@ public class TasklistFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                Fragment scheduleFragment=NewTaskFragment.newInstance(longDate);
+                Fragment scheduleFragment= NewEditTaskFragment.newInstance(longDate);
                 getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
                         .replace(R.id.frame_container, scheduleFragment).commit();
 

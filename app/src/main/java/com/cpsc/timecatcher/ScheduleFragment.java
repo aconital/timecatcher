@@ -1,7 +1,6 @@
 package com.cpsc.timecatcher;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -25,8 +24,6 @@ import com.parse.ParseUser;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -88,7 +85,7 @@ public class ScheduleFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                Fragment scheduleFragment=NewTaskFragment.newInstance(longDate);
+                Fragment scheduleFragment= NewEditTaskFragment.newInstance(longDate);
                 getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
                         .replace(R.id.frame_container, scheduleFragment).commit();
 
