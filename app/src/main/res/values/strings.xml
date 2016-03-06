@@ -12,12 +12,13 @@
 
     <!-- NEW TASK -->
     <string name="new_task_title">New Task</string>
+    <string name="edit_task_title">Edit Task</string>
     <string name="new_task_name">Name:</string>
     <string name="new_task_description">Description:</string>
     <string name="new_task_category">Categories:</string>
     <string name="new_task_TotalTime">Total Time:</string>
     <string name="new_task_category_hint">Pick all that apply</string>
-    <string name="new_task_fixed">Fixed Task</string>
+    <string name="new_task_fixed">Fixed</string>
 
     <string name="new_task_start_time_label">From: </string>
     <string name="new_task_end_time_label">To: </string>
@@ -26,7 +27,7 @@
     <string name="start_time_button">Change</string>
     <string name="end_time_button">Change</string>
 
-    <string name="new_task_save_button">Create Task</string>
+    <string name="new_task_save_button">Save</string>
     <string name="new_task_name_hint">Gym, Homework etc.</string>
     <string name="new_task_description_hint">Add a short description</string>
 
@@ -63,11 +64,17 @@
 
     <string-array name="set_time_minutes">
         <item>0</item>
+        <item>5</item>
         <item>10</item>
         <item>15</item>
+        <item>20</item>
+        <item>25</item>
         <item>30</item>
+        <item>35</item>
+        <item>40</item>
         <item>45</item>
         <item>50</item>
+        <item>55</item>
     </string-array>
 
     <string-array name="constraint_order">

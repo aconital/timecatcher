@@ -1,6 +1,7 @@
 package com.cpsc.timecatcher.model;
 
 import com.parse.ParseClassName;
+import com.parse.ParseException;
 import com.parse.ParseObject;
 
 /**
@@ -19,8 +20,8 @@ public class Constraint extends ParseObject {
         put("operator", operator.toString());
     }
 
-    public Task getOther() {
-        return (Task) getParseObject("other");
+    public Task getOther() throws ParseException{
+        return (Task) getParseObject("other").fetchIfNeeded();
     }
 
     public void setOther(Task other) {
@@ -34,6 +35,11 @@ public class Constraint extends ParseObject {
 
     @Override
     public String toString() {
-        return getOperator().toString() + ": " + getOther().getTitle();
+        try {
+            return getOperator().toString() + ": " + getOther().getTitle();
+        } catch (Exception e) {
+            return getOperator().toString() + ": ?";
+        }
+
     }
 }
