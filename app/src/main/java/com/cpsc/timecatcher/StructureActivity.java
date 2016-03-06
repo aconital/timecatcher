@@ -102,7 +102,7 @@ public class StructureActivity extends AppCompatActivity
 
     }
 
-    public void onUserLogOut(){
+    public void onClickUserLogOut(){
         Fragment ParseLoginFragment=new com.parse.ui.ParseLoginFragment();
         getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
         .replace(R.id.frame_container, ParseLoginFragment).commit();
