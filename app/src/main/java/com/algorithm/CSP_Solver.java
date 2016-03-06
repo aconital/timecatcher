@@ -75,10 +75,12 @@ public class CSP_Solver  {
 		ArrayList<TimeSlice> domainV=taskMap.get(v).getDomainArrayList();
 		
 		//check constraint from u to v
-		for(int i=0;i<domainU.size() && domainU.get(i).getAvailable()==true ;i++){
+		for(int i=0;i<domainU.size() ;i++){
+			if(domainU.get(i).getAvailable()==false) continue;
 			TimeSlice timeSliceOfU=domainU.get(i);
 			boolean unavailable=true;
-			for(int j=domainV.size()-1;j>=0 && domainV.get(j).getAvailable()==true;j--){
+			for(int j=domainV.size()-1;j>=0 ;j--){
+				if(domainV.get(j).getAvailable()==false) continue;
 				TimeSlice timeSliceOfV=domainV.get(j);
 				if(graphMatrix[u][v] >0){// edge is u->v 
 					if(timeSliceOfU.isBefore(timeSliceOfV)){// there exists at least one timeSliceOfV making timeSliceOfU can keep staying in domainU as available  
@@ -162,7 +164,8 @@ public class CSP_Solver  {
 		int id=traverseOrder[count];//except topological sort, we can have other choose strategies regarding which variable should be considered next 
 		ArrayList<TimeSlice> domainArrayList=taskMap.get(id).getDomainArrayList();
 		
-		for(int i=0;i< domainArrayList.size() && domainArrayList.get(i).getAvailable();i++ ){
+		for(int i=0;i< domainArrayList.size() ;i++ ){
+			if(domainArrayList.get(i).getAvailable()==false) continue;
 			TimeSlice slice=domainArrayList.get(i);
 			if(assignment.size()<=count){
 				assignment.add(new TaskAssignment(id,slice));
@@ -257,7 +260,5 @@ public class CSP_Solver  {
 			System.out.println("-------------------------------------------");
 		}//while
 	}
-	
-
 }
 
