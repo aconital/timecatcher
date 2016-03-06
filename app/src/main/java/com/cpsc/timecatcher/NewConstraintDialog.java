@@ -33,6 +33,7 @@ public class NewConstraintDialog extends Dialog {
     private Spinner operatorSpinner, otherTaskSpinner;
     private Operator operator;
     private Day day;
+    private Task task;
     private List<Constraint> constraintList;
     private List<Task> taskList;
 
@@ -40,10 +41,11 @@ public class NewConstraintDialog extends Dialog {
         super(context);
     }
 
-    public NewConstraintDialog(Context context, Day day, List<Constraint> constraintList) {
+    public NewConstraintDialog(Context context, Day day, List<Constraint> constraintList, Task task) {
         super(context);
         this.day = day;
         this.constraintList = constraintList;
+        this.task = task;
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,14 +79,25 @@ public class NewConstraintDialog extends Dialog {
             @Override
             public void done(List<Task> objects, ParseException e) {
                 if (e == null) {
-                    String[] taskNames = new String[objects.size()];
+                    String[] taskNames;
+                    if (task == null) {
+                        taskNames = new String[objects.size()];
+                    } else {
+                        // "otherTask" cannot be task itself
+                        taskNames = new String[objects.size() - 1];
+                    }
                     int i = 0;
                     taskList = objects;
 
                     for (Task task : objects) {
-                        taskNames[i++] = task.getTitle();
+                        if (NewConstraintDialog.this.task != null) {
+                            if (!task.getObjectId().equals(
+                                    NewConstraintDialog.this.task.getObjectId())) {
+                                // "otherTask" cannot be task itself
+                                taskNames[i++] = task.getTitle();
+                            }
+                        }
                     }
-
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                             android.R.layout.simple_spinner_item, taskNames);
                     otherTaskSpinner.setAdapter(adapter);
@@ -120,16 +133,21 @@ public class NewConstraintDialog extends Dialog {
                 boolean duplicate = false;
 
                 for (Constraint c : constraintList) {
-                    if (c.getOperator() == operator && c.getOther() == other) {
-                        duplicate = true;
-                        new AlertDialog.Builder(getContext())
-                            .setTitle("Save Constraint Error")
-                            .setMessage("You already have this constraint!")
-                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
+                    try {
+                        if (c.getOperator() == operator && c.getOther() == other) {
+                            duplicate = true;
+                            new AlertDialog.Builder(getContext())
+                                    .setTitle("Save Constraint Error")
+                                    .setMessage("You already have this constraint!")
+                                    .setPositiveButton(android.R.string.ok, new OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
 
-                                }
-                            }).show();
+                                        }
+                                    }).show();
+                        }
+                    } catch (ParseException e) {
+                        Log.e(Constants.NEW_CONSTRAINT_TAG, "Duplicate check getOtherFailed");
+                        Log.e(Constants.NEW_CONSTRAINT_TAG, e.getLocalizedMessage());
                     }
                 }
                 if (!duplicate) {

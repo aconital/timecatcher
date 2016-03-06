@@ -95,7 +95,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
         else
             holder.end.setText("No Title");
 
-        if(endtime !=null) {
+        if(endtime !=null && task.getFixed()) {
             Calendar calendar = Calendar.getInstance(); // creates a new calendar instance
             calendar.setTime(endtime);   // assigns calendar to given date
             String minute= Integer.toString(calendar.get(Calendar.MINUTE));
@@ -115,7 +115,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
         else
             holder.end.setText("No EndTime");
 
-        if(starttime!=null)
+        if(starttime!=null && task.getFixed())
         {
             Calendar calendar = Calendar.getInstance(); // creates a new calendar instance
             calendar.setTime(starttime);   // assigns calendar to given date

@@ -3,6 +3,7 @@ package com.cpsc.timecatcher.model;
 import android.util.Log;
 
 import com.cpsc.timecatcher.algorithm.TimeUtils;
+import com.parse.GetCallback;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -12,6 +13,7 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by yutongluo on 2/5/16.
@@ -74,8 +76,12 @@ public class Task extends ParseObject implements ITimeSlot {
         put("day", day);
     }
 
-    public Day getDay() {
-        return (Day) getParseObject("day");
+    public Day getDay() throws ParseException{
+        return getParseObject("day").fetchIfNeeded();
+    }
+
+    public void getDay(GetCallback<Day> callback) {
+        getParseObject("day").fetchIfNeededInBackground(callback);
     }
 
     public void addCategory(final Category category) {
@@ -173,7 +179,15 @@ public class Task extends ParseObject implements ITimeSlot {
         });
     }
 
-    public ParseQuery<ParseObject> getConstraints() {
+    public void removeAllConstraints() throws ParseException {
+        ParseRelation relation = this.getRelation("constraints");
+        List<Constraint> constraints = getConstraints().find();
+        for (Constraint c : constraints) {
+            relation.remove(c);
+        }
+    }
+
+    public ParseQuery<Constraint> getConstraints() {
         ParseRelation relation = this.getRelation("constraints");
         return relation.getQuery();
     }
