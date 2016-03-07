@@ -244,10 +244,12 @@ public class CSP_Solver  {
 				set.addAll(set2);
 			}
 			else if(taskDomainChangedSet1.get(i)!=null ){
-
+				set1=taskDomainChangedSet1.get(i);
+				set.addAll(set1);
 			}
 			else if(taskDomainChangedSet2.get(i)!=null){
-
+				set2=taskDomainChangedSet2.get(i);
+				set.addAll(set2);
 			}
 			else{
 				continue;//both null
@@ -390,6 +392,8 @@ public class CSP_Solver  {
 		if(problem.getOverTime()==true)  return solutions;
 		if(isFixedTaskOverlap()==true) return solutions;
 		if(taskCount==0)return solutions;
+		if(problem.getConstraints()!=null
+			&& problem.isConstraintsConflict()==true) return solutions;
 
 		// other traverse order is also possible, should consider in the future
 		int[] traverseOrder=constraints.GetTopologicalSort();

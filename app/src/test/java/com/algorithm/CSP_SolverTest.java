@@ -15,6 +15,12 @@ public class CSP_SolverTest {
     private CSP problem;
     private List<ArrayList<TaskAssignment>> solutions;
 
+    @Before
+    public void setUp() throws Exception {
+        System.out.println("                                 ");
+        System.out.println("                                 ");
+        System.out.println("CSP_SolverTest  Result: ");
+    }
     /*****************************************************************************************************
      * test case 1:
      * day time 7:00~12:00
@@ -26,14 +32,12 @@ public class CSP_SolverTest {
      * Constraints:
      * 		task2 before task1
      *****************************************************************************************************/
-    @Before
-    public void setUp() throws Exception {
-        System.out.println("SystemTest4  Result: ");
-
+/*
+    @Test
+    public void test1() throws Exception {
         dayStart=new Time(7,0);
         dayEnd=new Time(12,0);
         problem= new CSP(dayStart,dayEnd);
-
         problem.addFlexibleTask(new Time(2,0));// id=0
         problem.addFlexibleTask(new Time(2,0));// id=1
         problem.addFixedTask(new Time(9, 0), new Time(10, 0));//id=3
@@ -43,13 +47,27 @@ public class CSP_SolverTest {
         // also, createConstraintGraph() must be called before calling a series of constraints related methods
         problem.createConstraintGraph();
         problem.addConstraint(1, 0, 0);// 1->0
+        CSP_Solver solver= new CSP_Solver(problem);
+        solutions=solver.getSolutions();
+        solver.printSolutions();
+
     }
+*/
     @Test
-    public void testPrintSolutions() throws Exception {
-        if(false == problem.isConstraintsConflict()){// constraints are not conflict
-            CSP_Solver solver= new CSP_Solver(problem);
-            solutions=solver.getSolutions();
-            solver.printSolutions();
-        }//if
+    public void test2() throws Exception {
+        dayStart=new Time(1,0);
+        dayEnd=new Time(23,0);
+        problem= new CSP(dayStart,dayEnd);
+        //problem.addFlexibleTask(new Time(10, 0));
+        problem.addFlexibleTask(new Time(10, 0));
+        problem.addFlexibleTask(new Time(10, 0));
+        problem.addFlexibleTask(new Time(2, 0));
+        problem.createConstraintGraph();
+
+        // Hours total 22 and 1 minute. These tasks should NOT fit exactly in 22 hour day
+        CSP_Solver solver = new CSP_Solver(problem);
+        solutions = solver.getSolutions();
+        solver.printSolutions();
     }
+
 }

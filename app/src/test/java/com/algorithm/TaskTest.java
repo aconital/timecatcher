@@ -31,10 +31,10 @@ public class TaskTest {
 
     @Test
     public void testIncreaseTaskCount() throws Exception {
-        assertEquals(1, Task.taskCount);
+        assertEquals(0, Task.taskCount);
         Task.increaseTaskCount();
         Task.increaseTaskCount();
-        assertEquals(3, Task.taskCount);
+        assertEquals(2, Task.taskCount);
     }
 
     @Test
