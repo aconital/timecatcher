@@ -100,7 +100,7 @@ public class SystemTestAllTasksNoConstraints extends TimedTest {
     }
 
     @Test
-    public void taskFlexibleOneHourSnugFit() throws Exception {
+    public void testFlexibleOneHourSnugFit() throws Exception {
         problem.addFixedTask(new Time(1, 0), new Time(12, 30));
         problem.addFixedTask(new Time(13, 30), new Time(23, 0));
         problem.addFlexibleTask(new Time(1, 0));
@@ -118,7 +118,7 @@ public class SystemTestAllTasksNoConstraints extends TimedTest {
     }
 
     @Test
-    public void taskFlexibleOneMinuteSnugFit() throws Exception {
+    public void testFlexibleOneMinuteSnugFit() throws Exception {
         problem.addFixedTask(new Time(1, 0), new Time(12, 30));
         problem.addFixedTask(new Time(12, 30), new Time(13, 29));
         problem.addFixedTask(new Time(13, 30), new Time(23, 0));
@@ -137,7 +137,7 @@ public class SystemTestAllTasksNoConstraints extends TimedTest {
     }
 
     @Test
-    public void taskFiveMinuteGapsForFourUnitFlexibleTasks() throws Exception {
+    public void testFiveMinuteGapsForFourUnitFlexibleTasks() throws Exception {
         for (int min = 61; min < 23 * 60; ) {
             Time A = new Time(min / 60 , min % 60);
             min += 14;
