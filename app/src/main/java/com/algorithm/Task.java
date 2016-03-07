@@ -37,7 +37,7 @@ public class Task {
 	}
 	
 	void initializeDomainSet(Time dayStart,Time dayEnd, Time step) {}// overridden by subclass
-	void initializeDomainSet(){}// overridden by subclass	
+	//void initializeDomainSet(){}// overridden by subclass
 }
 
 class FlexibleTask extends Task{
@@ -77,6 +77,7 @@ class FixedTask extends Task{
 			endTime=e;
 			taskId=Task.taskCount;
 			Task.increaseTaskCount();
+			domain.initializeDomainSet(startTime, endTime);
 		}
 	}
 	
@@ -86,9 +87,11 @@ class FixedTask extends Task{
 	int getTaskId(){
 		return taskId;
 	}
+	/*
 	void initializeDomainSet(){
 		domain.initializeDomainSet(startTime, endTime);
-	}	
+	}
+	*/
 }
 
 

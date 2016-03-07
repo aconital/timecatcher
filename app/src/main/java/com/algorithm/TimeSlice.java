@@ -61,11 +61,6 @@ public class TimeSlice implements Comparable<TimeSlice>{
 		}
 	}
 
-	boolean isOverlap(TimeSlice other) {
-		return this.startTime.compareTime(other.endTime) <= 0 &&
-				other.startTime.compareTime(this.endTime) <= 0;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;

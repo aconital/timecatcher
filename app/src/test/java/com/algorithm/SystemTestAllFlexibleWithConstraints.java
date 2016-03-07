@@ -1,13 +1,12 @@
 package com.algorithm;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by yutongluo on 3/6/16.
@@ -32,7 +31,8 @@ public class SystemTestAllFlexibleWithConstraints {
         problem.createConstraintGraph();
         CSP_Solver solver = new CSP_Solver(problem);
         solutions = solver.getSolutions();
-        assertEquals(0, solutions.get(0).size());
+        assertEquals(true, solutions.isEmpty());
+        //assertEquals(0, solutions.get(0).size());
     }
 
     @Test

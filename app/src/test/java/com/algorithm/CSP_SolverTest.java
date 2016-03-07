@@ -36,7 +36,8 @@ public class CSP_SolverTest {
 
         problem.addFlexibleTask(new Time(2,0));// id=0
         problem.addFlexibleTask(new Time(2,0));// id=1
-        problem.addFixedTask(new Time(9,0), new Time(10,0));//id=3
+        problem.addFixedTask(new Time(9, 0), new Time(10, 0));//id=3
+        //problem.addFlexibleTask(new Time(2, 0));// id=4
 
         // only when you finish adding tasks can you invoke  constraints related methods;
         // also, createConstraintGraph() must be called before calling a series of constraints related methods

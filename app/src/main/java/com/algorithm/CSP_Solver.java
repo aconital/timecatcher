@@ -53,7 +53,7 @@ public class CSP_Solver  {
 			Set<Integer> domainChangedSet = new HashSet<Integer>();
 			// edges's direction can be u->v or v->u
 			// check from u to v  and mark inconsistent domain value of vertex u 
-			if(markInconsistentValues(u, v,domainChangedSet)==true){
+			if(markInconsistentValues(u, v, domainChangedSet)==true){
 				taskDomainChangedSet.put(u, domainChangedSet);
 				LinkedList<AdjListNode> vertexList=undirectedAdj[u];
 				ListIterator<AdjListNode> it = vertexList.listIterator();
@@ -126,7 +126,7 @@ public class CSP_Solver  {
 			Set<Integer> domainChangedSet = new HashSet<Integer>();
 			// edges's direction can be u->v or v->u
 			// check from u to v  and mark inconsistent domain value of vertex u 
-			if(markInconsistentValues2(u, v,domainChangedSet)==true){
+			if(markInconsistentValues2(u, v, domainChangedSet)==true){
 				taskDomainChangedSet.put(u, domainChangedSet);
 			}//if
 			queue.remove();//remove the first element of this list 
@@ -168,8 +168,36 @@ public class CSP_Solver  {
 		}//for
 		return inconsistent;
 	}//method
-	
-	
+
+	/*
+	 *  the task with id has got an assignment, using below method to mark others task's
+	 *  domainArrayList which duplicates with that assignment
+	 */
+
+	HashMap<Integer, Set<Integer> > directedCheckAndMarkOverlap(int id, HashMap<Integer, Boolean> visited){
+		HashMap<Integer, Set<Integer>> taskDomainChangedSet=new HashMap<Integer,Set<Integer> >();
+		TimeSlice timeSlice1=assignedMap.get(id);
+		int count=taskMap.size();
+
+		for(int i=0;i<count;i++){
+			if(i==id || visited.get(i)==true) continue;
+			ArrayList<TimeSlice> domainArrayList=taskMap.get(i).getDomainArrayList();
+			Set<Integer> domainChangedSet= new HashSet<Integer>();
+
+			for(int j=0;j<domainArrayList.size();j++){
+				if(domainArrayList.get(j).getAvailable()==false) continue;
+
+				TimeSlice timeSlice2=domainArrayList.get(j);
+				if(timeSlice1.isOverlap(timeSlice2)){
+					timeSlice2.setAvailable(false);
+					domainChangedSet.add(j);
+				}
+			}//for
+			taskDomainChangedSet.put(i,domainChangedSet);
+		}//for
+		return taskDomainChangedSet;
+	}
+
 	/*
 	 *  get a list of arcs connected with vertex u and adjacent 
 	 */	
@@ -197,8 +225,38 @@ public class CSP_Solver  {
 	 */	
 	HashMap<Integer, Set<Integer>> updateRelatedDomainMark(int id, HashMap<Integer, Boolean> visited){
 		LinkedList<Arc> queue;
+		HashMap<Integer, Set<Integer>> taskDomainChangedSet1,taskDomainChangedSet2,taskDomainChangedSet;
+		taskDomainChangedSet= new HashMap<Integer, Set<Integer>>();
 		queue=getRelatedArcs(id,visited);
-		return  directedConstraintCheck(queue);// return task DomainChanged Set
+
+		taskDomainChangedSet1= directedConstraintCheck(queue);
+		taskDomainChangedSet2= directedCheckAndMarkOverlap(id, visited);
+		int count=taskMap.size();
+
+		for(int i=0;i< count;i++){
+			Set<Integer>set1,set2,set;
+			set= new HashSet<Integer>();
+
+			if(taskDomainChangedSet1.get(i)!=null  && taskDomainChangedSet2.get(i)!=null){
+				set1=taskDomainChangedSet1.get(i);
+				set2=taskDomainChangedSet2.get(i);
+				set.addAll(set1);
+				set.addAll(set2);
+			}
+			else if(taskDomainChangedSet1.get(i)!=null ){
+
+			}
+			else if(taskDomainChangedSet2.get(i)!=null){
+
+			}
+			else{
+				continue;//both null
+			}
+			taskDomainChangedSet.put(i,set);
+		}//for
+
+		//return combination of taskDomainChangedSet1 and taskDomainChangedSet2
+		return  taskDomainChangedSet;// return task DomainChanged Set
 	}//method 
 	
 	/*
@@ -217,7 +275,8 @@ public class CSP_Solver  {
 	}//method
 
 	/*
-	 * this method is used to initialize domain for all tasks based on given step 
+	 * this method is used to initialize domain for all tasks based on given step
+	 * fixed task domain is initialized when the task is created
 	 */
 	void domainInitializationForAllTasks(Time step){
 		//HashMap<Integer, Task> taskMap;// <indetifier, task>
@@ -226,37 +285,35 @@ public class CSP_Solver  {
 			if(task instanceof FlexibleTask){
 				task.initializeDomainSet(problem.getDayStart(), problem.getDayEnd(), step);
 			}
-			else{// FixedTask 
-				task.initializeDomainSet();
-			}
 		}//for 
 	}
 
 	/*
 	 * return true if any two fixed task overlap with each other
-	 *
+	 * otherwise false;
 	 */
 
 	boolean isFixedTaskOverlap(){
 		ArrayList<TimeSlice> sliceArrayList=new ArrayList<TimeSlice>();
-		Set<Integer> fixedTaskIdSet=problem.getFlexibleTaskIdSet();
-
+		Set<Integer> fixedTaskIdSet=problem.getFixedTaskIdSet();
+		if(fixedTaskIdSet.size()<=1) return false;
 		for(Integer id: fixedTaskIdSet){
 			TimeSlice slice=taskMap.get(id).getDomainArrayList().get(0);
 			sliceArrayList.add(slice);
 		}
 		//Ascending order
 		Collections.sort(sliceArrayList);
-
-		for(int i=0;i<sliceArrayList.size()-1;i++){
-			TimeSlice slice1,slice2;
+		TimeSlice slice1,slice2;
+		//System.out.println("size is :"+sliceArrayList.size());
+		for(int i=0;i+1<sliceArrayList.size();i++){
+			//System.out.println("index i is: "+i+"   index i+1 is: "+(i+1));
 			slice1=sliceArrayList.get(i);
 			slice2=sliceArrayList.get(i+1);
-			if(slice1.isOverlap(slice2)==true ){
+			if(slice1.isOverlap(slice2)==true){
 				return true;
 			}
 		}//for
-		return true;
+		return false;
 	}
 	/*
 	 * this method is used to mark time slices in domains of flexible tasks that overlap with that of Fixed Tasks;
@@ -314,7 +371,6 @@ public class CSP_Solver  {
 			// and update their domain marks
 			// and recored all the changes to these related domain, because we need to recover this changes later
 			HashMap<Integer, Set<Integer>> taskDomainChangedSet=updateRelatedDomainMark(id, visited);
-			
 			if(searchSolutions(count, traverseOrder,visited)== true){//search valid assignment for next task/vertex  
 				return true;
 			}
@@ -327,14 +383,14 @@ public class CSP_Solver  {
 		return false;
 	}//method 
 
-
 	/*
 	 * this method return  a final solution of  possible schedule 
 	 */
 	List<ArrayList<TaskAssignment> > getSolutions(){
-		if(isFixedTaskOverlap()==true){
-			return solutions;
-		}
+		if(problem.getOverTime()==true)  return solutions;
+		if(isFixedTaskOverlap()==true) return solutions;
+		if(taskCount==0)return solutions;
+
 		// other traverse order is also possible, should consider in the future
 		int[] traverseOrder=constraints.GetTopologicalSort();
 		if(traverseOrder == null){//constraint graph has graph, cannot get TopologicalSort

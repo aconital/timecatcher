@@ -55,7 +55,7 @@ public class FixedTaskTest {
 
     @Test
     public void testInitializeDomainSet() throws Exception {
-        task.initializeDomainSet();
+       // task.initializeDomainSet();
 
         Set<TimeSlice> domainSet2=task.getDomainSet();
         Set<TimeSlice> domainSet1= new HashSet<TimeSlice>();
