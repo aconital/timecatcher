@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by yutongluo on 3/6/16.
  */
-public class SystemTestAllFlexibleNoConstraints {
+public class SystemTestAllFlexibleNoConstraints extends TimedTest {
 
     private Time dayStart;
     private Time dayEnd;
@@ -21,7 +21,7 @@ public class SystemTestAllFlexibleNoConstraints {
     public void setUp() throws Exception {
         dayStart = new Time(1,0);
         dayEnd = new Time(23,0);
-        // 22 hours available
+        // 3 hours available
         problem = new CSP(dayStart,dayEnd);
     }
 
@@ -49,6 +49,7 @@ public class SystemTestAllFlexibleNoConstraints {
         solutions = solver.getSolutions();
         try {
             AlgorithmTestUtils.noOverLap(solutions);
+            assertEquals(false, solutions.isEmpty());
         } catch (AssertionError e) {
             // print out problematic solution
             solver.printSolutions();
@@ -69,6 +70,7 @@ public class SystemTestAllFlexibleNoConstraints {
         //solver.printSolutions();
         try {
             AlgorithmTestUtils.noOverLap(solutions);
+            assertEquals(false, solutions.isEmpty());
         } catch (AssertionError e) {
             // print out problematic solution
             solver.printSolutions();
@@ -79,22 +81,24 @@ public class SystemTestAllFlexibleNoConstraints {
     @Test
     public void TaskFitExactly() throws Exception {
         problem.addFlexibleTask(new Time(10, 0));
-        problem.addFlexibleTask(new Time(8, 0));
+        problem.addFlexibleTask(new Time(10, 0));
         problem.addFlexibleTask(new Time(2, 0));
         problem.createConstraintGraph();
 
         // Hours total 22. These tasks should fit exactly in 22 hour day
         CSP_Solver solver = new CSP_Solver(problem);
         solutions = solver.getSolutions();
-       // solver.printSolutions();
+        // solver.printSolutions();
 
         try {
             AlgorithmTestUtils.noOverLap(solutions);
+            assertEquals(false, solutions.isEmpty());
         } catch (AssertionError e) {
             // print out problematic solution
             solver.printSolutions();
             throw e;
         }
+        solver.printSolutions();
     }
 
     @Test
@@ -108,7 +112,7 @@ public class SystemTestAllFlexibleNoConstraints {
         // Hours total 22 and 1 minute. These tasks should NOT fit exactly in 22 hour day
         CSP_Solver solver = new CSP_Solver(problem);
         solutions = solver.getSolutions();
-        //solver.printSolutions();
+        assertEquals(true, solutions.isEmpty());
     }
 
 }

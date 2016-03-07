@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by yutongluo on 3/6/16.
  */
-public class SystemTestAllFlexibleWithConstraints {
+public class SystemTestAllFlexibleWithConstraints extends TimedTest {
     private Time dayStart;
     private Time dayEnd;
     private CSP problem;
@@ -60,6 +60,7 @@ public class SystemTestAllFlexibleWithConstraints {
         try {
             AlgorithmTestUtils.noOverLap(solutions);
             AlgorithmTestUtils.checkConstraints(solutions, problem);
+            assertEquals(false, solutions.isEmpty());
         } catch (AssertionError e) {
             // print out problematic solution
             solver.printSolutions();
@@ -81,6 +82,7 @@ public class SystemTestAllFlexibleWithConstraints {
         CSP_Solver solver = new CSP_Solver(problem);
         solutions = solver.getSolutions();
         try {
+            assertEquals(false, solutions.isEmpty());
             AlgorithmTestUtils.noOverLap(solutions);
             AlgorithmTestUtils.checkConstraints(solutions, problem);
         } catch (AssertionError e) {
@@ -88,10 +90,11 @@ public class SystemTestAllFlexibleWithConstraints {
             solver.printSolutions();
             throw e;
         }
+        solver.printSolutions();
     }
 
     @Test
-    public void testHundredConstraints() throws Exception {
+    public void testHundredTasks() throws Exception {
         for (int i = 0; i < 100; i++) {
             problem.addFlexibleTask(new Time(0,1));
         }
@@ -110,10 +113,49 @@ public class SystemTestAllFlexibleWithConstraints {
         try {
             AlgorithmTestUtils.noOverLap(solutions);
             AlgorithmTestUtils.checkConstraints(solutions, problem);
+            assertEquals(false, solutions.isEmpty());
         } catch (AssertionError e) {
             // print out problematic solution
             solver.printSolutions();
             throw e;
         }
+    }
+    @Test
+    public void test99Constraints() throws Exception {
+        // I got 99 constraints a conflict ain't one
+        for (int i = 0; i < 100; i++) {
+            problem.addFlexibleTask(new Time(0,1));
+        }
+        problem.createConstraintGraph();
+        for (int i = 1; i < 100; i++) {
+            problem.addConstraint(i-1, i, 0);
+        }
+        CSP_Solver solver = new CSP_Solver(problem);
+        solutions = solver.getSolutions();
+        try {
+            AlgorithmTestUtils.noOverLap(solutions);
+            AlgorithmTestUtils.checkConstraints(solutions, problem);
+            assertEquals(false, solutions.isEmpty());
+        } catch (AssertionError e) {
+            // print out problematic solution
+            solver.printSolutions();
+            throw e;
+        }
+    }
+
+    @Test
+    public void test100Constraints() throws Exception {
+        for (int i = 0; i < 100; i++) {
+            problem.addFlexibleTask(new Time(0,1));
+        }
+        problem.createConstraintGraph();
+        for (int i = 1; i < 100; i++) {
+            problem.addConstraint(i-1, i, 0);
+        }
+        // introduce the cycle
+        problem.addConstraint(99, 0, 0);
+        CSP_Solver solver = new CSP_Solver(problem);
+        solutions = solver.getSolutions();
+        assertEquals(true, problem.isConstraintsConflict());
     }
 }
