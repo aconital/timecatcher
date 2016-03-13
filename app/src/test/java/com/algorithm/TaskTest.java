@@ -31,7 +31,8 @@ public class TaskTest {
 
     @Test
     public void testIncreaseTaskCount() throws Exception {
-        assertEquals(0, Task.taskCount);
+        Task.setTaskCount(0);
+        //assertEquals(0, Task.taskCount);
         Task.increaseTaskCount();
         Task.increaseTaskCount();
         assertEquals(2, Task.taskCount);

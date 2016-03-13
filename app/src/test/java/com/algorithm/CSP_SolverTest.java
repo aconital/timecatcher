@@ -6,6 +6,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Created by fujiaoyang1 on 3/5/16.
  */
@@ -32,7 +34,7 @@ public class CSP_SolverTest {
      * Constraints:
      * 		task2 before task1
      *****************************************************************************************************/
-
+/*
     @Test
     public void test1() throws Exception {
         dayStart=new Time(7,0);
@@ -69,5 +71,31 @@ public class CSP_SolverTest {
         solutions = solver.getSolutions();
         solver.printSolutions();
     }
+*/
 
+    @Test
+    public void test1() throws Exception {
+        dayStart=new Time(3,0);
+        dayEnd=new Time(13,0);
+        problem= new CSP(dayStart,dayEnd);
+        problem.addFixedTask(new Time(3, 30), new Time(5, 30)); // 0
+        problem.addFixedTask(new Time(6, 30), new Time(12, 30)); // 1
+        problem.addFlexibleTask(new Time(1, 0)); // 2
+
+        problem.createConstraintGraph();
+        problem.addConstraint(2, 1, 0);
+        problem.addConstraint(0, 2, 0);
+        CSP_Solver solver = new CSP_Solver(problem);
+        solutions = solver.getSolutions();
+
+        solver.printSolutions();
+        try {
+            AlgorithmTestUtils.noOverLap(solutions);
+            assertEquals(false, solutions.isEmpty());
+        } catch (AssertionError e) {
+            // print out problematic solution
+            solver.printSolutions();
+            throw e;
+        }
+    }
 }

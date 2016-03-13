@@ -420,7 +420,8 @@ public class CSP_Solver  {
 		for(Time step: stepList){
 			domainInitializationForAllTasks(step);
 			markOverlappingDomain();
-			constraintConsistencyCheck(arcs);// preprocess the domain constraints 
+			// preprocess the domain constraints
+			constraintConsistencyCheck(arcs); // this function will set some tasks' available as false, but doesn't recover it in next for loop. so in domainInitializationForAllTasks(), we need to reset the avaialbe as true for every fixed task.
 			if(true == searchSolutions(0,traverseOrder,visited)){
 				return solutions;
 			}			
