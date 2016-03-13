@@ -282,10 +282,14 @@ public class CSP_Solver  {
 	 */
 	void domainInitializationForAllTasks(Time step){
 		//HashMap<Integer, Task> taskMap;// <indetifier, task>
+		// do not forget to set all available  as true when step is give a new value
 		for (Integer key : taskMap.keySet()){
 			Task task=taskMap.get(key);
 			if(task instanceof FlexibleTask){
 				task.initializeDomainSet(problem.getDayStart(), problem.getDayEnd(), step);
+			}
+			else{
+				task.getDomainArrayList().get(0).setAvailable(true);
 			}
 		}//for 
 	}

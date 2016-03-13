@@ -32,7 +32,7 @@ public class CSP_SolverTest {
      * Constraints:
      * 		task2 before task1
      *****************************************************************************************************/
-/*
+
     @Test
     public void test1() throws Exception {
         dayStart=new Time(7,0);
@@ -43,7 +43,7 @@ public class CSP_SolverTest {
         problem.addFixedTask(new Time(9, 0), new Time(10, 0));//id=3
         //problem.addFlexibleTask(new Time(2, 0));// id=4
 
-        // only when you finish adding tasks can you invoke  constraints related methods;
+        // only when you finish adding tasks can you invoke constraints related methods;
         // also, createConstraintGraph() must be called before calling a series of constraints related methods
         problem.createConstraintGraph();
         problem.addConstraint(1, 0, 0);// 1->0
@@ -52,7 +52,7 @@ public class CSP_SolverTest {
         solver.printSolutions();
 
     }
-*/
+
     @Test
     public void test2() throws Exception {
         dayStart=new Time(1,0);

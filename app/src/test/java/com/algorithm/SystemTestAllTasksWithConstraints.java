@@ -34,11 +34,14 @@ public class SystemTestAllTasksWithConstraints extends TimedTest {
         problem.addFlexibleTask(new Time(5, 30)); // 3
         problem.addFlexibleTask(new Time(1, 0)); // 4
         problem.addFlexibleTask(new Time(0, 15)); // 5
+
         problem.createConstraintGraph();
         problem.addConstraint(5, 0, 0);
         problem.addConstraint(4, 2, 0);
         CSP_Solver solver = new CSP_Solver(problem);
         solutions = solver.getSolutions();
+
+        //solver.printSolutions();
         try {
             AlgorithmTestUtils.noOverLap(solutions);
             assertEquals(false, solutions.isEmpty());
@@ -92,5 +95,4 @@ public class SystemTestAllTasksWithConstraints extends TimedTest {
         solutions = solver.getSolutions();
         assertEquals(true, solutions.isEmpty());
     }
-
 }
