@@ -37,6 +37,10 @@
     <string name="totalTimeMinutes">min</string>
     <string name="addConstraintButton">Add Constraint</string>
 
+    <!-- Graph -->
+    <string name="graphContainer">graph Container</string>
+    <string name="graphTextWarning">graph Text Warning</string>
+
 
     <string-array name="new_task_default_categories_array">
         <item>School</item>

@@ -1,7 +1,7 @@
 package com.algorithm;
-import java.util.*;
-
-import com.algorithm.TimeSlice;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Domain {
 	private Set<TimeSlice> domainSet;//a set of possible time slice 
@@ -14,7 +14,7 @@ public class Domain {
 	Set<TimeSlice> getDomainSet(){
 		return domainSet;
 	}
-	
+
 	ArrayList<TimeSlice> getDomainArrayList(){
 		return domainArrayList;
 	}

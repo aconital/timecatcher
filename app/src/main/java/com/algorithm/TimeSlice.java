@@ -1,6 +1,5 @@
 package com.algorithm;
-
-public class TimeSlice{
+public class TimeSlice implements Comparable<TimeSlice>{
 	private Time startTime;// this is point in time instead of a duration 
 	private Time endTime; //this point in time instead of a duration 
 	private boolean available; 
@@ -95,6 +94,11 @@ public class TimeSlice{
 		} else if (!startTime.equals(other.startTime))
 			return false;
 		return true;
+	}
+
+	public int compareTo (TimeSlice t1) {
+        /* For Ascending order*/
+		return  startTime.compareTime(t1.getStartTime());
 	}
 	
 

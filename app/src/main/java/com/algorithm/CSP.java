@@ -14,7 +14,8 @@ public class CSP {
 	private Time accumulatedTime;//used to trace accumulated working time point
 	private Set<Integer> fixedTaskIdSet;
 	private Set<Integer> flexibleTaskIdSet;
-	
+	private boolean overtime;// indicate if the totoal working time of all tasks exceed the given work time
+
 	CSP(Time dayStart,Time dayEnd){
 		this.dayStart=dayStart;
 		this.dayEnd=dayEnd;
@@ -22,6 +23,8 @@ public class CSP {
 		taskMap=new HashMap<Integer, Task>();
 		fixedTaskIdSet =new HashSet<Integer>();
 		flexibleTaskIdSet =new HashSet<Integer>();
+		Task.setTaskCount(0);
+		overtime=false;
 	}
 		
 	void setConstraints(ConstraintGraph c) {constraints = c;}
@@ -41,7 +44,9 @@ public class CSP {
 	Set<Integer> getFlexibleTaskIdSet(){
 		return flexibleTaskIdSet;
 	}
-	
+
+	boolean getOverTime(){return overtime;}
+
 	int getTaskCount(){
 		if(taskMap.size()!=0){
 			return taskMap.size();
@@ -60,6 +65,7 @@ public class CSP {
 			flexibleTaskIdSet.add(task.getTaskId());
 		}
 		else{
+			overtime=true;
 			System.out.println("not enough remaining woking time for this flexible task");
 		}
 	}
@@ -77,6 +83,7 @@ public class CSP {
 			fixedTaskIdSet.add(task.getTaskId());
 		}
 		else{
+			overtime=true;
 			System.out.println("not enough remaining woking time for this  fixed task");
 		}
 	}
