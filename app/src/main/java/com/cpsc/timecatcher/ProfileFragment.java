@@ -112,8 +112,8 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-            return view;
-        }
+        return view;
+    }
 
         public interface OnFragmentInteractionListener{
             public void onClickUserLogOut();
