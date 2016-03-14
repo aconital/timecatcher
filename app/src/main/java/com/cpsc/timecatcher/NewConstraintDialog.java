@@ -96,11 +96,15 @@ public class NewConstraintDialog extends Dialog {
                                 // "otherTask" cannot be task itself
                                 taskNames[i++] = task.getTitle();
                             }
+                        } else {
+                            taskNames[i++] = task.getTitle();
                         }
                     }
+                    Log.d("TEST", taskNames.toString());
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                             android.R.layout.simple_spinner_item, taskNames);
                     otherTaskSpinner.setAdapter(adapter);
+                    Log.d("TEST", "AFTER");
                 } else {
                     Log.d(Constants.NEW_CONSTRAINT_TAG, "Couldn't find other tasks!");
                 }
