@@ -3,7 +3,6 @@ package com.cpsc.timecatcher;
 import android.content.Context;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -19,7 +18,7 @@ import com.facebook.appevents.AppEventsLogger;
 
 public class StructureActivity extends AppCompatActivity
         implements ScheduleFragment.OnFragmentInteractionListener,
-        NewTaskFragment.OnFragmentInteractionListener,
+        NewEditTaskFragment.OnFragmentInteractionListener,
         CalendarFragment.OnFragmentInteractionListener,
         TasklistFragment.OnFragmentInteractionListener,
         ProfileFragment.OnFragmentInteractionListener{
@@ -102,7 +101,7 @@ public class StructureActivity extends AppCompatActivity
 
     }
 
-    public void onUserLogOut(){
+    public void onClickUserLogOut(){
         Fragment ParseLoginFragment=new com.parse.ui.ParseLoginFragment();
         getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
         .replace(R.id.frame_container, ParseLoginFragment).commit();
@@ -110,7 +109,7 @@ public class StructureActivity extends AppCompatActivity
 
     public void addTask(long date)
     {
-        Fragment scheduleFragment=NewTaskFragment.newInstance(date);
+        Fragment scheduleFragment= NewEditTaskFragment.newInstance(date);
         getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
                 .replace(R.id.frame_container, scheduleFragment).commit();
 

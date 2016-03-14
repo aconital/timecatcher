@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -27,6 +26,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.cengalabs.flatui.views.FlatTextView;
 import com.cpsc.timecatcher.gui.MultiSpinner;
 import com.cpsc.timecatcher.gui.NoScrollListView;
 import com.cpsc.timecatcher.helper.Constants;
@@ -59,18 +59,19 @@ import static com.cpsc.timecatcher.algorithm.TimeUtils.addMinutesToDate;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link NewTaskFragment.OnFragmentInteractionListener} interface
+ * {@link NewEditTaskFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link NewTaskFragment#newInstance} factory method to
+ * Use the {@link NewEditTaskFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 
 
-public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinnerListener {
+public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiSpinnerListener {
     private Date date;
     private boolean newDate = false;
     private Day day;
     private final static String DATE_TAG="DATE";
+    private final static String TASK_TAG="TASK";
     private final String OTHER_TASK_LABEL = "otherTasksInDay";
 
     private boolean fixed;
@@ -86,7 +87,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
     private final Calendar calendar = Calendar.getInstance();
     private List<Constraint> constraints;
 
-    public NewTaskFragment() {
+    public NewEditTaskFragment() {
         // Required empty public constructor
     }
 
@@ -95,13 +96,21 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
      * this fragment using the provided parameters.
      *
      * @param date  MAKE SURE THIS DATE IS THE STRIPED DATE WITH 0h:0m:0s:00
-     * @return A new instance of fragment NewTaskFragment.
+     * @return A new instance of fragment NewEditTaskFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static NewTaskFragment newInstance(long date) {
-        NewTaskFragment fragment = new NewTaskFragment();
+    public static NewEditTaskFragment newInstance(long date) {
+        NewEditTaskFragment fragment = new NewEditTaskFragment();
         Bundle args = new Bundle();
         args.putLong(DATE_TAG, date);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static NewEditTaskFragment newInstance(String taskId) {
+        NewEditTaskFragment fragment = new NewEditTaskFragment();
+        Bundle args = new Bundle();
+        args.putString(TASK_TAG, taskId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -111,6 +120,27 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             date = new Date(getArguments().getLong(DATE_TAG));
+            String taskString = getArguments().getString(TASK_TAG);
+            if (taskString != null) {
+                ParseQuery<Task> taskParseQuery = Task.getQuery();
+                taskParseQuery.whereEqualTo("objectId", getArguments().getString(TASK_TAG));
+                try {
+                    task = taskParseQuery.getFirst();
+                } catch (Exception e) {
+                    new AlertDialog.Builder(getContext())
+                            .setTitle("Error")
+                            .setMessage("Could not find task!")
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // close fragment
+                                    getActivity().getSupportFragmentManager().beginTransaction().remove(
+                                            NewEditTaskFragment.this).commit();
+                                }
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+                }
+            }
         }
     }
 
@@ -129,22 +159,51 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                         allCategories.add(category.getTitle());
                     }
                 } else {
-                    Log.e(Constants.NEW_TASK_TAG, "Could not fetch categories!");
+                    Log.e(Constants.NEW_EDIT_TASK_TAG, "Could not fetch categories!");
                 }
-                NewTaskFragment.this.categories = new ArrayList<>(allCategories);
+                NewEditTaskFragment.this.categories = new ArrayList<>(allCategories);
                 spinner.setItems(
-                        new ArrayList<>(NewTaskFragment.this.categories),
+                        new ArrayList<>(NewEditTaskFragment.this.categories),
                         getResources().getString(R.string.new_task_category_hint),
-                        NewTaskFragment.this);
+                        NewEditTaskFragment.this);
+//
+//                if (task != null) {
+//                    List<Category> categoryList = new ArrayList<>();
+//
+//                }
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Spinner values cannot be set with onCreateView. This is a fix. God damn it android
+        // why you gotta be like dis.
+        if (task != null) {
+            View view = getView();
+            final Spinner totalTimeHour = (Spinner) view.findViewById(R.id.totalTimeHour);
+            final Spinner totalTimeMinute = (Spinner) view.findViewById(R.id.totalTimeHourMinute);
+
+            int totalTime = task.getTotalTime();
+            int totalTimeHoursTask = totalTime / 60;
+            int totalTimeMinutesTask = totalTime % 60;
+
+            totalTimeHour.setSelection(totalTimeHoursTask);
+            // index should be just the minutes divided by 5, since the selection goes by
+            // 5 minute intervals. This also ensures the minute value is rounded in the strange
+            // case that it wasn't before.
+            totalTimeMinute.setSelection(totalTimeMinutesTask / 5);
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        final View view = inflater.inflate(R.layout.fragment_new_task, container, false);
+        final View view = inflater.inflate(R.layout.fragment_new_edit_task, container, false);
+        final FlatTextView taskPageTitle = (FlatTextView) view.findViewById(R.id.title_newtask);
         final EditText title = (EditText) view.findViewById(R.id.edit_task_name);
         final EditText description = (EditText) view.findViewById(R.id.edit_task_description);
         final TextView startTime = (TextView) view.findViewById(R.id.startTime);
@@ -160,22 +219,74 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
         final Button saveButton = (Button) view.findViewById(R.id.save_button);
         final Button newConstraintButton = (Button) view.findViewById(R.id.add_constraint_button);
 
+        if (task != null) {
+            title.setText(task.getTitle());
+            description.setText(task.getDescription());
+            taskPageTitle.setText(R.string.edit_task_title);
+            // start time, end time, dateTextView, multiSpinner are initiated later.
+            fixed = task.getFixed();
+            fixedSwitch.setChecked(task.getFixed());
+            if (task.getFixed()) {
+                startTimeLayout.setVisibility(View.VISIBLE);
+                endTimeLayout.setVisibility(View.VISIBLE);
+                totalTimeLayout.setVisibility(View.GONE);
+            } else {
+                startTimeLayout.setVisibility(View.GONE);
+                endTimeLayout.setVisibility(View.GONE);
+                totalTimeLayout.setVisibility(View.VISIBLE);
+            }
+        }
+
         view.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                NewTaskFragment.this.getActivity().onTouchEvent(event);
+                NewEditTaskFragment.this.getActivity().onTouchEvent(event);
                 return false;
             }
         });
 
         // Check if user is logged in
         if (ParseUser.getCurrentUser() == null) {
-            Log.e(Constants.NEW_TASK_TAG, "USER IS NULL! SAVING WILL NOT WORK");
+            Log.e(Constants.NEW_EDIT_TASK_TAG, "USER IS NULL! SAVING WILL NOT WORK");
         }
 
+        // Initialize Texts
+        if (task == null) {
+            this.startTime = calendar.getTime();
+            this.endTime = addMinutesToDate(calendar, 30).getTime();
+        } else {
+            this.startTime = task.getStartTime();
+            this.endTime = task.getEndTime();
+        }
+        startTime.setText(timeFormat.format(this.startTime));
+        endTime.setText(timeFormat.format(this.endTime));
+
         // Day
-        day = getOrCreateDay();
+        if (task == null) {
+            day = getOrCreateDay();
+        } else {
+            try {
+                day = task.getDay();
+            } catch (Exception e) {
+                Log.e(Constants.NEW_EDIT_TASK_TAG, "Could not find existing day!");
+                new AlertDialog.Builder(getContext())
+                        .setTitle("Error")
+                        .setMessage("Something went wrong. Please try again!")
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+
+            }
+            date = day.getDate();
+        }
         assert (day != null);
+        assert (date != null);
+
+        calendar.setTime(date);
+        if (task == null) {
+            dateTextView.setText(dateFormat.format(calendar.getTime()));
+        } else {
+            dateTextView.setText(dateFormat.format(day.getDate()));
+        }
 
         // Validate field inputs
         title.addTextChangedListener(new TextWatcher() {
@@ -196,15 +307,6 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
             }
         });
 
-        // Initialize Texts
-        startTime.setText(timeFormat.format(calendar.getTime()));
-        this.startTime = calendar.getTime();
-        endTime.setText(timeFormat.format(addMinutesToDate(calendar, 30).getTime()));
-        this.endTime = addMinutesToDate(calendar, 30).getTime();
-
-        calendar.setTime(date);
-        dateTextView.setText(dateFormat.format(calendar.getTime()));
-        
         // initialize spinner items
         ArrayAdapter<CharSequence> totalTimeHourAdapter = ArrayAdapter.createFromResource(
                 getActivity().getBaseContext(),
@@ -225,7 +327,17 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
 
         // Initialize Constraints List View
         ListView constraintsListView = (NoScrollListView) view.findViewById(R.id.constraints_list);
-        constraints = new ArrayList<>();
+        if (task != null) {
+            ParseQuery<Constraint> taskConstraintsQuery = task.getConstraints();
+            try {
+                constraints = taskConstraintsQuery.find();
+            } catch (Exception e) {
+                Log.d(Constants.NEW_EDIT_TASK_TAG, "Could not find constraints! Assume no constraints");
+                constraints = new ArrayList<>();
+            }
+        } else {
+            constraints = new ArrayList<>();
+        }
         final ConstraintAdapter constraintAdapter = new ConstraintAdapter(
                 getContext(),
                 R.layout.constraint_list_row,
@@ -239,7 +351,6 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                 return false;
             }
         });
-
 
         // Listeners
         fixedSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -263,7 +374,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
             @Override
             public void onClick(View v) {
                 final Calendar c = Calendar.getInstance();
-                c.setTime(NewTaskFragment.this.startTime);
+                c.setTime(NewEditTaskFragment.this.startTime);
                 int hour = c.get(Calendar.HOUR_OF_DAY);
                 int minute = c.get(Calendar.MINUTE);
                 TimePickerDialog startTimePicker;
@@ -272,14 +383,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                     public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
                         c.set(Calendar.HOUR_OF_DAY, selectedHour);
                         c.set(Calendar.MINUTE, selectedMinute);
-                        if (NewTaskFragment.this.endTime != null) {
-                            if (NewTaskFragment.this.endTime.before(c.getTime())) {
-                                // endTime < startTime!
-                                // silent fail the change
-                                return;
-                            }
-                        }
-                        NewTaskFragment.this.startTime = c.getTime();
+                        NewEditTaskFragment.this.startTime = c.getTime();
                         startTime.setText(timeFormat.format(c.getTime()));
                     }
                 }, hour, minute, android.text.format.DateFormat.is24HourFormat(getActivity()));
@@ -291,7 +395,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
             @Override
             public void onClick(View v) {
                 final Calendar c = Calendar.getInstance();
-                c.setTime(NewTaskFragment.this.endTime);
+                c.setTime(NewEditTaskFragment.this.endTime);
 
                 int hour = c.get(Calendar.HOUR_OF_DAY);
                 int minute = c.get(Calendar.MINUTE);
@@ -301,14 +405,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                     public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
                         c.set(Calendar.HOUR_OF_DAY, selectedHour);
                         c.set(Calendar.MINUTE, selectedMinute);
-                        if (NewTaskFragment.this.startTime != null) {
-                            if (NewTaskFragment.this.startTime.after(c.getTime())) {
-                                // startTime > endTime !
-                                // silent fail the change
-                                return;
-                            }
-                        }
-                        NewTaskFragment.this.endTime = c.getTime();
+                        NewEditTaskFragment.this.endTime = c.getTime();
                         endTime.setText(timeFormat.format(c.getTime()));
                     }
                 }, hour, minute, android.text.format.DateFormat.is24HourFormat(getActivity()));
@@ -320,19 +417,18 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
             @Override
             public void onClick(View v) {
                 final NewConstraintDialog constraintDialog = new NewConstraintDialog(
-                        getActivity(), day, constraints);
+                        getActivity(), day, constraints, task);
                 // Constraint needs to be based on current day only
                 // pass in day so it knows which day.
                 constraintDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
-                        Log.d(Constants.NEW_TASK_TAG,
+                        Log.d(Constants.NEW_EDIT_TASK_TAG,
                                 "Dialog dismissed, notifying data change: " + constraints.size());
                         constraintAdapter.notifyDataSetChanged();
                     }
                 });
                 constraintDialog.show();
-
             }
         });
 
@@ -375,11 +471,22 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                         @Override
                         public void done(List<Task> objects, ParseException e) {
                             if (e == null) {
-                                Log.d(Constants.NEW_TASK_TAG, "# tasks with same name: " + objects.size());
-                                if (objects.size() > 0 && !newDate) {
+                                Log.d(Constants.NEW_EDIT_TASK_TAG, "# tasks with same name: " + objects.size());
+                                if (objects.size() > 0 && !newDate && task == null) {
+                                    // trying to create a task with the same name
                                     title.setError("Already have a task with the same name!");
+                                } else if (NewEditTaskFragment.this.endTime.before(
+                                        NewEditTaskFragment.this.startTime
+                                )){
+                                    new AlertDialog.Builder(getContext())
+                                            .setTitle("Error")
+                                            .setMessage("Start time cannot be after end time!")
+                                            .setIcon(android.R.drawable.ic_dialog_alert)
+                                            .show();
                                 } else {
-                                    task = new Task();
+                                    if (task == null) {
+                                        task = new Task();
+                                    }
                                     saveButton.setEnabled(false);
                                     saveButton.setText("Saving...");
                                     task.setTitle(title.getText().toString());
@@ -389,8 +496,8 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
 
                                     // Time
                                     if (fixed) {
-                                        task.setStartTime(NewTaskFragment.this.startTime);
-                                        task.setEndTime(NewTaskFragment.this.endTime);
+                                        task.setStartTime(NewEditTaskFragment.this.startTime);
+                                        task.setEndTime(NewEditTaskFragment.this.endTime);
                                     } else {
                                         task.setTotalTime(totalTime);
                                     }
@@ -423,10 +530,10 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                                                             } else if (objects.size() == 1) {
                                                                 task.addCategory(objects.get(0));
                                                             } else {
-                                                                Log.e(Constants.NEW_TASK_TAG, "Multiple categories returned!");
+                                                                Log.e(Constants.NEW_EDIT_TASK_TAG, "Multiple categories returned!");
                                                             }
                                                         } else {
-                                                            Log.e(Constants.NEW_TASK_TAG, "Could not fetch categories!");
+                                                            Log.e(Constants.NEW_EDIT_TASK_TAG, "Could not fetch categories!");
                                                         }
                                                     }
                                                 });
@@ -436,7 +543,22 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
 
                                     // save constraints
                                     for (final Constraint c : constraints) {
-                                        Log.d(Constants.NEW_TASK_TAG, "Adding constraint: " + c.toString());
+                                        // remove all previous constraints
+                                        try {
+                                            task.removeAllConstraints();
+                                        } catch (ParseException e1) {
+                                            new AlertDialog.Builder(getActivity().getBaseContext())
+                                                    .setTitle("Error")
+                                                    .setMessage("Something went wrong. Please try again!")
+                                                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            saveButton.setEnabled(true);
+                                                        }
+                                                    })
+                                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                                    .show();
+                                        }
+                                        Log.d(Constants.NEW_EDIT_TASK_TAG, "Adding constraint: " + c.toString());
                                         c.saveInBackground();
                                         task.addConstraint(c);
                                     }
@@ -454,18 +576,18 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                                                             // TODO: Close view
                                                             saveButton.setText("Saved!");
                                                         } else {
-                                                            Log.e(Constants.NEW_TASK_TAG + "SaveTask", e.getMessage());
+                                                            Log.e(Constants.NEW_EDIT_TASK_TAG + "SaveTask", e.getMessage());
                                                         }
                                                     }
                                                 });
                                             } else {
-                                                Log.e(Constants.NEW_TASK_TAG + "SaveDay", e.getMessage());
+                                                Log.e(Constants.NEW_EDIT_TASK_TAG + "SaveDay", e.getMessage());
                                             }
                                         }
                                     });
                                 }
                             } else {
-                                Log.e(Constants.NEW_TASK_TAG, e.getMessage());
+                                Log.e(Constants.NEW_EDIT_TASK_TAG, e.getMessage());
                             }
                         }
                     });
@@ -482,7 +604,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
         Day day;
         try{
             List<Day> days = dayParseQuery.find();
-            Log.d(Constants.NEW_TASK_TAG, "# of day with same date: " + days.size());
+            Log.d(Constants.NEW_EDIT_TASK_TAG, "# of day with same date: " + days.size());
             if (days.size() == 0) {
                 // no such day, create it
                 newDate = true;
@@ -524,7 +646,7 @@ public class NewTaskFragment extends Fragment implements MultiSpinner.MultiSpinn
                         public void onClick(DialogInterface dialog, int which) {
                             // close fragment
                             getActivity().getSupportFragmentManager().beginTransaction().remove(
-                                    NewTaskFragment.this).commit();
+                                    NewEditTaskFragment.this).commit();
                         }
                     })
                     .setIcon(android.R.drawable.ic_dialog_alert)

@@ -1,19 +1,21 @@
 package com.cpsc.timecatcher;
 
 import android.content.Context;
-import android.net.Uri;
+
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.alamkanak.weekview.WeekView;
+import com.alamkanak.weekview.WeekViewEvent;
 import com.cpsc.timecatcher.helper.SimpleItemTouchHelperCallback;
 import com.cpsc.timecatcher.model.Day;
 import com.cpsc.timecatcher.model.Task;
@@ -25,8 +27,8 @@ import com.parse.ParseUser;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -42,8 +44,10 @@ import adapters.TaskAdapter;
  * Use the {@link ScheduleFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ScheduleFragment extends Fragment {
+public class ScheduleFragment extends Fragment implements WeekView.MonthChangeListener,
+        WeekView.EventClickListener, WeekView.EventLongPressListener {
     private  long longDate;
+    private   WeekView mWeekView;
     private Date date;
     private final static String DATE_TAG="DATE";
     private FloatingActionButton fab;
@@ -52,9 +56,9 @@ public class ScheduleFragment extends Fragment {
     private TaskAdapter mAdapter;
     private ItemTouchHelper mItemTouchHelper;
     private OnFragmentInteractionListener mListener;
-
+    private List<WeekViewEvent> events = new ArrayList<WeekViewEvent>();
     public ScheduleFragment() {}
-
+    private boolean fetched =false;
     public static ScheduleFragment newInstance(long date) {
         ScheduleFragment fragment = new ScheduleFragment();
         Bundle args = new Bundle();
@@ -66,12 +70,12 @@ public class ScheduleFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       if (getArguments() != null)
-       {   //convert long to Date
-           longDate=getArguments().getLong(DATE_TAG);
-           date = new Date(longDate);
+        if (getArguments() != null)
+        {   //convert long to Date
+            longDate=getArguments().getLong(DATE_TAG);
+            date = new Date(longDate);
 
-       }
+        }
     }
 
     @Override
@@ -80,20 +84,28 @@ public class ScheduleFragment extends Fragment {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_schedule, container, false);
         setTitle();
+        mWeekView = (WeekView) view.findViewById(R.id.weekView);
+        mWeekView.setOnEventClickListener(this);
+        // The week view has infinite scrolling horizontally. We have to provide the events of a
+        // month every time the month changes on the week view.
+        mWeekView.setMonthChangeListener(this);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-
+        // Set long press listener for events.
+        mWeekView.setEventLongPressListener(this);
         fab= (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Fragment scheduleFragment=NewTaskFragment.newInstance(longDate);
+                Fragment scheduleFragment= TasklistFragment.newInstance(longDate);
                 getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
                         .replace(R.id.frame_container, scheduleFragment).commit();
 
             }
         });
+     /*   recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+
+
 
         mAdapter = new TaskAdapter(taskList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -103,7 +115,7 @@ public class ScheduleFragment extends Fragment {
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(recyclerView);
+        mItemTouchHelper.attachToRecyclerView(recyclerView);*/
 
         return view;
     }
@@ -111,7 +123,7 @@ public class ScheduleFragment extends Fragment {
     public void onResume()
     {
         super.onResume();
-        updateSchedule();
+
     }
     private void setTitle()
     {       SimpleDateFormat newDateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy");
@@ -126,11 +138,12 @@ public class ScheduleFragment extends Fragment {
         }
     }
     private void updateSchedule()
-    {   taskList.clear();
+    {
+        if(!fetched){
+            fetched=true;
         ParseQuery<Day> query = new ParseQuery<Day>("Day");
         query.whereEqualTo("user", ParseUser.getCurrentUser());
         query.whereEqualTo("date", date);
-
         query.getFirstInBackground(new GetCallback<Day>() {
             @Override
             public void done(Day object, com.parse.ParseException e) {
@@ -138,17 +151,26 @@ public class ScheduleFragment extends Fragment {
                     Day day = object;
                     ParseQuery<Task> query = new ParseQuery<Task>("Task");
                     query.whereEqualTo("day", day);
-                 //   query.whereExists("startTime");
-                 //   query.whereExists("endTime");
+                    //   query.whereExists("startTime");
+                    //   query.whereExists("endTime");
                     query.addAscendingOrder("startTime");
                     query.findInBackground(new FindCallback<Task>() {
                         @Override
                         public void done(List<Task> objects, com.parse.ParseException e) {
                             if (objects.size() > 0) {
                                 for (Task t : objects) {
-                                        taskList.add(t);
+                                    Calendar startTime = Calendar.getInstance();
+                                    startTime.setTime(t.getStartTime());
+                                    Calendar endTime = Calendar.getInstance();
+                                    endTime.setTime(t.getEndTime());
+                                    WeekViewEvent event = new WeekViewEvent(1,t.getTitle(), startTime, endTime);
+                                    event.setColor(getResources().getColor(R.color.sea));
+                                    events.add(event);
                                 }
-                                mAdapter.notifyDataSetChanged();
+
+                                        // This line will trigger the method 'onMonthChange()' again.
+                                       mWeekView.notifyDatasetChanged();
+
                             } else
                                 Log.e("Parse", "No tasks found");
                         }
@@ -157,6 +179,8 @@ public class ScheduleFragment extends Fragment {
                     Log.e("Parse", "No object returned");
             }
         });
+
+        }
     }
 
     @Override
@@ -176,6 +200,32 @@ public class ScheduleFragment extends Fragment {
         mListener = null;
     }
 
+
+    @Override
+    public List<WeekViewEvent> onMonthChange(int newYear, int newMonth) {
+
+        if (events.size() <= 0 ) {
+            updateSchedule();
+            return new ArrayList<WeekViewEvent>();
+        }
+
+        return events;
+
+    }
+    private String getEventTitle(Calendar time) {
+        return String.format("Event of %02d:%02d %s/%d", time.get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE), time.get(Calendar.MONTH)+1, time.get(Calendar.DAY_OF_MONTH));
+    }
+
+    @Override
+    public void onEventClick(WeekViewEvent event, RectF eventRect) {
+        Toast.makeText(getActivity(), "Clicked " + event.getName(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onEventLongPress(WeekViewEvent event, RectF eventRect) {
+        Toast.makeText(getActivity(), "Long pressed event: " + event.getName(), Toast.LENGTH_SHORT).show();
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -188,6 +238,6 @@ public class ScheduleFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-         public void addTask(long date);
+        public void addTask(long date);
     }
 }

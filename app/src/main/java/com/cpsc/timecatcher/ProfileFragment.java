@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.cpsc.timecatcher.helper.Constants;
+import com.facebook.FacebookException;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -65,7 +68,17 @@ public class ProfileFragment extends Fragment {
         notification=(Switch) view.findViewById(R.id.notified_switch);
         invitation=(Button) view.findViewById(R.id.invite_friend);
         logOut=(Button) view.findViewById(R.id.user_logout);
-
+        final ParseUser currentUser=ParseUser.getCurrentUser();
+        try{
+            if(currentUser!=null){
+                userName.setText(currentUser.getString("name"));
+//                if(currentUser.getString("authData")!=null){
+//                    profile.setBackgroundColor(getResources().getColor(R.color.grape_light));
+//                }
+            }
+        }catch(Exception e){
+            Log.e(Constants.PROFILE_TAG + "UserProfile",e.getMessage());
+        }
 
 
         notification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -79,9 +92,6 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-
-
-
             }
 
         });
@@ -90,18 +100,24 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ParseUser.logOut();
-                if(ParseUser.getCurrentUser()==null){
-                    mListener.onUserLogOut();
+                try{
+                    if(ParseUser.getCurrentUser()==null){
+                        mListener.onClickUserLogOut();
+                    }
+                }catch(Exception e){
+                    Log.e(Constants.PROFILE_TAG + "LogOut", e.getMessage());
+
                 }
+
             }
         });
 
-            return view;
-        }
+        return view;
+    }
 
         public interface OnFragmentInteractionListener{
-            public void onUserLogOut();
-    }
+            public void onClickUserLogOut();
+        }
 
 
 
