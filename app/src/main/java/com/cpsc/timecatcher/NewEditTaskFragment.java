@@ -484,8 +484,10 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                             .setIcon(android.R.drawable.ic_dialog_alert)
                                             .show();
                                 } else {
+                                    boolean isNew = false;
                                     if (task == null) {
                                         task = new Task();
+                                        isNew = true;
                                     }
                                     saveButton.setEnabled(false);
                                     saveButton.setText("Saving...");
@@ -545,7 +547,9 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                     for (final Constraint c : constraints) {
                                         // remove all previous constraints
                                         try {
-                                            task.removeAllConstraints();
+                                            if (!isNew) {
+                                                task.removeAllConstraints();
+                                            }
                                         } catch (ParseException e1) {
                                             new AlertDialog.Builder(getActivity().getBaseContext())
                                                     .setTitle("Error")
