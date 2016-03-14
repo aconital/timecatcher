@@ -23,7 +23,7 @@ public class StructureActivity extends AppCompatActivity
         TasklistFragment.OnFragmentInteractionListener,
         ProfileFragment.OnFragmentInteractionListener{
 
-    private Button schedule,calendar,analytics,profile;
+    private Button schedule,calendar,graph,profile;
 
 
     @Override
@@ -68,18 +68,18 @@ public class StructureActivity extends AppCompatActivity
 
 
 
-        analytics=(Button)findViewById(R.id.analytics);
-/*        search.setOnClickListener(new View.OnClickListener() {
+        graph=(Button)findViewById(R.id.analytics);
+        graph.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Fragment f = getSupportFragmentManager().findFragmentById(R.id.frame_container);
-                if (!(f instanceof ChooseAvatarFragment))
+                if (!(f instanceof GraphFragment))
                 {
-                    Fragment introFragment=new ChooseAvatarFragment();
-                    launchFragment(introFragment,Constants.AVATAR_TAG);
+                    Fragment introFragment=new GraphFragment();
+                    launchFragment(introFragment,Constants.GRAPH_TAG);
                 }
             }
-        });*/
+        });
         profile=(Button)findViewById(R.id.profile);
         profile.setOnClickListener(new View.OnClickListener() {
             @Override
