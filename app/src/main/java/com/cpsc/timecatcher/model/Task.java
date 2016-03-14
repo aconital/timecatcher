@@ -126,7 +126,7 @@ public class Task extends ParseObject implements ITimeSlot {
         this.saveInBackground();
     }
 
-    public ParseQuery<ParseObject> getCategories() {
+    public ParseQuery<Category> getCategories() {
         ParseRelation relation = this.getRelation("categories");
         return relation.getQuery();
     }
