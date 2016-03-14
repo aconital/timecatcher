@@ -1,12 +1,17 @@
 package adapters;
 
+import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.cpsc.timecatcher.NewEditTaskFragment;
 import com.cpsc.timecatcher.helper.ItemTouchHelperViewHolder;
 import com.cpsc.timecatcher.R;
 import com.cpsc.timecatcher.helper.ItemTouchHelperAdapter;
@@ -23,6 +28,7 @@ import java.util.List;
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> implements ItemTouchHelperAdapter {
 
     private List<Task> taskList;
+    private FragmentActivity mContext;
 
     @Override
     public void onItemMove(int fromPosition, int toPosition) {
@@ -51,6 +57,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
 
         @Override
         public void onItemSelected() {
+
             itemView.setBackgroundColor(Color.LTGRAY);
 
         }
@@ -65,7 +72,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
     public TaskAdapter(List<Task> taskList) {
         this.taskList = taskList;
     }
-
+    public TaskAdapter(List<Task> taskList, FragmentActivity c) {
+        this.taskList = taskList;
+        mContext=c;
+    }
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
