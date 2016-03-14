@@ -5,18 +5,27 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.cpsc.timecatcher.NewEditTaskFragment;
 import com.cpsc.timecatcher.helper.ItemTouchHelperViewHolder;
 import com.cpsc.timecatcher.R;
 import com.cpsc.timecatcher.helper.ItemTouchHelperAdapter;
+import com.cpsc.timecatcher.model.Category;
 import com.cpsc.timecatcher.model.Task;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
 
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -47,12 +56,15 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
     public class MyViewHolder extends RecyclerView.ViewHolder  implements
             ItemTouchHelperViewHolder {
         public TextView title, end, start;
+        public LinearLayout tagsLayout;
 
         public MyViewHolder(View view) {
             super(view);
             title = (TextView) view.findViewById(R.id.title);
             end = (TextView) view.findViewById(R.id.end);
             start = (TextView) view.findViewById(R.id.start);
+            tagsLayout=(LinearLayout) view.findViewById(R.id.tags);
+
         }
 
         @Override
@@ -87,6 +99,25 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Task task = taskList.get(position);
+        ParseQuery<Category> queryCategories= task.getCategories();
+        List<Category> categories;
+        try {
+            categories=queryCategories.find();
+        } catch (ParseException e) {
+            e.printStackTrace();
+            categories=new ArrayList<>();
+        }
+        holder.tagsLayout.removeAllViews();
+        for(Category c:categories)
+        {
+            TextView cat =new TextView(mContext);
+            cat.setText(c.getTitle());
+            cat.setPadding(25,5,25,5);
+            cat.setGravity(Gravity.CENTER);
+            cat.setBackgroundResource(R.drawable.bg_round);
+            cat.setTextColor(ContextCompat.getColor(mContext,R.color.white));
+            holder.tagsLayout.addView(cat);
+        }
 
         boolean isFixed = task.getFixed();
         //different color for fixed tasks
