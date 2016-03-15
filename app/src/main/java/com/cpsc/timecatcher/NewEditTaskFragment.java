@@ -613,6 +613,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                 // no such day, create it
                 newDate = true;
                 day = new Day();
+                day.initialize();
                 day.setUser(ParseUser.getCurrentUser());
                 day.setDate(date);
 

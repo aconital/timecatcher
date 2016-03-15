@@ -36,6 +36,17 @@ public class Day extends ParseObject {
         return getDate("date");
     }
 
+    public void initialize() {
+        String[] categories = {"Work", "School", "Housework", "Gym", "Family"};
+        for(String category : categories) {
+            setTimeSpent(category, 0);
+        }
+    }
+
+    public void setTimeSpent(String categoryName, int timeSpent) {
+        put("timeSpentOn" + categoryName, timeSpent);
+    }
+
     public void setDayStart(Date date) {
         put("dayStart", date);
     }
@@ -79,6 +90,10 @@ public class Day extends ParseObject {
         } else {
             taskOfDayQuery(currentUser).findInBackground(cb);
         }
+    }
+
+    public int getTimeSpentOn(String categoryName) {
+        return getInt("timeSpentOn" + categoryName);
     }
 
     private ParseQuery<Task> taskOfDayQuery(ParseUser currentUser) {
