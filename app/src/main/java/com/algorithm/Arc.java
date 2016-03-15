@@ -9,7 +9,7 @@ public class Arc {
 	private int v;
 	private int weight;
 	
-	Arc(int _u, int _v, int _weight){
+	Arc(int _u, int _v, int _weight) {
 		u=_u;
 		v=_v;
 		weight=_weight;

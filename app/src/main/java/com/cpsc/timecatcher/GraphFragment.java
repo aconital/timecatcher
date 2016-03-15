@@ -36,18 +36,28 @@ public class GraphFragment extends Fragment {
     private TextView txtView;
 
     private String[] xData = { "School", "Work", "HouseWork","Family","Gym"};
-    private float[] yData = { 30,30,10,20,10 };// corresponds to  "School", "Work", "HouseWork","Family","Gym" respectively
+    private float[] yData = { 30,20,10,30,10};// corresponds to  "School", "Work", "HouseWork","Family","Gym" respectively
 
 
     public GraphFragment(){}
 
     private void dataInitialization(){
         // used to initialize   float[] yData
+        /*
+        ParseQuery<Task> taskParseQuery = Task.getQuery();
+        taskParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+        if (day != null) {
+            taskParseQuery.whereEqualTo("day", day);
+        } else {
+            Log.d(Constants.NEW_CONSTRAINT_TAG, "Warning: null day, getting all user's tasks");
+        }
+       */
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getActivity().setTitle("Time Spent Distribution Chart");
         dataInitialization();
     }
 
@@ -93,7 +103,7 @@ public class GraphFragment extends Fragment {
 
                 toast = Toast.makeText(getActivity(),
                         xData[e.getXIndex()] + " = " + formatter.format(e.getVal()) + "%", Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.BOTTOM | Gravity.CENTER, 0, 110);
+                toast.setGravity(Gravity.BOTTOM | Gravity.CENTER, 0, 145);
                 toast.show();
             }
 
@@ -114,16 +124,14 @@ public class GraphFragment extends Fragment {
         l.setTextColor(Color.parseColor("#000000"));//black
         //l.setTextColor(Color.parseColor(Integer.toString(getResources().getColor(R.color.black))));//black
         l.setTextSize(10f);
-
         return view;
     }
     private void addData() {
         ArrayList<Entry> yVals1 = new ArrayList<Entry>();
+        ArrayList<String> xVals = new ArrayList<String>();
 
         for (int i = 0; i < yData.length; i++)
             yVals1.add(new Entry(yData[i], i));
-
-        ArrayList<String> xVals = new ArrayList<String>();
 
         for (int i = 0; i < xData.length; i++)
             xVals.add(xData[i]);
