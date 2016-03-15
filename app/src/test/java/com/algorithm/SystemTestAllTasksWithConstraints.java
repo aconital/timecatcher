@@ -1,6 +1,7 @@
 package com.algorithm;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -94,5 +95,96 @@ public class SystemTestAllTasksWithConstraints extends TimedTest {
         CSP_Solver solver = new CSP_Solver(problem);
         solutions = solver.getSolutions();
         assertEquals(true, solutions.isEmpty());
+    }
+
+    @Test
+    public void testFlexibleOneMinuteSnugFitWithConstraint() throws Exception {
+        problem.addFixedTask(new Time(1, 0), new Time(12, 30));
+        problem.addFixedTask(new Time(12, 31), new Time(13, 29));
+        problem.addFixedTask(new Time(13, 30), new Time(23, 0));
+        problem.addFlexibleTask(new Time(0, 1));
+        problem.addFlexibleTask(new Time(0, 1));
+        problem.createConstraintGraph();
+        problem.addConstraint(3, 2, 0);
+        CSP_Solver solver = new CSP_Solver(problem);
+        solutions = solver.getSolutions();
+        try {
+            AlgorithmTestUtils.noOverLap(solutions);
+            assertEquals(false, solutions.isEmpty());
+        } catch (AssertionError e) {
+            // print out problematic solution
+            solver.printSolutions();
+            throw e;
+        }
+    }
+
+    @Test
+    public void testShortDay() {
+        dayStart = new Time(22,0);
+        dayEnd = new Time(23,0);
+        problem = new CSP(dayStart,dayEnd);
+        problem.addFlexibleTask(new Time(1, 0));
+        problem.createConstraintGraph();
+        CSP_Solver solver = new CSP_Solver(problem);
+        solutions = solver.getSolutions();
+        try {
+            assertEquals(false, solutions.isEmpty());
+            AlgorithmTestUtils.noOverLap(solutions);
+            AlgorithmTestUtils.checkConstraints(solutions, problem);
+        } catch (AssertionError e) {
+            // print out problematic solution
+            solver.printSolutions();
+            throw e;
+        }
+    }
+
+    @Ignore("This test takes 22 seconds")
+    @Test
+    public void testMaxTasksDay() {
+
+        dayStart = new Time(0, 0);
+        dayEnd = new Time(23, 59);
+        problem = new CSP(dayStart,dayEnd);
+        for (int i = 0; i < 60 * 24 - 1; i++) {
+            problem.addFlexibleTask(new Time(0, 1));
+        }
+        problem.createConstraintGraph();
+        CSP_Solver solver = new CSP_Solver(problem);
+        solutions = solver.getSolutions();
+        try {
+            assertEquals(false, solutions.isEmpty());
+            AlgorithmTestUtils.noOverLap(solutions);
+            AlgorithmTestUtils.checkConstraints(solutions, problem);
+        } catch (AssertionError e) {
+            // print out problematic solution
+            solver.printSolutions();
+            throw e;
+        }
+    }
+
+    @Ignore("This test takes 150 seconds")
+    @Test
+    public void testMaxTasksWithConstraintsDay() {
+        dayStart = new Time(0, 0);
+        dayEnd = new Time(23, 59);
+        problem = new CSP(dayStart,dayEnd);
+        for (int i = 0; i < 60 * 24 - 1; i++) {
+            problem.addFlexibleTask(new Time(0, 1));
+        }
+        problem.createConstraintGraph();
+        for (int i = 0; i < 60 * 24 - 2; i++) {
+            problem.addConstraint(i, i+1, 0);
+        }
+        CSP_Solver solver = new CSP_Solver(problem);
+        solutions = solver.getSolutions();
+        try {
+            assertEquals(false, solutions.isEmpty());
+            AlgorithmTestUtils.noOverLap(solutions);
+            AlgorithmTestUtils.checkConstraints(solutions, problem);
+        } catch (AssertionError e) {
+            // print out problematic solution
+            solver.printSolutions();
+            throw e;
+        }
     }
 }
