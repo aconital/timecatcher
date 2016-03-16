@@ -20,6 +20,8 @@ import android.widget.TextView;
 import com.cpsc.timecatcher.helper.Constants;
 import com.facebook.FacebookException;
 import com.facebook.login.widget.ProfilePictureView;
+import com.facebook.share.model.AppInviteContent;
+import com.facebook.share.widget.AppInviteDialog;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -31,6 +33,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
 
 /**
  * Created by junyishen on 2016-02-25.
@@ -89,7 +92,13 @@ public class ProfileFragment extends Fragment {
 //                GetXMLTask task = new GetXMLTask();
 //                // Execute the task
 //                task.execute(new String[]{URL});
-                profilePictureView.setProfileId(currentUser.getObjectId());
+                HashMap authDataMap = (HashMap)currentUser.get("authData");
+                if(authDataMap!=null) {
+                    HashMap facebookMap = (HashMap) authDataMap.get("facebook");
+                    String facebookId = (String) facebookMap.get("id");
+                    profilePictureView.setProfileId(facebookId);
+                    profilePictureView.setPresetSize(ProfilePictureView.LARGE);
+                }
             }
         }catch(Exception e){
             Log.e(Constants.PROFILE_TAG + "UserProfile",e.getMessage());
@@ -105,7 +114,18 @@ public class ProfileFragment extends Fragment {
         invitation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String appLinkUrl, previewImageUrl;
 
+                appLinkUrl = "https://fb.me/1255752534439555";
+               // previewImageUrl = "https://www.mydomain.com/my_invite_image.jpg";
+
+                if (AppInviteDialog.canShow()) {
+                    AppInviteContent content = new AppInviteContent.Builder()
+                            .setApplinkUrl(appLinkUrl)
+                //            .setPreviewImageUrl(previewImageUrl)
+                            .build();
+                    AppInviteDialog.show(ProfileFragment.this, content);
+                }
             }
 
         });
@@ -187,7 +207,5 @@ public class ProfileFragment extends Fragment {
     public interface OnFragmentInteractionListener{
         public void onClickUserLogOut();
     }
-
-
 
 }
