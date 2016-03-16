@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.cengalabs.flatui.views.FlatTextView;
+import com.cpsc.timecatcher.algorithm.TimeUtils;
 import com.cpsc.timecatcher.gui.MultiSpinner;
 import com.cpsc.timecatcher.gui.NoScrollListView;
 import com.cpsc.timecatcher.helper.Constants;
@@ -436,9 +437,8 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
             @Override
             public void onClick(View v) {
                 CharSequence error = title.getError();
-                int totalHours = Integer.parseInt(totalTimeHour.getSelectedItem().toString());
-                int totalMinutes = Integer.parseInt(totalTimeMinute.getSelectedItem().toString());
-                final int totalTime = totalHours * 60 + totalMinutes;
+                final int totalHours = Integer.parseInt(totalTimeHour.getSelectedItem().toString());
+                final int totalMinutes = Integer.parseInt(totalTimeMinute.getSelectedItem().toString());
                 if (error != null) {
                     // If title is empty
                     title.requestFocus();
@@ -447,7 +447,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                     // this check is still necessary
                     title.setError("Task name cannot be empty!");
                     title.requestFocus();
-                } else if (totalTime == 0 && !fixed) {
+                } else if (totalHours == 0 && totalMinutes == 0 && !fixed) {
                     // Total time shouldn't be zero
                     new AlertDialog.Builder(getContext())
                             .setTitle("Save Task Error")
@@ -497,10 +497,16 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                     task.setUser(ParseUser.getCurrentUser());
 
                                     // Time
+                                    final int totalTime;
                                     if (fixed) {
                                         task.setStartTime(NewEditTaskFragment.this.startTime);
                                         task.setEndTime(NewEditTaskFragment.this.endTime);
+                                        totalTime = TimeUtils.getMinutesDiff(
+                                                NewEditTaskFragment.this.startTime,
+                                                NewEditTaskFragment.this.endTime);
+                                        task.setTotalTime(totalTime);
                                     } else {
+                                        totalTime = totalHours * 60 + totalMinutes;
                                         task.setTotalTime(totalTime);
                                     }
                                     // Categories
@@ -527,10 +533,12 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                                                     @Override
                                                                     public void done(ParseException e) {
                                                                         task.addCategory(c);
+                                                                        day.setTimeSpent(title, totalTime);
                                                                     }
                                                                 });
                                                             } else if (objects.size() == 1) {
                                                                 task.addCategory(objects.get(0));
+                                                                day.setTimeSpent(title, totalTime);
                                                             } else {
                                                                 Log.e(Constants.NEW_EDIT_TASK_TAG, "Multiple categories returned!");
                                                             }
