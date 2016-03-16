@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * Created by fujiaoyang1 on 3/13/16.
@@ -35,9 +36,12 @@ public class GraphFragmentWeek extends Fragment {
     private FrameLayout frameLayout;
     private PieChart mChart;
     private String[] xData = { "School", "Work", "HouseWork","Family","Gym"};
-    private float[] yData = { 30,20,10,30,10};// corresponds to  "School", "Work", "HouseWork","Family","Gym" respectively
-    //private float[] yData = { 0,0,0,0,0};// corresponds to  "School", "Work", "HouseWork","Family","Gym" respectively
+    //private float[] yData = { 30,20,10,30,10};// corresponds to  "School", "Work", "HouseWork","Family","Gym" respectively
+    private float[] yData = { 0,0,0,0,0};// corresponds to  "School", "Work", "HouseWork","Family","Gym" respectively
     private float rotationAngel=0;
+    private Date today;
+    private Date sevenDaysAgo;
+
     public GraphFragmentWeek(){}
 
     private void dataInitialization(){
@@ -57,6 +61,10 @@ public class GraphFragmentWeek extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActivity().setTitle("Time Spent Distribution Chart");
+        Calendar cal = new GregorianCalendar();
+        cal.add(Calendar.DAY_OF_MONTH, -6);
+        sevenDaysAgo = cal.getTime();//seven Days Ago
+        today= Calendar.getInstance().getTime();
         dataInitialization();
     }
 
@@ -71,11 +79,11 @@ public class GraphFragmentWeek extends Fragment {
 
         // show start and end date
         TextView startTime = (TextView) relativeLayout.findViewById(R.id.startDateGraph);
-        startTimeStr= getDateString(Calendar.getInstance().getTime());
+        startTimeStr= getDateString(sevenDaysAgo);
         startTime.setText(startTimeStr);
 
         TextView endTime = (TextView) relativeLayout.findViewById(R.id.endDateGraph);
-        endTimeStr= getDateString(Calendar.getInstance().getTime());
+        endTimeStr= getDateString(today);
         endTime.setText(endTimeStr);
 
         // check if data available
