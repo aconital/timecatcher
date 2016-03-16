@@ -12,6 +12,7 @@
         android:layout_alignParentLeft="true"
         android:paddingTop="10dip"
         android:gravity="center_horizontal"
+        android:clickable="true"
         android:textColor="@color/black"
         android:textSize="16sp"
         android:text="start Date" />
@@ -33,9 +34,12 @@
         android:layout_alignParentRight="true"
         android:paddingTop="10dip"
         android:gravity="center_horizontal"
+        android:clickable="true"
         android:textColor="@color/black"
         android:textSize="16sp"
         android:text="end Date" />
+
+
 
     <LinearLayout
         android:orientation="vertical"
@@ -44,6 +48,12 @@
         android:layout_alignParentStart="true"
         android:layout_marginTop="40dip"
         android:layout_below="@+id/startDateGraph">
+
+            <Button
+            android:id="@+id/button1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pick_date" />
 
             <FrameLayout
                 android:id="@+id/pieChartContainer"

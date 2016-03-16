@@ -31,13 +31,17 @@ public class GraphFragmentTabHost extends Fragment {
         mTabHost.setup(getActivity(), getChildFragmentManager(), R.id.graphRealTabContent);
 
         mTabHost.getTabWidget().setBackgroundColor(getResources().getColor(R.color.pale_purple));
-
+        /*
         mTabHost.addTab(mTabHost.newTabSpec("Day").setIndicator("Day"),
                 GraphFragmentDay.class, null);
         mTabHost.addTab(mTabHost.newTabSpec("Week").setIndicator("Week"),
                 GraphFragmentWeek.class, null);
         mTabHost.addTab(mTabHost.newTabSpec("Month").setIndicator("Month"),
                 GraphFragmentMonth.class, null);
+         */
+
+        mTabHost.addTab(mTabHost.newTabSpec("Range").setIndicator("Range"),
+                GraphFragmentRange.class, null);
 
         return rootView;
     }

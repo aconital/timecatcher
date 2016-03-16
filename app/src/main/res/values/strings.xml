@@ -45,6 +45,8 @@
     <string name="endDateGraph">end Date Graph</string>
     <string name="graphRealTabContent">graph Real Tab Content</string>
     <string name="NoChartText">No Chart Text</string>
+    <string name="pick_date">pick_date</string>
+    <string name="button1">button1</string>
 
     <string-array name="new_task_default_categories_array">
         <item>School</item>
