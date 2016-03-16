@@ -73,9 +73,9 @@ public class StructureActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 Fragment f = getSupportFragmentManager().findFragmentById(R.id.frame_container);
-                if (!(f instanceof GraphFragment))
+                if (!(f instanceof GraphFragmentTabHost))
                 {
-                    Fragment introFragment=new GraphFragment();
+                    Fragment introFragment=new GraphFragmentTabHost();
                     launchFragment(introFragment,Constants.GRAPH_TAG);
                 }
             }

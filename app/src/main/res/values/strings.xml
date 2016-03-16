@@ -39,8 +39,12 @@
 
     <!-- Graph -->
     <string name="graphContainer">graph Container</string>
-    <string name="graphTextWarning">graph Text Warning</string>
-
+    <string name="pieChartContainer">pie Chart  Container</string>
+    <string name="categorySelectedText">category Selected Text</string>
+    <string name="startDateGraph">start Date Graph</string>
+    <string name="endDateGraph">end Date Graph</string>
+    <string name="graphRealTabContent">graph Real Tab Content</string>
+    <string name="NoChartText">No Chart Text</string>
 
     <string-array name="new_task_default_categories_array">
         <item>School</item>
