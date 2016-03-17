@@ -11,6 +11,7 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.cpsc.timecatcher.model.Day;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.Entry;
@@ -19,6 +20,8 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -27,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * Created by fujiaoyang1 on 3/13/16.
@@ -46,15 +50,36 @@ public class GraphFragmentWeek extends Fragment {
 
     private void dataInitialization(){
         // used to initialize   float[] yData
-        /*
-        ParseQuery<Task> taskParseQuery = Task.getQuery();
-        taskParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
-        if (day != null) {
-            taskParseQuery.whereEqualTo("day", day);
-        } else {
-            Log.d(Constants.NEW_CONSTRAINT_TAG, "Warning: null day, getting all user's tasks");
+        long timeSpentOnCategory[]={0,0,0,0,0};
+        long total=0;
+
+        ParseQuery<Day> dayParseQuery = Day.getQuery();
+        dayParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+        dayParseQuery.whereGreaterThanOrEqualTo("date", sevenDaysAgo);
+        dayParseQuery.whereLessThanOrEqualTo("date", today);
+        try{
+            List<Day> days = dayParseQuery.find();
+            for (Day day : days) {
+                timeSpentOnCategory[0]+=day.getTimeSpentOn(xData[0]);
+                timeSpentOnCategory[1]+=day.getTimeSpentOn(xData[1]);
+                timeSpentOnCategory[2]+=day.getTimeSpentOn(xData[2]);
+                timeSpentOnCategory[3]+=day.getTimeSpentOn(xData[3]);
+                timeSpentOnCategory[4]+=day.getTimeSpentOn(xData[4]);
+            }
+
+            for(int i=0;i<5;i++) {
+                total+=timeSpentOnCategory[i];
+            }
+
+            if(Float.compare(0, total)!=0){
+                for(int i=0;i<5;i++) {
+                    yData[i]=100* ((float)timeSpentOnCategory[i]/(float)total);
+                }
+            }
+
+        }catch(Exception e) {
+            System.out.println("Exception thrown  :" + e);
         }
-       */
     }
 
     @Override
@@ -72,7 +97,6 @@ public class GraphFragmentWeek extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         String startTimeStr,endTimeStr;
-
 
         View view=  inflater.inflate(R.layout.fragment_graph_day, container, false);
         relativeLayout = (RelativeLayout) view.findViewById(R.id.graphContainer);
@@ -165,13 +189,12 @@ public class GraphFragmentWeek extends Fragment {
         ArrayList<Entry> yVals1 = new ArrayList<Entry>();
         ArrayList<String> xVals = new ArrayList<String>();
 
-        for (int i = 0; i < yData.length; i++){
+        for (int i = 0,j=0; i < yData.length; i++){
             if(Float.compare(0, yData[i])!=0){
-                yVals1.add(new Entry(yData[i], i));
+                yVals1.add(new Entry(yData[i], j++));
                 xVals.add(xData[i]);
             }//if
         }//for
-
         // create pie data set
         PieDataSet dataSet = new PieDataSet(yVals1, "");
         dataSet.setSliceSpace(3);

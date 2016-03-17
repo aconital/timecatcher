@@ -215,9 +215,9 @@ public class GraphFragmentRange extends Fragment {
         ArrayList<Entry> yVals1 = new ArrayList<Entry>();
         ArrayList<String> xVals = new ArrayList<String>();
 
-        for (int i = 0; i < yData.length; i++){
+        for (int i = 0,j=0; i < yData.length; i++){
             if(Float.compare(0, yData[i])!=0){
-                yVals1.add(new Entry(yData[i], i));
+                yVals1.add(new Entry(yData[i], j++));
                 xVals.add(xData[i]);
             }//if
         }//for

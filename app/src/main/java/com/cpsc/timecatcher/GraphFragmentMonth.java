@@ -40,8 +40,8 @@ public class GraphFragmentMonth extends Fragment {
     private FrameLayout frameLayout;
     private PieChart mChart;
     private String[] xData = { "School", "Work", "HouseWork","Family","Gym"};
-    private float[] yData = { 30,20,10,30,10};// corresponds to  "School", "Work", "HouseWork","Family","Gym" respectively
-    //private float[] yData = { 0,0,0,0,0};// corresponds to  "School", "Work", "HouseWork","Family","Gym" respectively
+    //private float[] yData = { 30,20,10,30,10};// corresponds to  "School", "Work", "HouseWork","Family","Gym" respectively
+    private float[] yData = { 0,0,0,0,0};// corresponds to  "School", "Work", "HouseWork","Family","Gym" respectively
     private float rotationAngel=0;
     private Date today;
     private Date aMonthAgo;//30 days
@@ -64,14 +64,17 @@ public class GraphFragmentMonth extends Fragment {
                 timeSpentOnCategory[1]+=day.getTimeSpentOn(xData[1]);
                 timeSpentOnCategory[2]+=day.getTimeSpentOn(xData[2]);
                 timeSpentOnCategory[3]+=day.getTimeSpentOn(xData[3]);
+                timeSpentOnCategory[4]+=day.getTimeSpentOn(xData[4]);
             }
 
             for(int i=0;i<5;i++) {
                 total+=timeSpentOnCategory[i];
             }
 
-            for(int i=0;i<5;i++) {
-                yData[i]=100* ((float)timeSpentOnCategory[0]/(float)total);
+            if(Float.compare(0, total)!=0){
+                for(int i=0;i<5;i++) {
+                    yData[i]=100* ((float)timeSpentOnCategory[i]/(float)total);
+                }
             }
 
         }catch(Exception e) {
@@ -187,9 +190,9 @@ public class GraphFragmentMonth extends Fragment {
         ArrayList<Entry> yVals1 = new ArrayList<Entry>();
         ArrayList<String> xVals = new ArrayList<String>();
 
-        for (int i = 0; i < yData.length; i++){
+        for (int i = 0,j=0; i < yData.length; i++){
             if(Float.compare(0, yData[i])!=0){
-                yVals1.add(new Entry(yData[i], i));
+                yVals1.add(new Entry(yData[i], j++));
                 xVals.add(xData[i]);
             }//if
         }//for
