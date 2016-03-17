@@ -50,21 +50,33 @@ public class GraphFragmentMonth extends Fragment {
 
     private void dataInitialization(){
         // used to initialize   float[] yData
+        long timeSpentOnCategory[]={0,0,0,0,0};
+        long total=0;
 
-        int timeSpentOnSchool=0;
         ParseQuery<Day> dayParseQuery = Day.getQuery();
         dayParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
-        dayParseQuery.whereEqualTo("date", aMonthAgo);
-        dayParseQuery.whereGreaterThan("date", today);
+        dayParseQuery.whereGreaterThanOrEqualTo("date", aMonthAgo);
+        dayParseQuery.whereLessThanOrEqualTo("date", today);
         try{
             List<Day> days = dayParseQuery.find();
             for (Day day : days) {
-                timeSpentOnSchool += day.getTimeSpentOn("School");
+                timeSpentOnCategory[0]+=day.getTimeSpentOn(xData[0]);
+                timeSpentOnCategory[1]+=day.getTimeSpentOn(xData[1]);
+                timeSpentOnCategory[2]+=day.getTimeSpentOn(xData[2]);
+                timeSpentOnCategory[3]+=day.getTimeSpentOn(xData[3]);
             }
-        }catch(Exception e){
+
+            for(int i=0;i<5;i++) {
+                total+=timeSpentOnCategory[i];
+            }
+
+            for(int i=0;i<5;i++) {
+                yData[i]=100* ((float)timeSpentOnCategory[0]/(float)total);
+            }
+
+        }catch(Exception e) {
             System.out.println("Exception thrown  :" + e);
         }
-
     }
 
     @Override
