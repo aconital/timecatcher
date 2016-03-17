@@ -2,14 +2,12 @@ package com.cpsc.timecatcher;
 
 
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -34,23 +32,21 @@ import java.util.Date;
 /**
  * Created by fujiaoyang1 on 3/13/16.
  */
-public class GraphFragmentRange extends  DialogFragment
-        implements DatePickerDialog.OnDateSetListener{
+public class GraphFragmentRange extends Fragment {
     private RelativeLayout relativeLayout;
     private FrameLayout frameLayout;
     private DatePicker datePicker;
     private PieChart mChart;
     private String[] xData = { "School", "Work", "HouseWork","Family","Gym"};
-    //private float[] yData = { 30,20,10,30,10};// corresponds to  "School", "Work", "HouseWork","Family","Gym" respectively
-    private float[] yData = { 0,0,0,0,0};// corresponds to  "School", "Work", "HouseWork","Family","Gym" respectively
+    private float[] yData = { 30,20,10,30,10};// corresponds to  "School", "Work", "HouseWork","Family","Gym" respectively
+    //private float[] yData = { 0,0,0,0,0};// corresponds to  "School", "Work", "HouseWork","Family","Gym" respectively
     private float rotationAngel=0;
     private Date startDate;
     private Date endDate;
-    private Date dateChanged;
-    private int year, month, day;
+    private static int Year=-1, Month, Day;
+    private TextView textViewStart,textViewEnd;
 
     public GraphFragmentRange(){}
-
     private void dataInitialization(){
         // used to initialize   float[] yData
         /*
@@ -67,14 +63,16 @@ public class GraphFragmentRange extends  DialogFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        //icepick.Icepick.restoreInstanceState(this, savedInstanceState);
         getActivity().setTitle("Time Spent Distribution Chart");
         Calendar calendar = Calendar.getInstance();
         endDate=startDate= calendar.getTime();
-        year = calendar.get(Calendar.YEAR);
-        month = calendar.get(Calendar.MONTH);
-        day = calendar.get(Calendar.DAY_OF_MONTH);
         dataInitialization();
+    }
+
+    @Override public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //icepick.Icepick.saveInstanceState(this, outState);
     }
 
     @Override
@@ -82,23 +80,58 @@ public class GraphFragmentRange extends  DialogFragment
                              Bundle savedInstanceState) {
         View view=  inflater.inflate(R.layout.fragment_graph_day, container, false);
         relativeLayout = (RelativeLayout) view.findViewById(R.id.graphContainer);
-        showDate(startDate, endDate);
 
-        TextView textViewStart=(TextView)view.findViewById(R.id.startDateGraph);
-        TextView textViewEnd=(TextView)view.findViewById(R.id.endDateGraph);
-        Button button=(Button)view.findViewById(R.id.button1);
+        textViewStart=(TextView)view.findViewById(R.id.startDateGraph);
+        textViewEnd=(TextView)view.findViewById(R.id.endDateGraph);
+        textViewStart.setText(getDateString(startDate));
+        textViewEnd.setText(getDateString(endDate));
 
-        button.setOnClickListener(new View.OnClickListener() {
+        //Button button=(Button)view.findViewById(R.id.button1);
+
+        textViewStart.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                DialogFragment newFragment = new GraphFragmentRange();
-                newFragment.show(getActivity().getSupportFragmentManager(), "datePicker");
-                //Log.d("GraphFragmentrange", "onClickListener button works ");
-                Button button=(Button)view.findViewById(R.id.button1);
-                button.setText("button1");
-                button.setTextColor(0xFF4C9900);//green
-                showDate(startDate, endDate);
-            }
+            public void onClick(View source) {
+                Calendar c = Calendar.getInstance();
+                // create a new DatePickerDialog instance and show it
+                new DatePickerDialog(getActivity(),
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker dp, int year,
+                                                  int month, int dayOfMonth) {
+                                Year=year;
+                                Month=month;
+                                Day=dayOfMonth;
+                                textViewStart.setText(getDateString(new Date(year-1900,month,dayOfMonth)));
+                            }
+                        }
+                        //initial day
+                        , c.get(Calendar.YEAR)
+                        , c.get(Calendar.MONTH)
+                        , c.get(Calendar.DAY_OF_MONTH)).show();
+            }//onClick
+        });
+
+        textViewEnd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View source) {
+                Calendar c = Calendar.getInstance();
+                // create a new DatePickerDialog instance and show it
+                new DatePickerDialog(getActivity(),
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker dp, int year,
+                                                  int month, int dayOfMonth) {
+                                Year=year;
+                                Month=month;
+                                Day=dayOfMonth;
+                                textViewEnd.setText(getDateString(new Date(year-1900,month,dayOfMonth)));
+                            }
+                        }
+                        //initial day
+                        , c.get(Calendar.YEAR)
+                        , c.get(Calendar.MONTH)
+                        , c.get(Calendar.DAY_OF_MONTH)).show();
+            }//onClick
         });
 
         // check if data available
@@ -138,6 +171,7 @@ public class GraphFragmentRange extends  DialogFragment
                 catetorySelectedText.setText("");
             }
         });
+
         addData();// add data
         Legend l = mChart.getLegend();// customize legends
         l.setPosition(Legend.LegendPosition.LEFT_OF_CHART);
@@ -155,30 +189,6 @@ public class GraphFragmentRange extends  DialogFragment
         }
     }
 
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        // Use the current date as the default date in the picker
-        // Create a new instance of DatePickerDialog and return it
-        return new DatePickerDialog(getActivity(), this, year, month, day);
-    }
-
-    @Override
-    public void onDateSet(DatePicker view, int year, int month, int day) {
-        // Do something with the date chosen by the user
-        //dateChanged=new Date(year,month,day);
-    }
-
-    private void showDate(Date start, Date end){
-        String startTimeStr,endTimeStr;
-        // show start and end date
-        TextView startTime = (TextView) relativeLayout.findViewById(R.id.startDateGraph);
-        startTimeStr= getDateString(start);
-        startTime.setText(startTimeStr);
-
-        TextView endTime = (TextView) relativeLayout.findViewById(R.id.endDateGraph);
-        endTimeStr= getDateString(end);
-        endTime.setText(endTimeStr);
-    }
 
     private boolean IsEmptyChart(){
         float sum=0;
@@ -235,5 +245,6 @@ public class GraphFragmentRange extends  DialogFragment
         mChart.highlightValues(null);// undo all highlights
         mChart.invalidate();// update pie chart
     }
-
 }
+
+
