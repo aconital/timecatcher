@@ -13,6 +13,7 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.cpsc.timecatcher.model.Day;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.Entry;
@@ -21,6 +22,8 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -28,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by fujiaoyang1 on 3/13/16.
@@ -37,36 +41,66 @@ public class GraphFragmentRange extends Fragment {
     private FrameLayout frameLayout;
     private DatePicker datePicker;
     private PieChart mChart;
-    private String[] xData = { "School", "Work", "HouseWork","Family","Gym"};
-    private float[] yData = { 30,20,10,30,10};// corresponds to  "School", "Work", "HouseWork","Family","Gym" respectively
-    //private float[] yData = { 0,0,0,0,0};// corresponds to  "School", "Work", "HouseWork","Family","Gym" respectively
+    private String[] xData = { "School", "Work", "Housework","Family","Gym"};
+    //private float[] yData = { 30,20,10,30,10};// corresponds to  "School", "Work", "HouseWork","Family","Gym" respectively
+    private float[] yData = { 0,0,0,0,0};// corresponds to  "School", "Work", "HouseWork","Family","Gym" respectively
     private float rotationAngel=0;
     private Date startDate;
     private Date endDate;
-    private static int Year=-1, Month, Day;
+    private static int Year=-1, Month=-1, Day=-1;
     private TextView textViewStart,textViewEnd;
 
     public GraphFragmentRange(){}
     private void dataInitialization(){
         // used to initialize   float[] yData
-        /*
-        ParseQuery<Task> taskParseQuery = Task.getQuery();
-        taskParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
-        if (day != null) {
-            taskParseQuery.whereEqualTo("day", day);
-        } else {
-            Log.d(Constants.NEW_CONSTRAINT_TAG, "Warning: null day, getting all user's tasks");
+        long timeSpentOnCategory[]={0,0,0,0,0};
+        long total=0;
+
+        ParseQuery<com.cpsc.timecatcher.model.Day> dayParseQuery = com.cpsc.timecatcher.model.Day.getQuery();
+        dayParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+        if(startDate.compareTo(endDate)==0){
+            dayParseQuery.whereEqualTo("date", startDate);
         }
-       */
+        else{
+            dayParseQuery.whereGreaterThanOrEqualTo("date", startDate);
+            dayParseQuery.whereLessThanOrEqualTo("date", endDate);
+        }
+        try{
+            List<Day> days = dayParseQuery.find();
+            for (Day day : days) {
+                timeSpentOnCategory[0]+=day.getTimeSpentOn(xData[0]);
+                timeSpentOnCategory[1]+=day.getTimeSpentOn(xData[1]);
+                timeSpentOnCategory[2]+=day.getTimeSpentOn(xData[2]);
+                timeSpentOnCategory[3]+=day.getTimeSpentOn(xData[3]);
+                timeSpentOnCategory[4]+=day.getTimeSpentOn(xData[4]);
+            }
+
+            for(int i=0;i<5;i++) {
+                total+=timeSpentOnCategory[i];
+            }
+
+            if(Float.compare(0, total)!=0){
+                for(int i=0;i<5;i++) {
+                    yData[i]=100* ((float)timeSpentOnCategory[i]/(float)total);
+                }
+            }
+
+        }catch(Exception e) {
+            System.out.println("Exception thrown  :" + e);
+        }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //icepick.Icepick.restoreInstanceState(this, savedInstanceState);
         getActivity().setTitle("Time Spent Distribution Chart");
-        Calendar calendar = Calendar.getInstance();
-        endDate=startDate= calendar.getTime();
+        Calendar currentTime = Calendar.getInstance();
+        currentTime.set(Calendar.HOUR_OF_DAY, 0);
+        currentTime.set(Calendar.MINUTE, 0);
+        currentTime.set(Calendar.SECOND, 0);
+        currentTime.set(Calendar.MILLISECOND, 0);
+        Date today=currentTime.getTime();
+        endDate=startDate= today;
         dataInitialization();
     }
 
@@ -80,13 +114,11 @@ public class GraphFragmentRange extends Fragment {
                              Bundle savedInstanceState) {
         View view=  inflater.inflate(R.layout.fragment_graph_day, container, false);
         relativeLayout = (RelativeLayout) view.findViewById(R.id.graphContainer);
-
+        frameLayout = (FrameLayout) view.findViewById(R.id.pieChartContainer);
         textViewStart=(TextView)view.findViewById(R.id.startDateGraph);
         textViewEnd=(TextView)view.findViewById(R.id.endDateGraph);
         textViewStart.setText(getDateString(startDate));
         textViewEnd.setText(getDateString(endDate));
-
-        //Button button=(Button)view.findViewById(R.id.button1);
 
         textViewStart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,10 +130,13 @@ public class GraphFragmentRange extends Fragment {
                             @Override
                             public void onDateSet(DatePicker dp, int year,
                                                   int month, int dayOfMonth) {
-                                Year=year;
-                                Month=month;
-                                Day=dayOfMonth;
-                                textViewStart.setText(getDateString(new Date(year-1900,month,dayOfMonth)));
+                                Date specifiedDate=new Date(year-1900,month,dayOfMonth);
+                                if(specifiedDate.compareTo(startDate)!=0){// date changed
+                                    startDate=specifiedDate;
+                                    textViewStart.setText(getDateString(specifiedDate));
+                                    dataInitialization();
+                                    drawPieChart();// add data
+                                }
                             }
                         }
                         //initial day
@@ -121,10 +156,13 @@ public class GraphFragmentRange extends Fragment {
                             @Override
                             public void onDateSet(DatePicker dp, int year,
                                                   int month, int dayOfMonth) {
-                                Year=year;
-                                Month=month;
-                                Day=dayOfMonth;
-                                textViewEnd.setText(getDateString(new Date(year-1900,month,dayOfMonth)));
+                                Date specifiedDate=new Date(year-1900,month,dayOfMonth);
+                                if(specifiedDate.compareTo(endDate)!=0){// date changed
+                                    endDate=specifiedDate;
+                                    textViewEnd.setText(getDateString(specifiedDate));
+                                    dataInitialization();
+                                    drawPieChart();// add data
+                                }
                             }
                         }
                         //initial day
@@ -138,47 +176,7 @@ public class GraphFragmentRange extends Fragment {
         if(IsEmptyChart()==true){//no data to show
             return view;
         }
-
-        frameLayout = (FrameLayout) view.findViewById(R.id.pieChartContainer);
-        mChart = new PieChart(getActivity());
-        frameLayout.addView(mChart);// add pie chart to main layout
-        mChart.setUsePercentValues(true);
-        mChart.setHoleRadius(50f);
-        mChart.setTransparentCircleRadius(10f);
-        mChart.setDescription("");//text in the bottom right corner. set it to "", because the default is "Description"
-
-        // enable hole and configure
-        mChart.setDrawHoleEnabled(true);
-        mChart.setHoleColorTransparent(true);
-        mChart.setHoleRadius(4);
-        mChart.setTransparentCircleRadius(10);
-        mChart.setTransparentCircleColor(0xCCCCFF);// light transparent purple
-        mChart.setRotationAngle(rotationAngel);// enable rotation of the chart by touch
-        mChart.setRotationEnabled(true);
-        // set a chart value selected listener
-        mChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
-            @Override
-            public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
-                NumberFormat formatter = new DecimalFormat("#00.0");
-                if (e == null) { return; }
-                TextView catetorySelectedText = (TextView) relativeLayout.findViewById(R.id.categorySelectedText);
-                catetorySelectedText.setText(xData[e.getXIndex()] +
-                        " = " + formatter.format(e.getVal()) + "%" );// display msg when value selected
-            }
-            @Override
-            public void onNothingSelected() {
-                TextView catetorySelectedText = (TextView) relativeLayout.findViewById(R.id.categorySelectedText);
-                catetorySelectedText.setText("");
-            }
-        });
-
-        addData();// add data
-        Legend l = mChart.getLegend();// customize legends
-        l.setPosition(Legend.LegendPosition.LEFT_OF_CHART);
-        l.setXEntrySpace(0.5f);
-        l.setYEntrySpace(0.5f);
-        l.setTextColor(getResources().getColor(R.color.black));//black
-        l.setTextSize(10f);
+        drawPieChart();
         return view;
     }
     @Override
@@ -188,7 +186,6 @@ public class GraphFragmentRange extends Fragment {
             rotationAngel=mChart.getRotationAngle();
         }
     }
-
 
     private boolean IsEmptyChart(){
         float sum=0;
@@ -211,7 +208,50 @@ public class GraphFragmentRange extends Fragment {
         return Datetime;
     }
 
-    private void addData() {
+    private void drawPieChart(){
+
+        mChart = new PieChart(getActivity());
+        frameLayout.addView(mChart);// add pie chart to main layout
+        mChart.setUsePercentValues(true);
+        mChart.setHoleRadius(50f);
+        mChart.setTransparentCircleRadius(10f);
+        mChart.setDescription("");//text in the bottom right corner. set it to "", because the default is "Description"
+
+        // enable hole and configure
+        mChart.setDrawHoleEnabled(true);
+        mChart.setHoleColorTransparent(true);
+        mChart.setHoleRadius(4);
+        mChart.setTransparentCircleRadius(10);
+        mChart.setTransparentCircleColor(0xCCCCFF);// light transparent purple
+        mChart.setRotationAngle(rotationAngel);// enable rotation of the chart by touch
+        mChart.setRotationEnabled(true);
+        // set a chart value selected listener
+        mChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
+                NumberFormat formatter = new DecimalFormat("##0.0");
+                if (e == null) { return; }
+                TextView catetorySelectedText = (TextView) relativeLayout.findViewById(R.id.categorySelectedText);
+                catetorySelectedText.setText(xData[e.getXIndex()] +
+                        " = " + formatter.format(e.getVal()) + "%" );// display msg when value selected
+            }
+            @Override
+            public void onNothingSelected() {
+                TextView catetorySelectedText = (TextView) relativeLayout.findViewById(R.id.categorySelectedText);
+                catetorySelectedText.setText("");
+            }
+        });
+
+        addPieChartData();// add data
+        Legend l = mChart.getLegend();// customize legends
+        l.setPosition(Legend.LegendPosition.LEFT_OF_CHART);
+        l.setXEntrySpace(0.5f);
+        l.setYEntrySpace(0.5f);
+        l.setTextColor(getResources().getColor(R.color.black));//black
+        l.setTextSize(10f);
+    }
+
+    private void addPieChartData() {
         ArrayList<Entry> yVals1 = new ArrayList<Entry>();
         ArrayList<String> xVals = new ArrayList<String>();
 

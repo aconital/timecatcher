@@ -38,17 +38,24 @@ public class GraphFragmentDay extends Fragment {
     private RelativeLayout relativeLayout;
     private FrameLayout frameLayout;
     private PieChart mChart;
-    private String[] xData = { "School", "Work", "HouseWork","Family","Gym"};
+    private String[] xData = { "School", "Work", "Housework","Family","Gym"};
     //private float[] yData = { 30,30,0,40,0};// corresponds to  "School", "Work", "HouseWork","Family","Gym" respectively
     private float[] yData = { 0,0,0,0,0};// corresponds to  "School", "Work", "HouseWork","Family","Gym" respectively
     private float rotationAngel=0;
+    private Date today;
     public GraphFragmentDay(){}
 
     private void dataInitialization(){
         // used to initialize   float[] yData
         long timeSpentOnCategory[]={0,0,0,0,0};
         long total=0;
-        Date today= Calendar.getInstance().getTime();
+        //Date today= Calendar.getInstance().getTime();
+        Calendar currentTime = Calendar.getInstance();
+        currentTime.set(Calendar.HOUR_OF_DAY, 0);
+        currentTime.set(Calendar.MINUTE, 0);
+        currentTime.set(Calendar.SECOND, 0);
+        currentTime.set(Calendar.MILLISECOND, 0);
+        today=currentTime.getTime();
 
         ParseQuery<Day> dayParseQuery = Day.getQuery();
         dayParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
@@ -92,7 +99,7 @@ public class GraphFragmentDay extends Fragment {
 
         View view=  inflater.inflate(R.layout.fragment_graph_day, container, false);
         relativeLayout = (RelativeLayout) view.findViewById(R.id.graphContainer);
-
+        frameLayout = (FrameLayout) view.findViewById(R.id.pieChartContainer);
         // show start and end date
         TextView startTime = (TextView) relativeLayout.findViewById(R.id.startDateGraph);
         startTimeStr= getDateString(Calendar.getInstance().getTime());
@@ -106,46 +113,7 @@ public class GraphFragmentDay extends Fragment {
         if(IsEmptyChart()==true){//no data to show
             return view;
         }
-
-        frameLayout = (FrameLayout) view.findViewById(R.id.pieChartContainer);
-        mChart = new PieChart(getActivity());
-        frameLayout.addView(mChart);// add pie chart to main layout
-        mChart.setUsePercentValues(true);
-        mChart.setHoleRadius(50f);
-        mChart.setTransparentCircleRadius(10f);
-        mChart.setDescription("");//text in the bottom right corner. set it to "", because the default is "Description"
-
-        // enable hole and configure
-        mChart.setDrawHoleEnabled(true);
-        mChart.setHoleColorTransparent(true);
-        mChart.setHoleRadius(4);
-        mChart.setTransparentCircleRadius(10);
-        mChart.setTransparentCircleColor(0xCCCCFF);// light transparent purple
-        mChart.setRotationAngle(rotationAngel);// enable rotation of the chart by touch
-        mChart.setRotationEnabled(true);
-        // set a chart value selected listener
-        mChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
-            @Override
-            public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
-                NumberFormat formatter = new DecimalFormat("#00.0");
-                if (e == null) { return; }
-                TextView catetorySelectedText = (TextView) relativeLayout.findViewById(R.id.categorySelectedText);
-                catetorySelectedText.setText(xData[e.getXIndex()] +
-                        " = " + formatter.format(e.getVal()) + "%" );// display msg when value selected
-            }
-            @Override
-            public void onNothingSelected() {
-                TextView catetorySelectedText = (TextView) relativeLayout.findViewById(R.id.categorySelectedText);
-                catetorySelectedText.setText("");
-            }
-        });
-        addData();// add data
-        Legend l = mChart.getLegend();// customize legends
-        l.setPosition(Legend.LegendPosition.LEFT_OF_CHART);
-        l.setXEntrySpace(0.5f);
-        l.setYEntrySpace(0.5f);
-        l.setTextColor(getResources().getColor(R.color.black));//black
-        l.setTextSize(10f);
+        drawPieChart();
         return view;
     }
     @Override
@@ -176,8 +144,50 @@ public class GraphFragmentDay extends Fragment {
         Datetime = dateformat.format(date);// the argument is an date object Date(int year, int month, int day)
         return Datetime;
     }
+    private void drawPieChart(){
 
-    private void addData() {
+        mChart = new PieChart(getActivity());
+        frameLayout.addView(mChart);// add pie chart to main layout
+        mChart.setUsePercentValues(true);
+        mChart.setHoleRadius(50f);
+        mChart.setTransparentCircleRadius(10f);
+        mChart.setDescription("");//text in the bottom right corner. set it to "", because the default is "Description"
+
+        // enable hole and configure
+        mChart.setDrawHoleEnabled(true);
+        mChart.setHoleColorTransparent(true);
+        mChart.setHoleRadius(4);
+        mChart.setTransparentCircleRadius(10);
+        mChart.setTransparentCircleColor(0xCCCCFF);// light transparent purple
+        mChart.setRotationAngle(rotationAngel);// enable rotation of the chart by touch
+        mChart.setRotationEnabled(true);
+        // set a chart value selected listener
+        mChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
+                NumberFormat formatter = new DecimalFormat("##0.0");
+                if (e == null) { return; }
+                TextView catetorySelectedText = (TextView) relativeLayout.findViewById(R.id.categorySelectedText);
+                catetorySelectedText.setText(xData[e.getXIndex()] +
+                        " = " + formatter.format(e.getVal()) + "%" );// display msg when value selected
+            }
+            @Override
+            public void onNothingSelected() {
+                TextView catetorySelectedText = (TextView) relativeLayout.findViewById(R.id.categorySelectedText);
+                catetorySelectedText.setText("");
+            }
+        });
+
+        addPieChartData();// add data
+        Legend l = mChart.getLegend();// customize legends
+        l.setPosition(Legend.LegendPosition.LEFT_OF_CHART);
+        l.setXEntrySpace(0.5f);
+        l.setYEntrySpace(0.5f);
+        l.setTextColor(getResources().getColor(R.color.black));//black
+        l.setTextSize(10f);
+    }
+
+    private void addPieChartData() {
         ArrayList<Entry> yVals1 = new ArrayList<Entry>();
         ArrayList<String> xVals = new ArrayList<String>();
 
@@ -211,6 +221,5 @@ public class GraphFragmentDay extends Fragment {
         mChart.highlightValues(null);// undo all highlights
         mChart.invalidate();// update pie chart
     }
-
 
 }
