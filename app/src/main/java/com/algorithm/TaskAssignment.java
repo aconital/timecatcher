@@ -18,11 +18,11 @@ public class TaskAssignment implements Comparable<TaskAssignment>{
 		taskId=id;
 	}
 	
-	TimeSlice getAssignment(){
+	public TimeSlice getAssignment(){
 		return assignment;
 	}
 	
-	int getTaskId(){
+	public int getTaskId(){
 		return taskId;
 	}
 	

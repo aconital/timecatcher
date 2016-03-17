@@ -16,7 +16,7 @@ public class CSP {
 	private Set<Integer> flexibleTaskIdSet;
 	private boolean overtime;// indicate if the totoal working time of all tasks exceed the given work time
 
-	CSP(Time dayStart,Time dayEnd){
+	public CSP(Time dayStart, Time dayEnd){
 		this.dayStart=dayStart;
 		this.dayEnd=dayEnd;
 		accumulatedTime=new Time(dayStart);
@@ -56,22 +56,23 @@ public class CSP {
 		}
     }//function 
 	
-	void addFlexibleTask(Time duration){
+	public boolean addFlexibleTask(Time duration){
 		// if the remaining working time is sufficient for this duration
 		if(accumulatedTime.addTime(duration).compareTime(dayEnd) <=0){
 			accumulatedTime=accumulatedTime.addTime(duration);
 			Task task=new FlexibleTask(duration);
-			taskMap.put(task.getTaskId(),task);// (id, task)
+			taskMap.put(task.getTaskId(), task);// (id, task)
 			flexibleTaskIdSet.add(task.getTaskId());
 		}
 		else{
 			overtime=true;
 			System.out.println("not enough remaining woking time for this flexible task");
 		}
+		return overtime;
 	}
 	
-	void addFixedTask(Time startTime,Time endTime){
-		if(startTime.compareTime(dayStart)<0 || endTime.compareTime(dayEnd)>0) return;
+	public boolean addFixedTask(Time startTime,Time endTime){
+		if(startTime.compareTime(dayStart)<0 || endTime.compareTime(dayEnd)>0) return false;
 		
 		Time duration= endTime.substractTime(startTime);
 		//System.out.println("duration: "+duration.getHour()+ ":"+ duration.getMinute());
@@ -86,6 +87,7 @@ public class CSP {
 			overtime=true;
 			System.out.println("not enough remaining woking time for this  fixed task");
 		}
+		return overtime;
 	}
 	
 	/*
@@ -103,11 +105,11 @@ public class CSP {
 	 * and add or delete constraints 
 	 */
 
-	void createConstraintGraph(){
+	public void createConstraintGraph(){
 		constraints=new ConstraintGraph(Task.taskCount);
 	}
 	
-	void addConstraint(int id1,int id2,int weight){// id1 -> id2 (task with id1 before task with id2)
+	public void addConstraint(int id1,int id2,int weight){// id1 -> id2 (task with id1 before task with id2)
 		constraints.addConstraint(id1, id2, weight);
 	}
 	
@@ -117,7 +119,7 @@ public class CSP {
 	
 	//detect whether initial constraints conflict with each other 
 	// return true if conflict, otherwise false;
-	boolean isConstraintsConflict(){
+	public boolean isConstraintsConflict(){
 		return constraints.isCyclic();
 	}
 	

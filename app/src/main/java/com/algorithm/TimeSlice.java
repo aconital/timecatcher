@@ -12,11 +12,11 @@ public class TimeSlice implements Comparable<TimeSlice>{
 		}
 	}
 	
-	Time getStartTime(){
+	public Time getStartTime(){
 		return startTime;
 	}
 	
-	Time getEndTime(){
+	public Time getEndTime(){
 		return endTime;
 	}
 	

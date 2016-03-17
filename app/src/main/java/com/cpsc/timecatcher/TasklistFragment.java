@@ -1,6 +1,8 @@
 package com.cpsc.timecatcher;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -10,21 +12,31 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.util.Pair;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.cpsc.timecatcher.helper.SimpleItemTouchHelperCallback;
+import com.algorithm.CSP;
+import com.algorithm.CSP_Solver;
+import com.algorithm.TaskAssignment;
+import com.algorithm.Time;
+import com.cpsc.timecatcher.helper.Constants;
+import com.cpsc.timecatcher.helper.Utility;
+import com.cpsc.timecatcher.model.Constraint;
 import com.cpsc.timecatcher.model.Day;
+import com.cpsc.timecatcher.model.Operator;
 import com.cpsc.timecatcher.model.Task;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
+import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -44,6 +56,7 @@ public class TasklistFragment extends Fragment {
     private TaskAdapter mAdapter;
     private ItemTouchHelper mItemTouchHelper;
     private OnFragmentInteractionListener mListener;
+    private Day day;
 
     public TasklistFragment(){}
     public static TasklistFragment newInstance(long date) {
@@ -74,7 +87,110 @@ public class TasklistFragment extends Fragment {
         schedule_fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO YUTONG DO WHAT YOU WANT HERE
+                // SCHEDULE
+                if ( taskList.size() == 0 ) {
+                    new AlertDialog.Builder(getActivity())
+                            .setTitle("Error")
+                            .setMessage("No tasks to schedule!")
+                            .setPositiveButton(android.R.string.ok,
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {}})
+                            .show();
+                }
+                else if (day != null) {
+                    ArrayList<Pair> constraintsInt = new ArrayList<>();
+                    CSP problem = new CSP(Utility.dateToTime(day.getDayStart()),
+                                          Utility.dateToTime(day.getDayEnd()));
+
+                    boolean overtime = false;
+                    for (int i = 0; i < taskList.size(); i++) {
+                        Task currentTask = taskList.get(i);
+                        if(currentTask.getFixed()) {
+                            overtime = overtime || problem.addFixedTask(
+                                    Utility.dateToTime(currentTask.getStartTime()),
+                                    Utility.dateToTime(currentTask.getEndTime()));
+                        } else {
+                            int hours = currentTask.getTotalTime() / 60;
+                            int minutes = currentTask.getTotalTime() % 60;
+                            overtime = overtime || problem.addFlexibleTask(new Time(hours, minutes));
+                        }
+                        if (overtime) {
+                            Log.d("Algorithm", "Could not add flexible task: not enough time");
+                        }
+                        List<Constraint> constraints;
+                        ParseQuery<Constraint> taskConstraintsQuery = currentTask.getConstraints();
+                        try {
+                            constraints = taskConstraintsQuery.find();
+                            for (Constraint constraint : constraints) {
+                                if (constraint.getOperator() == Operator.BEFORE){
+                                    constraintsInt.add(
+                                            Pair.create(i, taskList.indexOf(constraint.getOther())));
+                                } else {
+                                    constraintsInt.add(
+                                            Pair.create(taskList.indexOf(constraint.getOther()), i));
+                                }
+
+                            }
+                        } catch (Exception e) {
+                            Log.d(Constants.NEW_EDIT_TASK_TAG,
+                                    "Could not find constraints! Assume no constraints");
+                        }
+                    }
+                    problem.createConstraintGraph();
+                    for (Pair constraintPair : constraintsInt) {
+                        problem.addConstraint((int)constraintPair.first,
+                                (int)constraintPair.second, 0);
+                    }
+
+                    if (problem.isConstraintsConflict()) {
+                        new AlertDialog.Builder(getActivity())
+                                .setTitle("Error")
+                                .setMessage("You have conflicting constraints!" +
+                                        " Please edit your tasks and try again.")
+                                .setPositiveButton(android.R.string.ok,
+                                        new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {}})
+                        .show();
+                    }
+
+                    CSP_Solver csp_solver = new CSP_Solver(problem);
+                    List<ArrayList<TaskAssignment> > solutions = csp_solver.getSolutions();
+                    if (solutions.isEmpty()) {
+                        new AlertDialog.Builder(getActivity())
+                                .setTitle("Error")
+                                .setMessage("Could not schedule your day!" +
+                                        " Please edit your tasks and try again.")
+                                .setPositiveButton(android.R.string.ok,
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {}})
+                                .show();
+                    }
+
+                    ArrayList<TaskAssignment> solution = solutions.get(0);
+                    for (TaskAssignment taskAssignment : solution) {
+                        Task task = taskList.get(taskAssignment.getTaskId());
+                        if (!task.getFixed()) {
+                            // assign task to slot
+                            // start time
+                            task.setStartTime(Utility.timeToDate(day.getDate(),
+                                    taskAssignment.getAssignment().getStartTime()));
+
+                            // end time
+                            task.setEndTime(Utility.timeToDate(day.getDate(),
+                                    taskAssignment.getAssignment().getEndTime()));
+                            try {
+                                task.save();
+                            } catch (ParseException e) {
+                                Log.e("Algorithm", "Could not save task: " + task.getObjectId());
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                    mAdapter.notifyDataSetChanged();
+
+                    Log.d("Algorithm", csp_solver.solutionsString());
+                }
             }
         });
         fab= (FloatingActionButton) view.findViewById(R.id.fab);
@@ -132,7 +248,7 @@ public class TasklistFragment extends Fragment {
             @Override
             public void done(Day object, com.parse.ParseException e) {
                 if (object != null) {
-                    Day day = object;
+                    day = object;
                     ParseQuery<Task> query = new ParseQuery<Task>("Task");
                     query.whereEqualTo("day", day);
                     query.addAscendingOrder("startTime");
