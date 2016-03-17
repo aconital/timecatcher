@@ -259,8 +259,13 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
             this.startTime = task.getStartTime();
             this.endTime = task.getEndTime();
         }
-        startTime.setText(timeFormat.format(this.startTime));
-        endTime.setText(timeFormat.format(this.endTime));
+        if (this.startTime != null) {
+            startTime.setText(timeFormat.format(this.startTime));
+        }
+
+        if (this.endTime != null) {
+            endTime.setText(timeFormat.format(this.endTime));
+        }
 
         // Day
         if (task == null) {
