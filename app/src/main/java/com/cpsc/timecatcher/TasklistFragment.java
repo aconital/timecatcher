@@ -122,8 +122,6 @@ public class TasklistFragment extends Fragment {
                     Day day = object;
                     ParseQuery<Task> query = new ParseQuery<Task>("Task");
                     query.whereEqualTo("day", day);
-                    query.whereExists("startTime");
-                    query.whereExists("endTime");
                     query.addAscendingOrder("startTime");
                     query.findInBackground(new FindCallback<Task>() {
                         @Override
