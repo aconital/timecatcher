@@ -37,7 +37,7 @@ public class TasklistFragment extends Fragment {
     private  long longDate;
     private Date date;
     private final static String DATE_TAG="DATE";
-    private FloatingActionButton fab;
+    private FloatingActionButton fab,schedule_fab;
     private List<Task> taskList = new ArrayList<>();
     private RecyclerView recyclerView;
     private TaskAdapter mAdapter;
@@ -69,7 +69,13 @@ public class TasklistFragment extends Fragment {
 
 
        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-
+        schedule_fab=(FloatingActionButton) view.findViewById(R.id.fab_schedule);
+        schedule_fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO YUTONG DO WHAT YOU WANT HERE
+            }
+        });
         fab= (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
