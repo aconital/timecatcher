@@ -151,8 +151,8 @@ public class ScheduleFragment extends Fragment implements WeekView.MonthChangeLi
                     Day day = object;
                     ParseQuery<Task> query = new ParseQuery<Task>("Task");
                     query.whereEqualTo("day", day);
-                    //   query.whereExists("startTime");
-                    //   query.whereExists("endTime");
+                      query.whereExists("startTime");
+                       query.whereExists("endTime");
                     query.addAscendingOrder("startTime");
                     query.findInBackground(new FindCallback<Task>() {
                         @Override
