@@ -17,7 +17,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:src="@android:drawable/ic_dialog_dialer"
+        android:src="@drawable/ic_add_circle_outline_white_48dp"
         android:layout_marginLeft="@dimen/fab_margin"
         android:layout_marginRight="@dimen/fab_margin"
         android:layout_marginEnd="37dp"
