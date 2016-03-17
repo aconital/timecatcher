@@ -480,7 +480,8 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                 if (objects.size() > 0 && !newDate && task == null) {
                                     // trying to create a task with the same name
                                     title.setError("Already have a task with the same name!");
-                                } else if (NewEditTaskFragment.this.endTime.before(
+                                } else if (NewEditTaskFragment.this.fixed &&
+                                        NewEditTaskFragment.this.endTime.before(
                                         NewEditTaskFragment.this.startTime
                                 )){
                                     new AlertDialog.Builder(getContext())
