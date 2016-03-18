@@ -23,7 +23,7 @@ public class CSP_Solver  {
 	private HashMap<Integer, TimeSlice> assignedMap;// <indetifier, TimeSlice>
 	private List<ArrayList<TaskAssignment> >solutions;
 			
-	CSP_Solver(CSP problem1){
+	public CSP_Solver(CSP problem1){
 		this.problem=problem1;
 		constraints=problem.getConstraints();
 		taskMap=problem.getTaskMap();
@@ -392,7 +392,7 @@ public class CSP_Solver  {
 	/*
 	 * this method return  a final solution of  possible schedule 
 	 */
-	List<ArrayList<TaskAssignment> > getSolutions(){
+	public List<ArrayList<TaskAssignment> > getSolutions(){
 		if(problem.getOverTime()==true)  return solutions;
 		if(isFixedTaskOverlap()==true) return solutions;
 		if(taskCount==0)return solutions;
@@ -429,7 +429,7 @@ public class CSP_Solver  {
 		return solutions;
 	}//method 
 	
-	void printSolutions(){
+	public void printSolutions(){
 		ListIterator<ArrayList<TaskAssignment>> it = solutions.listIterator();
 		if(solutions.size()==0) {
 			System.out.println("No solutions!");
@@ -447,6 +447,27 @@ public class CSP_Solver  {
 			}
 			System.out.println("-------------------------------------------");
 		}//while
+	}
+
+	public String solutionsString(){
+		ListIterator<ArrayList<TaskAssignment>> it = solutions.listIterator();
+		String solution = "";
+		if(solutions.size()==0) {
+			return "No solutions!\n";
+		}
+		while(it.hasNext()){
+			solution += "-------------------------------------------\n";
+			solution += "Task Id     Start Time     End Time \n";
+			// consider sort based on start time, then print
+			ArrayList<TaskAssignment> AssignList=it.next();
+			for(int i=0; i<Task.taskCount;i++){
+				TaskAssignment assign =AssignList.get(i);
+				solution += "   "+ assign.getTaskId()+ "		 "+assign.getAssignment().getStartTime().getTimeString()
+						+"	  		 "+ assign.getAssignment().getEndTime().getTimeString() + "\n";
+			}
+			solution += "-------------------------------------------\n";
+		}//while
+		return solution;
 	}
 }
 
