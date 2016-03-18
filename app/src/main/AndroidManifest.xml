@@ -5,6 +5,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.SET_DEBUG_APP"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
         android:name=".AppController"
         android:allowBackup="true"
@@ -54,6 +57,9 @@
         <activity android:name=".StructureActivity"
             android:windowSoftInputMode="adjustPan|stateHidden">
         </activity>
+
+        <receiver android:name=".AlarmReceiver"></receiver>
+
     </application>
 
 </manifest>

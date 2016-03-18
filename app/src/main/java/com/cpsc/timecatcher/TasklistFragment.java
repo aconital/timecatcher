@@ -1,8 +1,12 @@
 package com.cpsc.timecatcher;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -179,12 +183,46 @@ public class TasklistFragment extends Fragment {
                             task.setEndTime(Utility.timeToDate(day.getDate(),
                                     taskAssignment.getAssignment().getEndTime()));
                             try {
+                                AlarmManager am = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+                                Intent i = new Intent(getActivity(), AlarmReceiver.class);
+                                i.putExtra("id", task.getObjectId());
+                                i.putExtra("msg", task.getTitle());
+                                PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+
+                                Calendar c=Calendar.getInstance();
+                                c.setTime(Utility.timeToDate(day.getDate(),
+                                        taskAssignment.getAssignment().getStartTime()));
+                                c.add(Calendar.MINUTE, -15);
+                                c.set(Calendar.SECOND,0);
+                                c.set(Calendar.MILLISECOND, 0);
+
+                                long time = c.getTime().getTime();
+                                am.set(AlarmManager.RTC_WAKEUP, time, pi);
                                 task.save();
                             } catch (ParseException e) {
                                 Log.e("Algorithm", "Could not save task: " + task.getObjectId());
                                 e.printStackTrace();
                             }
                         }
+                        else
+                        {
+                            AlarmManager am = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+                            Intent i = new Intent(getActivity(), AlarmReceiver.class);
+                            i.putExtra("id", task.getObjectId());
+                            i.putExtra("msg", task.getTitle());
+                            PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+                            //15 min before
+                            Calendar c = Calendar.getInstance();
+                            c.setTime(task.getStartTime());
+                            c.add(Calendar.MINUTE, -15);
+                            c.set(Calendar.SECOND,0);
+                            c.set(Calendar.MILLISECOND, 0);
+
+                            long time = c.getTime().getTime();
+                            am.set(AlarmManager.RTC_WAKEUP, time, pi);
+                        }
+
+
                     }
 
                     mAdapter.notifyDataSetChanged();
