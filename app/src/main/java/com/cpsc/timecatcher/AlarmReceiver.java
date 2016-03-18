@@ -23,7 +23,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle("TimeCatcher")
-                        .setContentText("It is time to start your task '"+msg+"'");
+                        .setContentText("Your task '"+msg+"' is going to start soon!");
 
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(1, mBuilder.build());
