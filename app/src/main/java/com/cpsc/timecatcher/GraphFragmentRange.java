@@ -1,6 +1,7 @@
 package com.cpsc.timecatcher;
 
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -120,6 +121,7 @@ public class GraphFragmentRange extends Fragment {
         textViewStart.setText(getDateString(startDate));
         textViewEnd.setText(getDateString(endDate));
 
+        checkDateOrder();
         textViewStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View source) {
@@ -133,6 +135,7 @@ public class GraphFragmentRange extends Fragment {
                                 Date specifiedDate=new Date(year-1900,month,dayOfMonth);
                                 if(specifiedDate.compareTo(startDate)!=0){// date changed
                                     startDate=specifiedDate;
+                                    checkDateOrder();
                                     textViewStart.setText(getDateString(specifiedDate));
                                     dataInitialization();
                                     drawPieChart();// add data
@@ -159,6 +162,7 @@ public class GraphFragmentRange extends Fragment {
                                 Date specifiedDate=new Date(year-1900,month,dayOfMonth);
                                 if(specifiedDate.compareTo(endDate)!=0){// date changed
                                     endDate=specifiedDate;
+                                    checkDateOrder();
                                     textViewEnd.setText(getDateString(specifiedDate));
                                     dataInitialization();
                                     drawPieChart();// add data
@@ -200,6 +204,18 @@ public class GraphFragmentRange extends Fragment {
         }
     }
 
+    private void checkDateOrder(){
+        if(startDate.compareTo(endDate)>0){
+            //AlertingDialogFragment newFragment = new AlertingDialogFragment();
+            //newFragment.show(getActivity().getSupportFragmentManager(), "alertDialog");
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Error")
+                    .setMessage("Start time cannot be after end time!")
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        }
+    }
+
     // return the string  format like Mar 15,2016
     private String getDateString(Date date){
         String Datetime;
@@ -209,7 +225,7 @@ public class GraphFragmentRange extends Fragment {
     }
 
     private void drawPieChart(){
-
+        frameLayout.removeAllViews();
         mChart = new PieChart(getActivity());
         frameLayout.addView(mChart);// add pie chart to main layout
         mChart.setUsePercentValues(true);

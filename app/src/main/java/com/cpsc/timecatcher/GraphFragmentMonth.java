@@ -91,7 +91,7 @@ public class GraphFragmentMonth extends Fragment {
         currentTime.set(Calendar.SECOND, 0);
         currentTime.set(Calendar.MILLISECOND, 0);
         today=currentTime.getTime();
-        currentTime.set(Calendar.DAY_OF_MONTH, Calendar.DAY_OF_MONTH - 29);
+        currentTime.add(Calendar.DAY_OF_MONTH, -29);
         aMonthAgo = currentTime.getTime();//seven Days Ago
         dataInitialization();
     }

@@ -221,5 +221,4 @@ public class GraphFragmentDay extends Fragment {
         mChart.highlightValues(null);// undo all highlights
         mChart.invalidate();// update pie chart
     }
-
 }
