@@ -23,7 +23,7 @@ import java.util.ArrayList;
  * Created by fujiaoyang1 on 3/18/16.
  */
 public class DrawPieChart {
-    private String[] xData = { "School", "Work", "Housework","Family","Gym"};
+    private String[] xData = {"School", "Work", "Housework","Family","Gym"};
     private float[] yData = { 0,0,0,0,0};
     private View view;
     private RelativeLayout relativeLayout;
@@ -31,7 +31,7 @@ public class DrawPieChart {
     private float rotationAngel=0;
     private PieChart mChart;
 
-    DrawPieChart(View view,PieChart mChart,float[]yData,float angel){
+    DrawPieChart(View view,PieChart mChart,float[]yData,float angel) {
         this.view=view;
         this.mChart=mChart;
         this.yData=yData;

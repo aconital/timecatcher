@@ -56,20 +56,20 @@ public class GraphFragmentMonth extends Fragment {
         startTime.setText(getDateString(aMonthAgo));
         endTime.setText(getDateString(today));
 
-        if(IsEmptyChart()!=true){
+        if(IsEmptyChart()!=true) {
             drawPieChart.draw();
         }
         return view;
     }
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
-        if(IsEmptyChart()==false){
+        if(IsEmptyChart()==false) {
             rotationAngel=mChart.getRotationAngle();
         }
     }
 
-    private boolean IsEmptyChart(){
+    private boolean IsEmptyChart() {
         for (int i = 0; i < yData.length; i++) {
             if(Float.compare(0, yData[i])!=0){
                 return false;
@@ -79,7 +79,7 @@ public class GraphFragmentMonth extends Fragment {
     }
 
     // return the string  format like Mar 15,2016
-    private String getDateString(Date date){
+    private String getDateString(Date date) {
         String Datetime;
         SimpleDateFormat dateformat = new SimpleDateFormat("MMM dd,' 'yyyy");//Mar 15,2016
         Datetime = dateformat.format(date);// the argument is an date object Date(int year, int month, int day)
