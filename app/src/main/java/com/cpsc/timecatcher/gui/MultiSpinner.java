@@ -43,8 +43,7 @@ public class MultiSpinner extends Spinner implements
         }
     }
 
-    @Override
-    public void onCancel(DialogInterface dialog) {
+    public void updateSpinnerText() {
         StringBuffer spinnerBuffer = new StringBuffer();
         boolean allUnselected = true;
         for (int i = 0; i < items.size(); i++) {
@@ -67,6 +66,11 @@ public class MultiSpinner extends Spinner implements
                 new String[] { spinnerText });
         setAdapter(adapter);
         listener.onItemsSelected(selected);
+    }
+
+    @Override
+    public void onCancel(DialogInterface dialog) {
+        updateSpinnerText();
     }
 
     @Override
@@ -103,6 +107,24 @@ public class MultiSpinner extends Spinner implements
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_item, new String[] { defaultText });
         setAdapter(adapter);
+    }
+
+    public void setItems(List<String> items, String defaultText,
+                         MultiSpinnerListener listener, int[] indicesSelected) {
+        this.items = items;
+        this.defaultText = defaultText;
+        this.listener = listener;
+
+        // none selected by default
+        selected = new boolean[items.size()];
+        for (int i = 0; i < selected.length; i++)
+            selected[i] = false;
+
+        // select indices
+        for (int i = 0; i < indicesSelected.length; i++) {
+            selected[indicesSelected[i]] = true;
+        }
+        updateSpinnerText();
     }
 
     public interface MultiSpinnerListener {

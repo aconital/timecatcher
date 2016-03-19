@@ -126,6 +126,14 @@ public class Task extends ParseObject implements ITimeSlot {
         this.saveInBackground();
     }
 
+    public void removeAllCategories() throws ParseException {
+        ParseRelation relation = this.getRelation("categories");
+        List<Category> categories = getCategories().find();
+        for (Category c : categories) {
+            relation.remove(c);
+        }
+    }
+
     public ParseQuery<Category> getCategories() {
         ParseRelation relation = this.getRelation("categories");
         return relation.getQuery();
@@ -143,7 +151,7 @@ public class Task extends ParseObject implements ITimeSlot {
                         @Override
                         public void done(ParseException e) {
                             if (e != null) {
-                                Log.d(TAG, e.getMessage());
+                                Log.d(TAG, "Error adding constraint:" + e.getMessage());
                             }
                         }
                     });
@@ -184,6 +192,7 @@ public class Task extends ParseObject implements ITimeSlot {
         List<Constraint> constraints = getConstraints().find();
         for (Constraint c : constraints) {
             relation.remove(c);
+            c.delete();
         }
     }
 

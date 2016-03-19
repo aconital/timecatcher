@@ -157,6 +157,7 @@ public class TasklistFragment extends Fragment {
                                             }
                                         })
                                 .show();
+                        return;
                     }
 
                     CSP_Solver csp_solver = new CSP_Solver(problem);
@@ -172,6 +173,7 @@ public class TasklistFragment extends Fragment {
                                             }
                                         })
                                 .show();
+                        return;
                     }
                     else {
                     ArrayList<TaskAssignment> solution = solutions.get(0);

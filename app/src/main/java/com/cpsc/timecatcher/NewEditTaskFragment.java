@@ -76,6 +76,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
     private final String OTHER_TASK_LABEL = "otherTasksInDay";
 
     private boolean fixed;
+    private boolean newTask = true;
     private Date startTime;
     private Date endTime;
 
@@ -123,6 +124,8 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
             date = new Date(getArguments().getLong(DATE_TAG));
             String taskString = getArguments().getString(TASK_TAG);
             if (taskString != null) {
+                Log.d(Constants.NEW_EDIT_TASK_TAG, "Not a new task! setting newTask to false");
+                newTask = false; // not a new task
                 ParseQuery<Task> taskParseQuery = Task.getQuery();
                 taskParseQuery.whereEqualTo("objectId", getArguments().getString(TASK_TAG));
                 try {
@@ -163,15 +166,36 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                     Log.e(Constants.NEW_EDIT_TASK_TAG, "Could not fetch categories!");
                 }
                 NewEditTaskFragment.this.categories = new ArrayList<>(allCategories);
-                spinner.setItems(
-                        new ArrayList<>(NewEditTaskFragment.this.categories),
-                        getResources().getString(R.string.new_task_category_hint),
-                        NewEditTaskFragment.this);
-//
-//                if (task != null) {
-//                    List<Category> categoryList = new ArrayList<>();
-//
-//                }
+                if (task != null) {
+                    // Select categories
+                    ParseQuery<Category> selectedCategoryQuery = task.getCategories();
+                    selectedCategoryQuery.findInBackground(new FindCallback<Category>() {
+                        @Override
+                        public void done(List<Category> objects, ParseException e) {
+                            if (e == null) {
+                                int[] selectedIndices = new int[objects.size()];
+                                for (int i = 0; i < objects.size(); i++) {
+                                    selectedIndices[i] =
+                                            NewEditTaskFragment.this.categories.indexOf(objects.get(i).getTitle());
+                                }
+                                spinner.setItems(
+                                        new ArrayList<>(NewEditTaskFragment.this.categories),
+                                        getResources().getString(R.string.new_task_category_hint),
+                                        NewEditTaskFragment.this,
+                                        selectedIndices
+                                );
+                            } else {
+                                Log.e(Constants.NEW_EDIT_TASK_TAG,
+                                        "Could not fetch selected categories!");
+                            }
+                        }
+                    });
+                } else {
+                    spinner.setItems(
+                            new ArrayList<>(NewEditTaskFragment.this.categories),
+                            getResources().getString(R.string.new_task_category_hint),
+                            NewEditTaskFragment.this);
+                }
             }
         });
     }
@@ -284,8 +308,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
             }
             date = day.getDate();
         }
-        assert (day != null);
-        assert (date != null);
+        if (day == null || date == null) throw new AssertionError("Day or date is null!");
 
         calendar.setTime(date);
         if (task == null) {
@@ -335,11 +358,21 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
         ListView constraintsListView = (NoScrollListView) view.findViewById(R.id.constraints_list);
         if (task != null) {
             ParseQuery<Constraint> taskConstraintsQuery = task.getConstraints();
+            constraints = new ArrayList<>();
             try {
-                constraints = taskConstraintsQuery.find();
+                for (Constraint constraint : taskConstraintsQuery.find()) {
+                    // A deep copy is required here, since when we edit constraints, we delete
+                    // all previous constraints and add the constraints again for simplicity.
+                    // If we do not deep copy, when we delete the constraints, existing constraints
+                    // will not be around anymore to be added.
+
+                    // In this method, a clone of each previous constraint is created. When we
+                    // delete all the previous constraints these are left, and is then saved and
+                    // associated with the current task by a ParseRelation.
+                    constraints.add(constraint.clone());
+                }
             } catch (Exception e) {
                 Log.d(Constants.NEW_EDIT_TASK_TAG, "Could not find constraints! Assume no constraints");
-                constraints = new ArrayList<>();
             }
         } else {
             constraints = new ArrayList<>();
@@ -402,7 +435,6 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
             public void onClick(View v) {
                 final Calendar c = Calendar.getInstance();
                 c.setTime(NewEditTaskFragment.this.endTime);
-
                 int hour = c.get(Calendar.HOUR_OF_DAY);
                 int minute = c.get(Calendar.MINUTE);
                 TimePickerDialog endTimePicker;
@@ -490,10 +522,8 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                             .setIcon(android.R.drawable.ic_dialog_alert)
                                             .show();
                                 } else {
-                                    boolean isNew = false;
-                                    if (task == null) {
+                                    if (newTask) {
                                         task = new Task();
-                                        isNew = true;
                                     }
                                     saveButton.setEnabled(false);
                                     saveButton.setText("Saving...");
@@ -516,6 +546,24 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                         task.setTotalTime(totalTime);
                                     }
                                     // Categories
+                                    try {
+                                        if (!newTask) {
+                                            Log.d(Constants.NEW_EDIT_TASK_TAG,
+                                                    "Not a new task! Removing all previous categories");
+                                            task.removeAllCategories();
+                                        }
+                                    } catch (ParseException e1) {
+                                        new AlertDialog.Builder(getActivity().getBaseContext())
+                                                .setTitle("Error")
+                                                .setMessage("Something went wrong. Please try again!")
+                                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        saveButton.setEnabled(true);
+                                                    }
+                                                })
+                                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                                .show();
+                                    }
                                     if (selected != null) {
                                         for (int i = 0; i < selected.length; i++) {
                                             if (selected[i]) {
@@ -558,14 +606,37 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                     }
 
                                     // save constraints
+                                    try {
+                                        if (!newTask) {
+                                            // If not a newTask, remove all previous constraints
+                                            // and add them again to the task. This is not an
+                                            // efficient approach, but it's very simple. The
+                                            // alternative is cross check which ones are gone and
+                                            // only delete those.
+                                            Log.d(Constants.NEW_EDIT_TASK_TAG,
+                                                    "Not a new task! Removing all previous constraints");
+                                            task.removeAllConstraints();
+                                        }
+                                    } catch (ParseException e1) {
+                                        new AlertDialog.Builder(getActivity().getBaseContext())
+                                                .setTitle("Error")
+                                                .setMessage("Something went wrong. Please try again!")
+                                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        saveButton.setEnabled(true);
+                                                    }
+                                                })
+                                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                                .show();
+                                    }
+
                                     for (final Constraint c : constraints) {
-                                        // remove all previous constraints
+                                        Log.d(Constants.NEW_EDIT_TASK_TAG, "Adding constraint: " + c.toString());
                                         try {
-                                            if (!isNew) {
-                                                task.removeAllConstraints();
-                                            }
+                                            c.save();
                                         } catch (ParseException e1) {
-                                            new AlertDialog.Builder(getActivity().getBaseContext())
+                                            Log.e(Constants.NEW_EDIT_TASK_TAG, "Could not save constraint: " + e1.getMessage());
+                                            new AlertDialog.Builder(getActivity())
                                                     .setTitle("Error")
                                                     .setMessage("Something went wrong. Please try again!")
                                                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -576,8 +647,6 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                                     .setIcon(android.R.drawable.ic_dialog_alert)
                                                     .show();
                                         }
-                                        Log.d(Constants.NEW_EDIT_TASK_TAG, "Adding constraint: " + c.toString());
-                                        c.saveInBackground();
                                         task.addConstraint(c);
                                     }
 
@@ -659,7 +728,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
             e.printStackTrace();
             // Couldn't save Day!
             // show error
-            new AlertDialog.Builder(getActivity().getBaseContext())
+            new AlertDialog.Builder(getActivity())
                     .setTitle("Error")
                     .setMessage("Something went wrong. Please try again!")
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
