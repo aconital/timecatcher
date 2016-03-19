@@ -638,7 +638,8 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
 
                 day.setDayStart(calendar.getTime());
 
-                calendar.set(Calendar.HOUR_OF_DAY, 20);
+                calendar.set(Calendar.HOUR_OF_DAY, 23);
+                calendar.set(Calendar.MINUTE, 59);
                 day.setDayEnd(calendar.getTime());
 
                 // reset time
