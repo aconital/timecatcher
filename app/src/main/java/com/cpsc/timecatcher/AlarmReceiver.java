@@ -19,6 +19,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         String id = intent.getStringExtra("id");
         String msg = intent.getStringExtra("msg");
 
+
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.mipmap.ic_launcher)

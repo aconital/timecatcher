@@ -104,12 +104,12 @@ public class TasklistFragment extends Fragment {
                 else if (day != null) {
                     ArrayList<Pair> constraintsInt = new ArrayList<>();
                     CSP problem = new CSP(Utility.dateToTime(day.getDayStart()),
-                                          Utility.dateToTime(day.getDayEnd()));
+                            Utility.dateToTime(day.getDayEnd()));
 
                     boolean overtime = false;
                     for (int i = 0; i < taskList.size(); i++) {
                         Task currentTask = taskList.get(i);
-                        if(currentTask.getFixed()) {
+                        if (currentTask.getFixed()) {
                             overtime = overtime || problem.addFixedTask(
                                     Utility.dateToTime(currentTask.getStartTime()),
                                     Utility.dateToTime(currentTask.getEndTime()));
@@ -126,7 +126,7 @@ public class TasklistFragment extends Fragment {
                         try {
                             constraints = taskConstraintsQuery.find();
                             for (Constraint constraint : constraints) {
-                                if (constraint.getOperator() == Operator.BEFORE){
+                                if (constraint.getOperator() == Operator.BEFORE) {
                                     constraintsInt.add(
                                             Pair.create(i, taskList.indexOf(constraint.getOther())));
                                 } else {
@@ -142,8 +142,8 @@ public class TasklistFragment extends Fragment {
                     }
                     problem.createConstraintGraph();
                     for (Pair constraintPair : constraintsInt) {
-                        problem.addConstraint((int)constraintPair.first,
-                                (int)constraintPair.second, 0);
+                        problem.addConstraint((int) constraintPair.first,
+                                (int) constraintPair.second, 0);
                     }
 
                     if (problem.isConstraintsConflict()) {
@@ -153,23 +153,27 @@ public class TasklistFragment extends Fragment {
                                         " Please edit your tasks and try again.")
                                 .setPositiveButton(android.R.string.ok,
                                         new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {}})
-                        .show();
+                                            public void onClick(DialogInterface dialog, int which) {
+                                            }
+                                        })
+                                .show();
                     }
 
                     CSP_Solver csp_solver = new CSP_Solver(problem);
-                    List<ArrayList<TaskAssignment> > solutions = csp_solver.getSolutions();
-                    if (solutions.isEmpty()) {
+                    List<ArrayList<TaskAssignment>> solutions = csp_solver.getSolutions();
+                    if (solutions.size() == 0) {
                         new AlertDialog.Builder(getActivity())
                                 .setTitle("Error")
                                 .setMessage("Could not schedule your day!" +
                                         " Please edit your tasks and try again.")
                                 .setPositiveButton(android.R.string.ok,
                                         new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int which) {}})
+                                            public void onClick(DialogInterface dialog, int which) {
+                                            }
+                                        })
                                 .show();
                     }
-
+                    else {
                     ArrayList<TaskAssignment> solution = solutions.get(0);
                     for (TaskAssignment taskAssignment : solution) {
                         Task task = taskList.get(taskAssignment.getTaskId());
@@ -189,11 +193,11 @@ public class TasklistFragment extends Fragment {
                                 i.putExtra("msg", task.getTitle());
                                 PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
 
-                                Calendar c=Calendar.getInstance();
+                                Calendar c = Calendar.getInstance();
                                 c.setTime(Utility.timeToDate(day.getDate(),
                                         taskAssignment.getAssignment().getStartTime()));
                                 c.add(Calendar.MINUTE, -15);
-                                c.set(Calendar.SECOND,0);
+                                c.set(Calendar.SECOND, 0);
                                 c.set(Calendar.MILLISECOND, 0);
 
                                 long time = c.getTime().getTime();
@@ -203,9 +207,7 @@ public class TasklistFragment extends Fragment {
                                 Log.e("Algorithm", "Could not save task: " + task.getObjectId());
                                 e.printStackTrace();
                             }
-                        }
-                        else
-                        {
+                        } else {
                             AlarmManager am = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
                             Intent i = new Intent(getActivity(), AlarmReceiver.class);
                             i.putExtra("id", task.getObjectId());
@@ -215,7 +217,7 @@ public class TasklistFragment extends Fragment {
                             Calendar c = Calendar.getInstance();
                             c.setTime(task.getStartTime());
                             c.add(Calendar.MINUTE, -15);
-                            c.set(Calendar.SECOND,0);
+                            c.set(Calendar.SECOND, 0);
                             c.set(Calendar.MILLISECOND, 0);
 
                             long time = c.getTime().getTime();
@@ -224,7 +226,7 @@ public class TasklistFragment extends Fragment {
 
 
                     }
-
+                }
                     mAdapter.notifyDataSetChanged();
 
                     Log.d("Algorithm", csp_solver.solutionsString());
