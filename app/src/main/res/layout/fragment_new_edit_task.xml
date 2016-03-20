@@ -2,6 +2,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:flatui="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@color/white"
     android:padding="20dp">
@@ -50,7 +51,8 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_margin="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
         android:background="@android:color/darker_gray" />
 
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -65,50 +67,31 @@
             android:orientation="vertical"
             >
 
-            <LinearLayout
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/edit_task_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="5dp"
-                android:paddingEnd="5dp">
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="0.33"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/new_task_name" />
+                android:singleLine="true"
+                android:hint="@string/new_task_name_hint"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                app:met_floatingLabelText="@string/new_task_name"
+                app:met_floatingLabel="highlight"
+                app:met_floatingLabelAlwaysShown="true"
+                app:met_floatingLabelTextSize="15sp"/>
 
-                <EditText
-                    android:id="@+id/edit_task_name"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.67"
-                    android:singleLine="true"
-                    android:hint="@string/new_task_name_hint" />
-
-            </LinearLayout>
-
-            <LinearLayout
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/edit_task_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="5dp"
-                android:paddingEnd="5dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="0.33"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/new_task_description" />
-
-                <EditText
-                    android:id="@+id/edit_task_description"
-                    android:layout_weight="0.67"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/new_task_description_hint" />
-            </LinearLayout>
+                android:singleLine="true"
+                android:hint="@string/new_task_description_hint"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                app:met_floatingLabelText="@string/new_task_description"
+                app:met_floatingLabel="highlight"
+                app:met_floatingLabelAlwaysShown="true"
+                app:met_floatingLabelTextSize="15sp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
