@@ -113,10 +113,10 @@ public class ProfileFragment extends Fragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
                     setting.edit().putBoolean("notification",true).commit();
-//                    PushService.setDefaultPushCallback(getApplicationContext(),AlarmReceiver.class);
+//                    PushService.setDefaultPushCallback(getActivity().getApplicationContext(),AlarmReceiver.class);class
                 }else{
                     setting.edit().putBoolean("notification",false).commit();
-//                    PushService.setDefaultPushCallback(getApplicationContext(), null);
+//                    PushService.setDefaultPushCallback(getActivity().getApplicationContext(), null);
                 }
             }
         });
