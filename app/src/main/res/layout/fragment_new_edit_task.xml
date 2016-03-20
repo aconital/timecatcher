@@ -1,10 +1,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:flatui="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:flatui="http://schemas.android.com/apk/res-auto"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:background="@color/white"
+    android:orientation="vertical"
     android:padding="20dp">
 
 
@@ -16,88 +16,85 @@
             android:id="@+id/title_newtask"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dip"
             android:layout_marginStart="5dip"
-            android:maxLines="1"
+            android:layout_marginTop="10dip"
             android:gravity="center_vertical"
+            android:maxLines="1"
             android:text="@string/new_task_title"
-            android:textSize="25sp">
-        </com.cengalabs.flatui.views.FlatTextView>
+            android:textSize="25sp"></com.cengalabs.flatui.views.FlatTextView>
 
         <com.cengalabs.flatui.views.FlatButton
             android:id="@+id/save_button"
-            android:textStyle="bold"
-            flatui:fl_touchEffect="fl_ripple"
-            flatui:fl_theme="@array/candy"
-            flatui:fl_blockButtonEffectHeight="3dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:text="@string/new_task_save_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:textStyle="bold"
+            flatui:fl_blockButtonEffectHeight="3dp"
+            flatui:fl_theme="@array/candy"
+            flatui:fl_touchEffect="fl_ripple" />
     </RelativeLayout>
 
     <com.cengalabs.flatui.views.FlatTextView
         android:id="@+id/title_date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
         android:layout_marginStart="5dip"
-        android:maxLines="1"
+        android:layout_marginTop="10dip"
         android:gravity="center_vertical"
-        android:textSize="15sp">
-    </com.cengalabs.flatui.views.FlatTextView>
+        android:maxLines="1"
+        android:textSize="15sp"></com.cengalabs.flatui.views.FlatTextView>
 
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
         android:background="@android:color/darker_gray" />
 
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:orientation="vertical"
-        android:fillViewport="true">
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <com.rengwuxian.materialedittext.MaterialEditText
                 android:id="@+id/edit_task_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:hint="@string/new_task_name_hint"
-                android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp"
-                app:met_floatingLabelText="@string/new_task_name"
+                android:layout_marginStart="5dp"
+                android:hint="@string/new_task_name_hint"
+                android:singleLine="true"
                 app:met_floatingLabel="highlight"
                 app:met_floatingLabelAlwaysShown="true"
-                app:met_floatingLabelTextSize="15sp"/>
+                app:met_floatingLabelText="@string/new_task_name"
+                app:met_floatingLabelTextSize="15sp" />
 
             <com.rengwuxian.materialedittext.MaterialEditText
                 android:id="@+id/edit_task_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:hint="@string/new_task_description_hint"
-                android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp"
-                app:met_floatingLabelText="@string/new_task_description"
+                android:layout_marginStart="5dp"
+                android:hint="@string/new_task_description_hint"
+                android:singleLine="true"
                 app:met_floatingLabel="highlight"
                 app:met_floatingLabelAlwaysShown="true"
-                app:met_floatingLabelTextSize="15sp"/>
+                app:met_floatingLabelText="@string/new_task_description"
+                app:met_floatingLabelTextSize="15sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="5dp"
                 android:paddingEnd="5dp"
+                android:paddingStart="5dp"
                 android:paddingTop="10dp">
 
                 <TextView
@@ -105,14 +102,14 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="0.33"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/new_task_category" />
+                    android:text="@string/new_task_category"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 <com.cpsc.timecatcher.gui.MultiSpinner
                     android:id="@+id/categories"
-                    android:layout_weight="0.67"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.67"/>
 
             </LinearLayout>
 
@@ -120,8 +117,8 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
                 android:background="@android:color/darker_gray" />
 
             <RelativeLayout
@@ -131,44 +128,52 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/new_task_fixed"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:paddingEnd="5dp"
                     android:paddingStart="5dp"
-                    android:paddingEnd="5dp"/>
+                    android:text="@string/new_task_fixed"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 <Switch
                     android:id="@+id/fixed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                    android:checked="false"/>
+                    android:checked="false" />
             </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/startTimeLayout"
-                android:padding="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:padding="5dp"
                 android:visibility="gone">
+
+                <com.joanzapata.iconify.widget.IconTextView
+                    android:id="@+id/startTimeIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="{fa-hourglass-start}"
+                    android:layout_alignBaseline="@+id/startTime"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:paddingStart="5dp"
                     android:paddingEnd="5dp"
-                    android:paddingTop="5dp"
-                    android:text="@string/new_task_start_time_label"/>
+                    android:paddingStart="10dp"
+                    android:layout_toRightOf="@id/startTimeIcon"
+                    android:layout_alignBaseline="@+id/startTime"
+                    android:text="@string/new_task_start_time_label"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 <TextView
                     android:id="@+id/startTime"
-                    android:paddingTop="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:clickable="true"
                     android:layout_alignParentEnd="true"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    />
+                    android:clickable="true"
+                    android:paddingTop="10dp"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -178,110 +183,108 @@
                 android:padding="5dp"
                 android:visibility="gone">
 
+                <com.joanzapata.iconify.widget.IconTextView
+                    android:id="@+id/endTimeIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="{fa-hourglass-end}"
+                    android:layout_alignBaseline="@+id/endTime"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:paddingStart="5dp"
-                    android:paddingEnd="5dp"
-                    android:paddingTop="5dp"
                     android:gravity="bottom"
-                    android:text="@string/new_task_end_time_label"/>
+                    android:paddingEnd="5dp"
+                    android:paddingStart="10dp"
+                    android:layout_toEndOf="@id/endTimeIcon"
+                    android:layout_alignBaseline="@+id/endTime"
+                    android:text="@string/new_task_end_time_label"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
                 <TextView
                     android:id="@+id/endTime"
-                    android:paddingTop="10dp"
-                    android:clickable="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    />
+                    android:clickable="true"
+                    android:paddingTop="10dp"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
             </RelativeLayout>
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/totalTimeLayout"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="10dp">
+                android:padding="5dp">
+
+                <com.joanzapata.iconify.widget.IconTextView
+                    android:id="@+id/totalTimeIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="{fa-clock-o}"
+                    android:layout_alignBaseline="@+id/totalTimeLabel"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 <TextView
                     android:id="@+id/totalTimeLabel"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="0.33"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/new_task_TotalTime" />
-
-                <Spinner
-                    android:id="@+id/totalTimeHour"
-                    android:layout_weight="0.2"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    />
+                    android:paddingStart="10dp"
+                    android:layout_toEndOf="@id/totalTimeIcon"
+                    android:text="@string/new_task_TotalTime"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:id="@+id/totalTime"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.135"
-                    android:text="@string/totalTimeHours"/>
+                    android:clickable="true"
+                    android:layout_alignParentEnd="true"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
 
-                <Spinner
-                    android:id="@+id/totalTimeHourMinute"
-                    android:layout_weight="0.2"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="0.135"
-                    android:layout_height="wrap_content"
-                    android:text="@string/totalTimeMinutes"/>
-
-            </LinearLayout>
+            </RelativeLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="5dp"
                 android:layout_marginBottom="10dp"
+                android:layout_marginTop="5dp"
                 android:background="@android:color/darker_gray" />
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <com.cengalabs.flatui.views.FlatTextView
-                    android:text="@string/constraintTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dip"
                     android:layout_marginStart="5dip"
-                    android:maxLines="1"
+                    android:layout_marginTop="10dip"
                     android:gravity="center_vertical"
-                    android:textSize="20sp">
-                </com.cengalabs.flatui.views.FlatTextView>
+                    android:maxLines="1"
+                    android:text="@string/constraintTitle"
+                    android:textSize="20sp"></com.cengalabs.flatui.views.FlatTextView>
 
                 <com.cengalabs.flatui.views.FlatButton
-                    flatui:fl_theme="@array/candy"
-                    flatui:fl_touchEffect="fl_ripple"
-                    flatui:fl_blockButtonEffectHeight="3dp"
                     android:id="@+id/add_constraint_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
                     android:text="@string/addConstraintButton"
                     android:textStyle="bold"
-                    android:layout_alignParentRight="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    flatui:fl_blockButtonEffectHeight="3dp"
+                    flatui:fl_theme="@array/candy"
+                    flatui:fl_touchEffect="fl_ripple" />
             </RelativeLayout>
 
             <com.cpsc.timecatcher.gui.NoScrollListView
                 android:id="@+id/constraints_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawSelectorOnTop="false"
-                />
+                android:drawSelectorOnTop="false" />
 
         </LinearLayout>
 
