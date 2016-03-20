@@ -1,6 +1,7 @@
 package com.cpsc.timecatcher;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -102,9 +103,12 @@ public class StructureActivity extends AppCompatActivity
     }
 
     public void onClickUserLogOut(){
-        Fragment ParseLoginFragment=new com.parse.ui.ParseLoginFragment();
-        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
-        .replace(R.id.frame_container, ParseLoginFragment).commit();
+//        Fragment ParseLoginFragment=new com.parse.ui.ParseLoginFragment();
+//        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
+//        .replace(R.id.frame_container, ParseLoginFragment).commit();
+        Intent intent=new Intent();
+        intent.setClass(StructureActivity.this,com.parse.ui.ParseLoginActivity.class);
+        startActivity(intent);
     }
 
     public void addTask(long date)

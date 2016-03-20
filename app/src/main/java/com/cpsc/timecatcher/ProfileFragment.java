@@ -206,6 +206,7 @@ public class ProfileFragment extends Fragment {
 
     public interface OnFragmentInteractionListener{
         public void onClickUserLogOut();
+
     }
 
 }
