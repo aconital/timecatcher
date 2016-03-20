@@ -22,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.algorithm.CSP;
 import com.algorithm.CSP_Solver;
@@ -232,6 +233,7 @@ public class TasklistFragment extends Fragment {
                     mAdapter.notifyDataSetChanged();
 
                     Log.d("Algorithm", csp_solver.solutionsString());
+                    Toast.makeText(getActivity(), "Tasks Scheduled!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
