@@ -64,4 +64,6 @@
     <string name="push_notification">Notification</string>
     <string name="invitation">SEND INVITATION</string>
 
+    <string name="totalTimeString">%1$d h %2$d m</string>
+
 </resources>

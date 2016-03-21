@@ -67,7 +67,7 @@ import static com.cpsc.timecatcher.algorithm.TimeUtils.addMinutesToDate;
 
 
 public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiSpinnerListener,
-        TimePickerDialogFragment.TimePickerDialogHandler {
+        RadialTimePickerDialogFragment.OnTimeSetListener {
     private Date date;
     private boolean newDate = false;
     private Day day;
@@ -319,12 +319,14 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
         });
 
         // initialize spinner items
-        totalTimeTextView.setText(totalTimeHours + " h " + totalTimeMinutes + " m");
+        totalTimeTextView.setText(
+                getString(R.string.totalTimeString, totalTimeHours, totalTimeMinutes));
         totalTimeTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 RadialTimePickerDialogFragment rtpd = new RadialTimePickerDialogFragment()
                         .setForced24hFormat()
+                        .setOnTimeSetListener(NewEditTaskFragment.this)
                         .setStartTime(totalTimeHours, totalTimeMinutes);
                 rtpd.show(getChildFragmentManager(), "FRAG");
             }
@@ -766,9 +768,9 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
     }
 
     @Override
-    public void onDialogTimeSet(int reference, int hourOfDay, int minute) {
+    public void onTimeSet(RadialTimePickerDialogFragment dialog, int hourOfDay, int minute) {
         totalTimeHours = hourOfDay;
         totalTimeMinutes = minute;
-        totalTimeTextView.setText(totalTimeHours + " h " + totalTimeMinutes + " m ");
+        totalTimeTextView.setText(getString(R.string.totalTimeString, hourOfDay, minute));
     }
 }
