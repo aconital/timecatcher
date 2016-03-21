@@ -44,4 +44,5 @@ dependencies {
     compile 'com.android.support:support-v4:23.1.1'
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
     compile 'com.code-troopers.betterpickers:library:2.5.2'
+    compile 'me.everything:providers-android:1.0.1'
 }
