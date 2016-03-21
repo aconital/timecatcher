@@ -14,19 +14,18 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.cengalabs.flatui.views.FlatTextView;
+import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
+import com.codetroopers.betterpickers.timepicker.TimePickerDialogFragment;
 import com.cpsc.timecatcher.algorithm.TimeUtils;
 import com.cpsc.timecatcher.gui.MultiSpinner;
 import com.cpsc.timecatcher.gui.NoScrollListView;
@@ -67,7 +66,8 @@ import static com.cpsc.timecatcher.algorithm.TimeUtils.addMinutesToDate;
  */
 
 
-public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiSpinnerListener {
+public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiSpinnerListener,
+        RadialTimePickerDialogFragment.OnTimeSetListener {
     private Date date;
     private boolean newDate = false;
     private Day day;
@@ -79,6 +79,10 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
     private boolean newTask = true;
     private Date startTime;
     private Date endTime;
+    private int totalTimeMinutes = 0;
+    private int totalTimeHours = 0;
+
+    TextView totalTimeTextView;
 
     private final DateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.CANADA);
     private final DateFormat dateFormat = new SimpleDateFormat("EEE, MMM d", Locale.CANADA);
@@ -201,29 +205,6 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
-        // Spinner values cannot be set with onCreateView. This is a fix. God damn it android
-        // why you gotta be like dis.
-        if (task != null) {
-            View view = getView();
-            final Spinner totalTimeHour = (Spinner) view.findViewById(R.id.totalTimeHour);
-            final Spinner totalTimeMinute = (Spinner) view.findViewById(R.id.totalTimeHourMinute);
-
-            int totalTime = task.getTotalTime();
-            int totalTimeHoursTask = totalTime / 60;
-            int totalTimeMinutesTask = totalTime % 60;
-
-            totalTimeHour.setSelection(totalTimeHoursTask);
-            // index should be just the minutes divided by 5, since the selection goes by
-            // 5 minute intervals. This also ensures the minute value is rounded in the strange
-            // case that it wasn't before.
-            totalTimeMinute.setSelection(totalTimeMinutesTask / 5);
-        }
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -238,11 +219,10 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
         final Switch fixedSwitch = (Switch) view.findViewById(R.id.fixed);
         final RelativeLayout startTimeLayout = (RelativeLayout) view.findViewById(R.id.startTimeLayout);
         final RelativeLayout endTimeLayout = (RelativeLayout) view.findViewById(R.id.endTimeLayout);
-        final LinearLayout totalTimeLayout = (LinearLayout) view.findViewById(R.id.totalTimeLayout);
-        final Spinner totalTimeHour = (Spinner) view.findViewById(R.id.totalTimeHour);
-        final Spinner totalTimeMinute = (Spinner) view.findViewById(R.id.totalTimeHourMinute);
+        final RelativeLayout totalTimeLayout = (RelativeLayout) view.findViewById(R.id.totalTimeLayout);
         final Button saveButton = (Button) view.findViewById(R.id.save_button);
         final Button newConstraintButton = (Button) view.findViewById(R.id.add_constraint_button);
+        totalTimeTextView = (TextView) view.findViewById(R.id.totalTime);
 
         if (task != null) {
             title.setText(task.getTitle());
@@ -259,6 +239,8 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                 startTimeLayout.setVisibility(View.GONE);
                 endTimeLayout.setVisibility(View.GONE);
                 totalTimeLayout.setVisibility(View.VISIBLE);
+                totalTimeMinutes = task.getTotalTime() % 60;
+                totalTimeHours = task.getTotalTime() / 60;
             }
         }
 
@@ -337,20 +319,18 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
         });
 
         // initialize spinner items
-        ArrayAdapter<CharSequence> totalTimeHourAdapter = ArrayAdapter.createFromResource(
-                getActivity().getBaseContext(),
-                R.array.new_task_set_time_hours, android.R.layout.simple_spinner_item
-        );
-        totalTimeHourAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        totalTimeHour.setAdapter(totalTimeHourAdapter);
-
-        ArrayAdapter<CharSequence> totalTimeMinuteAdapter = ArrayAdapter.createFromResource(
-                getActivity().getBaseContext(),
-                R.array.set_time_minutes, android.R.layout.simple_spinner_item
-        );
-
-        totalTimeMinuteAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        totalTimeMinute.setAdapter(totalTimeMinuteAdapter);
+        totalTimeTextView.setText(
+                getString(R.string.totalTimeString, totalTimeHours, totalTimeMinutes));
+        totalTimeTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RadialTimePickerDialogFragment rtpd = new RadialTimePickerDialogFragment()
+                        .setForced24hFormat()
+                        .setOnTimeSetListener(NewEditTaskFragment.this)
+                        .setStartTime(totalTimeHours, totalTimeMinutes);
+                rtpd.show(getChildFragmentManager(), "FRAG");
+            }
+        });
 
         populateCategoriesSpinner(multiSpinner);
 
@@ -474,8 +454,8 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
             @Override
             public void onClick(View v) {
                 CharSequence error = title.getError();
-                final int totalHours = Integer.parseInt(totalTimeHour.getSelectedItem().toString());
-                final int totalMinutes = Integer.parseInt(totalTimeMinute.getSelectedItem().toString());
+//                final int totalHours = Integer.parseInt(totalTimeHour.getSelectedItem().toString());
+//                final int totalMinutes = Integer.parseInt(totalTimeMinute.getSelectedItem().toString());
                 if (error != null) {
                     // If title is empty
                     title.requestFocus();
@@ -484,14 +464,13 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                     // this check is still necessary
                     title.setError("Task name cannot be empty!");
                     title.requestFocus();
-                } else if (totalHours == 0 && totalMinutes == 0 && !fixed) {
+                } else if (totalTimeHours == 0 && totalTimeMinutes == 0 && !fixed) {
                     // Total time shouldn't be zero
                     new AlertDialog.Builder(getContext())
                             .setTitle("Save Task Error")
                             .setMessage("Can't create a task with no total time!")
                             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    totalTimeMinute.requestFocus();
                                 }
                             }).show();
                 } else {
@@ -542,7 +521,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                                 NewEditTaskFragment.this.endTime);
                                         task.setTotalTime(totalTime);
                                     } else {
-                                        totalTime = totalHours * 60 + totalMinutes;
+                                        totalTime = totalTimeHours * 60 + totalTimeMinutes;
                                         task.setTotalTime(totalTime);
                                     }
                                     // Categories
@@ -788,5 +767,10 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
         this.selected = selected;
     }
 
-
+    @Override
+    public void onTimeSet(RadialTimePickerDialogFragment dialog, int hourOfDay, int minute) {
+        totalTimeHours = hourOfDay;
+        totalTimeMinutes = minute;
+        totalTimeTextView.setText(getString(R.string.totalTimeString, hourOfDay, minute));
+    }
 }
