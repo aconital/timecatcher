@@ -23,6 +23,14 @@ public class Task extends ParseObject implements ITimeSlot {
 
     public static final String TAG = "Task";
 
+    public void setInstanceId(long instanceId) {
+        put("instanceId", instanceId);
+    }
+
+    public long getInstanceId() {
+        return getLong("instanceId");
+    }
+
     public Boolean getFixed() {
         return getBoolean("fixed");
     }

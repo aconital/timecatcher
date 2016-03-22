@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="5dp">
+
+    <Button
+        android:id="@+id/done_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/import_picker_done"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"/>
+
+    <ListView
+        android:id="@+id/eventsList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_above="@id/done_button"
+        android:layout_alignParentStart="false" />
+
+    <CheckBox
+        android:id="@+id/selectAllCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/selectAll"
+        android:paddingEnd="5dp"
+        android:layout_toLeftOf="@id/done_button"
+        android:layout_alignBaseline="@id/done_button"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

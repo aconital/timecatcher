@@ -2,7 +2,6 @@ package com.cpsc.timecatcher;
 
 import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -30,6 +29,7 @@ import com.algorithm.TaskAssignment;
 import com.algorithm.Time;
 import com.cpsc.timecatcher.helper.Constants;
 import com.cpsc.timecatcher.helper.Utility;
+import com.cpsc.timecatcher.importer.ImporterDialog;
 import com.cpsc.timecatcher.model.Constraint;
 import com.cpsc.timecatcher.model.Day;
 import com.cpsc.timecatcher.model.Operator;
@@ -246,6 +246,15 @@ public class TasklistFragment extends Fragment {
                 getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
                         .replace(R.id.frame_container, scheduleFragment).commit();
 
+            }
+        });
+
+        import_fab = (FloatingActionButton) view.findViewById(R.id.fab_import);
+        import_fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImporterDialog importerDialog = new ImporterDialog(getContext());
+                importerDialog.show();
             }
         });
 
