@@ -275,7 +275,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
 
         // Day
         if (task == null) {
-            day = getOrCreateDay();
+            day = getOrCreateDay(date, calendar);
         } else {
             try {
                 day = task.getDay();
@@ -505,7 +505,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                         task = new Task();
                                     }
                                     saveButton.setEnabled(false);
-                                    saveButton.setText("Saving...");
+                                    saveButton.setText(R.string.button_saving);
                                     task.setTitle(title.getText().toString());
                                     task.setDescription(description.getText().toString());
                                     task.setFixed(fixed);
@@ -663,7 +663,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
         return view;
     }
 
-    public Day getOrCreateDay(){
+    public Day getOrCreateDay(Date date, Calendar calendar){
         ParseQuery<Day> dayParseQuery = Day.getQuery();
         dayParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
         dayParseQuery.whereEqualTo("date", date);
@@ -679,7 +679,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                 day.setUser(ParseUser.getCurrentUser());
                 day.setDate(date);
 
-                // reasonable default: 8:30 AM to 9PM
+                // reasonable default: 8:30 AM to 23:59PM
                 calendar.setTime(date);
                 calendar.set(Calendar.HOUR_OF_DAY, 8);
                 calendar.set(Calendar.MINUTE, 30);

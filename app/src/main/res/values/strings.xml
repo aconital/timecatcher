@@ -74,6 +74,7 @@
     <string name="import_picker_done">Done</string>
     <string name="import_count">Found %1$d tasks to be imported</string>
     <string name="import_pick">Select Tasks</string>
+    <string name="button_saving">Saving...</string>
 
     <string-array name="import_picker_values">
         <item>Today</item>

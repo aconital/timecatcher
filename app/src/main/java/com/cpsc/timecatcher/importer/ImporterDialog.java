@@ -1,7 +1,9 @@
 package com.cpsc.timecatcher.importer;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -12,14 +14,27 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cpsc.timecatcher.R;
+import com.cpsc.timecatcher.algorithm.TimeUtils;
+import com.cpsc.timecatcher.model.Day;
+import com.cpsc.timecatcher.model.Task;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import me.everything.providers.android.calendar.CalendarProvider;
+import me.everything.providers.android.calendar.Event;
 import me.everything.providers.android.calendar.Instance;
 
 /**
@@ -36,6 +51,7 @@ public class ImporterDialog extends Dialog implements EventPickerDialog.EventPic
 
     private TextView countLabel;
     private CalendarProvider calendarProvider;
+    private final java.util.Calendar c = java.util.Calendar.getInstance();
 
 
     public ImporterDialog(Context context) {
@@ -59,9 +75,9 @@ public class ImporterDialog extends Dialog implements EventPickerDialog.EventPic
         importSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                final java.util.Calendar c = java.util.Calendar.getInstance();
                 Date start, end;
                 instances.clear();
+                selectedInstances.clear();
                 if (position == 0) {
                     // today
 
@@ -110,7 +126,6 @@ public class ImporterDialog extends Dialog implements EventPickerDialog.EventPic
 
                 instances.addAll(instancesList);
 
-
                 // selectedInstances == instances on spinner picks.
                 selectedInstances.addAll(instancesList);
 
@@ -135,6 +150,139 @@ public class ImporterDialog extends Dialog implements EventPickerDialog.EventPic
                 eventPickerDialog.show();
             }
         });
+
+        importButton = (Button) findViewById(R.id.import_button);
+        importButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                for(Instance i : selectedInstances) {
+                    Log.d(TAG, "User selected: " + calendarProvider.getEvent(i.eventId).title);
+                }
+                if (selectedInstances.size() == 0) {
+                    new AlertDialog.Builder(getContext())
+                            .setTitle("Error")
+                            .setMessage("No tasks to import!")
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            })
+                            .show();
+                } else {
+                    importButton.setEnabled(false);
+                    importButton.setText(R.string.button_saving);
+                    final List<Task> tasks = new LinkedList<>();
+                    for (final Instance i : selectedInstances) {
+                        // check if day exists
+                        c.setTimeInMillis(i.begin);
+                        c.set(java.util.Calendar.HOUR_OF_DAY, 0);
+                        c.set(java.util.Calendar.MINUTE, 0);
+                        c.set(java.util.Calendar.SECOND, 0);
+                        c.set(java.util.Calendar.MILLISECOND, 0);
+
+                        ParseQuery<Day> dayParseQuery = Day.getQuery();
+                        dayParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+                        dayParseQuery.whereEqualTo("date", c.getTime());
+                        Day day = new Day();
+                        day.initialize();
+                        try {
+                            day = dayParseQuery.getFirst();
+                        } catch (Exception e) {
+                            if (e instanceof ParseException) {
+                                if (((ParseException) e).getCode() == ParseException.OBJECT_NOT_FOUND) {
+                                    // no such day, create it
+                                    day = new Day();
+                                    day.initialize();
+                                    day.setUser(ParseUser.getCurrentUser());
+                                    day.setDate(c.getTime());
+
+
+                                    c.set(Calendar.HOUR_OF_DAY, 8);
+                                    c.set(Calendar.MINUTE, 30);
+                                    day.setDayStart(c.getTime());
+
+                                    c.set(Calendar.HOUR_OF_DAY, 23);
+                                    c.set(Calendar.MINUTE, 59);
+                                    day.setDayEnd(c.getTime());
+                                    try {
+                                        day.save();
+                                    } catch (ParseException e1) {
+                                        // Couldn't save Day!
+                                        new AlertDialog.Builder(getContext())
+                                                .setTitle("Error")
+                                                .setMessage("Something went wrong. Please try again!")
+                                                .setPositiveButton(android.R.string.ok,
+                                                        new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        importButton.setText(R.string.import_button);
+                                                    }
+                                                })
+                                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                                .show();
+                                    }
+                                }
+                            }
+                        }
+                        // final instance of day to use in the next callback
+                        final Day finalDay = day;
+
+
+                        // check if duplicate:
+                        // in the case that event already exists, update it
+                        ParseQuery<Task> duplicateQuery = Task.getQuery();
+                        duplicateQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+                        duplicateQuery.whereEqualTo("instanceId", i.id);
+                        duplicateQuery.findInBackground(new FindCallback<Task>() {
+                            @Override
+                            public void done(List<Task> objects, ParseException e) {
+                                final Task task;
+                                Event event = calendarProvider.getEvent(i.eventId);
+                                // check for duplicates in current import:
+                                if (e != null || objects.size() == 0) {
+                                    // If we couldn't query for duplicates, or there are no
+                                    // duplicates, simply add the item
+                                    if (e != null) {
+                                        Log.d(TAG, "Could not query in duplicate check! " +
+                                                "Assume no duplicates");
+                                    }
+                                    task = new Task();
+
+                                    // settings unique to new task
+                                    task.setFixed(true);
+                                    task.setInstanceId(i.id);
+                                    task.setUser(ParseUser.getCurrentUser());
+
+                                } else {
+                                    // Duplicate. Simply update
+                                    // This code assumes objects.size() is never greater than one
+                                    task = objects.get(0);
+                                }
+                                task.setTitle(event.title);
+                                task.setDescription(event.description);
+                                task.setDay(finalDay);
+                                Date startDate = new Date(i.begin);
+                                Date endDate = new Date(i.end);
+                                task.setStartTime(startDate);
+                                task.setEndTime(endDate);
+
+                                int totalTime = TimeUtils.getMinutesDiff(startDate, endDate);
+                                task.setTotalTime(totalTime);
+                                tasks.add(task);
+                                if (tasks.size() == selectedInstances.size()) {
+                                    // we've added all the instances, save
+                                    // god damn async is a pain some times
+                                    ParseObject.saveAllInBackground(tasks, new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            ImporterDialog.this.dismiss();
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -157,9 +305,5 @@ public class ImporterDialog extends Dialog implements EventPickerDialog.EventPic
         countLabel.setText(
                 String.format(getContext().getResources().getString(R.string.import_count),
                         count));
-
-        for(Instance i : selectedInstances) {
-            Log.d(TAG, "User selected: " + calendarProvider.getEvent(i.eventId).title);
-        }
     }
 }

@@ -254,6 +254,13 @@ public class TasklistFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ImporterDialog importerDialog = new ImporterDialog(getContext());
+                importerDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        Log.d("Dismiss", "Dismissed: notifying adaptor");
+                        loadTasks();
+                    }
+                });
                 importerDialog.show();
             }
         });
