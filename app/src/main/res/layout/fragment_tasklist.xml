@@ -34,10 +34,9 @@
         android:src="@drawable/ic_add_circle_outline_white_48dp"
         android:layout_marginLeft="@dimen/fab_margin"
         android:layout_marginRight="@dimen/fab_margin"
-        android:layout_marginStart="95dp"
-        android:layout_marginBottom="39dp"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"/>
+        android:layout_marginStart="30dp"
+        android:layout_marginBottom="15dp"
+        android:layout_above="@+id/fab"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_schedule"
