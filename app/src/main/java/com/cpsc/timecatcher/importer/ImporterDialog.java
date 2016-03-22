@@ -30,8 +30,11 @@ import com.parse.SaveCallback;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import me.everything.providers.android.calendar.CalendarProvider;
 import me.everything.providers.android.calendar.Event;
@@ -52,6 +55,8 @@ public class ImporterDialog extends Dialog implements EventPickerDialog.EventPic
     private TextView countLabel;
     private CalendarProvider calendarProvider;
     private final java.util.Calendar c = java.util.Calendar.getInstance();
+
+    private final Map<Long, Event> instanceToEventMap = new HashMap<>();
 
 
     public ImporterDialog(Context context) {
@@ -118,6 +123,20 @@ public class ImporterDialog extends Dialog implements EventPickerDialog.EventPic
                         start.getTime(),
                         end.getTime()
                 ).getList();
+
+
+                Iterator<Instance> instanceIterator = instancesList.iterator();
+                while (instanceIterator.hasNext()) {
+                    Instance i = instanceIterator.next();
+                    Event e = calendarProvider.getEvent(i.eventId);
+                    if (e.allDay) {
+                        // filter allDay events
+                        instanceIterator.remove();
+                    } else {
+                        instanceToEventMap.put(i.id, e);
+                    }
+                }
+
 
                 Log.d(TAG, "Found " + instancesList.size() + " events");
                 countLabel.setText(
@@ -235,7 +254,7 @@ public class ImporterDialog extends Dialog implements EventPickerDialog.EventPic
                             @Override
                             public void done(List<Task> objects, ParseException e) {
                                 final Task task;
-                                Event event = calendarProvider.getEvent(i.eventId);
+                                Event event = instanceToEventMap.get(i.id);
                                 // check for duplicates in current import:
                                 if (e != null || objects.size() == 0) {
                                     // If we couldn't query for duplicates, or there are no
