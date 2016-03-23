@@ -85,6 +85,9 @@ public class ScheduleFragment extends Fragment implements WeekView.EventClickLis
         View view= inflater.inflate(R.layout.fragment_schedule, container, false);
         setTitle(date);
         mWeekView = (WeekView) view.findViewById(R.id.weekView);
+        Calendar calendar=Calendar.getInstance();
+        calendar.setTime(date);
+        mWeekView.goToDate(calendar);
         mWeekView.setOnEventClickListener(this);
         // The week view has infinite scrolling horizontally. We have to provide the events of a
         // month every time the month changes on the week view.
