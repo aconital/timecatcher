@@ -75,7 +75,7 @@ public class CSP_SolverTest {
 
     @Test
     public void test1() throws Exception {
-        dayStart=new Time(3,0);
+        dayStart=new Time(1,0);
         dayEnd=new Time(13,0);
         problem= new CSP(dayStart,dayEnd);
         problem.addFixedTask(new Time(3, 30), new Time(5, 30)); // 0
@@ -83,8 +83,8 @@ public class CSP_SolverTest {
         problem.addFlexibleTask(new Time(1, 0)); // 2
 
         problem.createConstraintGraph();
-        problem.addConstraint(2, 1, 0);
-        problem.addConstraint(0, 2, 0);
+        //problem.addConstraint(2, 1, 0);
+        //problem.addConstraint(0, 2, 0);
         CSP_Solver solver = new CSP_Solver(problem);
         solutions = solver.getSolutions();
 
