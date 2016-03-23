@@ -244,7 +244,7 @@ public class TasklistFragment extends Fragment {
 
                 Fragment scheduleFragment= NewEditTaskFragment.newInstance(longDate);
                 getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
-                        .replace(R.id.frame_container, scheduleFragment).commit();
+                        .replace(R.id.frame_container, scheduleFragment).addToBackStack(Constants.NEW_EDIT_TASK_TAG).commit();
 
             }
         });

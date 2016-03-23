@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.alamkanak.weekview.MonthLoader;
 import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewEvent;
+import com.cpsc.timecatcher.helper.Constants;
 import com.cpsc.timecatcher.helper.SimpleItemTouchHelperCallback;
 import com.cpsc.timecatcher.model.Day;
 import com.cpsc.timecatcher.model.Task;
@@ -114,7 +115,7 @@ public class ScheduleFragment extends Fragment implements WeekView.EventClickLis
 
                 Fragment scheduleFragment= TasklistFragment.newInstance(longDate);
                 getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
-                        .replace(R.id.frame_container, scheduleFragment).commit();
+                        .replace(R.id.frame_container, scheduleFragment).addToBackStack(Constants.SCHEDULE_TAG).commit();
 
             }
         });
