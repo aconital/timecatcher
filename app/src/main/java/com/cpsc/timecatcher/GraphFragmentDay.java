@@ -30,7 +30,7 @@ public class GraphFragmentDay extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().setTitle("Time Spent Distribution Chart");
+//        getActivity().setTitle("Time Spent Distribution Chart");
         Calendar currentTime = Calendar.getInstance();
         currentTime.set(Calendar.HOUR_OF_DAY, 0);
         currentTime.set(Calendar.MINUTE, 0);
