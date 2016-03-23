@@ -95,8 +95,7 @@ public class ScheduleFragment extends Fragment implements WeekView.EventClickLis
         mWeekView.setScrollListener(new WeekView.ScrollListener() {
             @Override
             public void onFirstVisibleDayChanged(Calendar newFirstVisibleDay, Calendar oldFirstVisibleDay) {
-                longDate=newFirstVisibleDay.getTime().getTime();
-                setTitle(newFirstVisibleDay.getTime());
+
             }
         });
 
@@ -172,7 +171,7 @@ public class ScheduleFragment extends Fragment implements WeekView.EventClickLis
                                     Calendar endTime = Calendar.getInstance();
                                     endTime.setTime(t.getEndTime());
                                     WeekViewEvent event = new WeekViewEvent(1,t.getTitle(), startTime, endTime);
-                                    event.setColor(getResources().getColor(R.color.grape_light));
+                                    event.setColor(getResources().getColor(R.color.sea));
                                     events.add(event);
                                 }
 
