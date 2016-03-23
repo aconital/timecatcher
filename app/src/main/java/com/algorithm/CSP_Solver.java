@@ -361,7 +361,8 @@ public class CSP_Solver  {
 			Collections.sort(assignment);//sort in increasing order of timeSlice
 			solutions.add(assignment);
 			solutionCount++;
-			assignment=new ArrayList<TaskAssignment>(problem.getTaskCount());
+			//assignment=new ArrayList<TaskAssignment>(problem.getTaskCount());
+			assignment=new ArrayList<TaskAssignment>(assignment);
 			return;
 		}//if
 
