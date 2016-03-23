@@ -22,6 +22,7 @@ import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.cengalabs.flatui.views.FlatTextView;
 import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
@@ -641,6 +642,13 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                                         if (e == null) {
                                                             // TODO: Close view
                                                             saveButton.setText("Saved!");
+                                                            Toast.makeText(
+                                                                    getActivity(),
+                                                                    "Saved",
+                                                                    Toast.LENGTH_LONG).show();
+                                                            getFragmentManager().popBackStackImmediate();
+                                                            getFragmentManager().beginTransaction().commit();
+
                                                         } else {
                                                             Log.e(Constants.NEW_EDIT_TASK_TAG + "SaveTask", e.getMessage());
                                                         }
