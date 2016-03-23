@@ -1,6 +1,4 @@
 package com.algorithm;
-import java.util.Comparator;
-
 public class TaskAssignment implements Comparable<TaskAssignment>{
 	private int taskId;// identifier of each task
 	private TimeSlice assignment;// specific assigned TimeSlice for current task 
@@ -18,11 +16,11 @@ public class TaskAssignment implements Comparable<TaskAssignment>{
 		taskId=id;
 	}
 	
-	TimeSlice getAssignment(){
+	public TimeSlice getAssignment(){
 		return assignment;
 	}
 	
-	int getTaskId(){
+	public int getTaskId(){
 		return taskId;
 	}
 	

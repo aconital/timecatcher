@@ -354,18 +354,19 @@ public class CSP_Solver  {
 	 * search all possible solutions for the given traverseOrder
 	 */
 	void searchSolutions(int count,int [] traverseOrder,HashMap<Integer, Boolean> visited){
+		if(solutionCount>=solutionCountMax){// find at most 5 solutions for the given problem
+			return;
+		}
 		if(count == taskCount){// one set of task time slice assignment is complete
 			Collections.sort(assignment);//sort in increasing order of timeSlice
 			solutions.add(assignment);
 			solutionCount++;
+			assignment=new ArrayList<TaskAssignment>(problem.getTaskCount());
+			return;
 		}//if
 
-		if(solutionCount>=solutionCountMax){// find at most 5 solutions for the given problem
-			return;
-		}
-		
 		// choose one task to be considered
-		int id=traverseOrder[count];//except topological sort, we can have other choose strategies regarding which variable should be considered next 
+		int id=traverseOrder[count];//besides topological sort, we can have other choose strategies regarding which variable should be considered next
 		ArrayList<TimeSlice> domainArrayList=taskMap.get(id).getDomainArrayList();
 		
 		for(int i=0;i< domainArrayList.size() ;i++ ){
@@ -385,6 +386,7 @@ public class CSP_Solver  {
 			// and update their domain marks
 			// and recored all the changes to these related domain, because we need to recover this changes later
 			HashMap<Integer, Set<Integer>> taskDomainChangedSet=updateRelatedDomainMark(id, visited);
+
 			searchSolutions(count, traverseOrder,visited);//search valid assignment for next task/vertex
 
 			assignedMap.remove(id);
@@ -454,6 +456,7 @@ public class CSP_Solver  {
 						+"	  		 "+ assign.getAssignment().getEndTime().getTimeString());
 			}
 			System.out.println("-------------------------------------------------------");
+			cnt++;
 		}//while
 	}
 
@@ -477,5 +480,6 @@ public class CSP_Solver  {
 		}//while
 		return solution;
 	}
+
 }
 

@@ -39,8 +39,14 @@
 
     <!-- Graph -->
     <string name="graphContainer">graph Container</string>
-    <string name="graphTextWarning">graph Text Warning</string>
-
+    <string name="pieChartContainer">pie Chart  Container</string>
+    <string name="categorySelectedText">category Selected Text</string>
+    <string name="startDateGraph">start Date Graph</string>
+    <string name="endDateGraph">end Date Graph</string>
+    <string name="graphRealTabContent">graph Real Tab Content</string>
+    <string name="NoChartText">No Chart Text</string>
+    <string name="pick_date">pick_date</string>
+    <string name="button1">button1</string>
 
     <string-array name="new_task_default_categories_array">
         <item>School</item>
@@ -50,37 +56,6 @@
         <item>Gym</item>
     </string-array>
 
-    <string-array name="new_task_set_time_hours">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-        <item>7</item>
-        <item>8</item>
-        <item>9</item>
-        <item>10</item>
-        <item>11</item>
-        <item>12</item>
-    </string-array>
-
-    <string-array name="set_time_minutes">
-        <item>0</item>
-        <item>5</item>
-        <item>10</item>
-        <item>15</item>
-        <item>20</item>
-        <item>25</item>
-        <item>30</item>
-        <item>35</item>
-        <item>40</item>
-        <item>45</item>
-        <item>50</item>
-        <item>55</item>
-    </string-array>
-
     <string-array name="constraint_order">
         <item>Before</item>
         <item>After</item>
@@ -88,5 +63,23 @@
 
     <string name="push_notification">Notification</string>
     <string name="invitation">SEND INVITATION</string>
+
+    <string name="totalTimeString">%1$d h %2$d m</string>
+    <string name="title_calendar_import">Import from Calendar</string>
+    <string name="import_time_picker_label">Import Events For:</string>
+    <string name="import_select_all">Select all</string>
+    <string name="import_select_none">Select None</string>
+    <string name="import_button">Import</string>
+    <string name="selectAll">Select All</string>
+    <string name="import_picker_done">Done</string>
+    <string name="import_count">Found %1$d tasks to be imported</string>
+    <string name="import_pick">Select Tasks</string>
+    <string name="button_saving">Saving...</string>
+
+    <string-array name="import_picker_values">
+        <item>Today</item>
+        <item>This week</item>
+    </string-array>
+
 
 </resources>

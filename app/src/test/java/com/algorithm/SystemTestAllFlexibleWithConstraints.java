@@ -90,7 +90,6 @@ public class SystemTestAllFlexibleWithConstraints extends TimedTest {
             solver.printSolutions();
             throw e;
         }
-        solver.printSolutions();
     }
 
     @Test

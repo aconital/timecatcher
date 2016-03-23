@@ -1,5 +1,7 @@
 package com.cpsc.timecatcher.model;
 
+import android.util.Log;
+
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -14,6 +16,18 @@ public class Constraint extends ParseObject {
     public Operator getOperator() {
         String operator = getString("operator");
         return Operator.valueOf(operator);
+    }
+
+    public Constraint clone() {
+        Constraint constraint = new Constraint();
+        try {
+            constraint.setOther(this.getOther());
+        } catch (ParseException e) {
+            Log.e(TAG, "cannot clone: " + e.getMessage());
+            return null;
+        }
+        constraint.setOperator(this.getOperator());
+        return constraint;
     }
 
     public void setOperator(Operator operator) {

@@ -8,7 +8,7 @@ public class Time{
 	private int hour;
 	private int minute;
 	
-	Time(int h,int m){
+	public Time(int h, int m){
 		if(h>=0 && h<24){
 			hour=h;
 		}
@@ -23,8 +23,8 @@ public class Time{
 		minute=t.minute;
 	}
 
-	int getHour()	{return hour;}
-	int getMinute()	{return minute;}
+	public int getHour()	{return hour;}
+	public int getMinute()	{return minute;}
 	void setHour(int h){hour=h;}
 	void setMinute(int m){minute=m;}
 	
