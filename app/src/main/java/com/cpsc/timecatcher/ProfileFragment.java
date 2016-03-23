@@ -88,15 +88,17 @@ public class ProfileFragment extends Fragment {
         logOut=(Button) view.findViewById(R.id.user_logout);
         profilePictureView = (ProfilePictureView) view.findViewById(R.id.profile);
 
-
         final ParseUser currentUser=ParseUser.getCurrentUser();
-        boolean get_notification= (boolean) currentUser.get("notification");
-        if(get_notification) notify.setChecked(true);
-        else notify.setChecked(false);
+//        boolean get_notification= (boolean) currentUser.get("notification");
 
         try{
             if(currentUser!=null){
                 userName.setText(currentUser.getString("name"));
+                if((boolean) currentUser.get("notification")){
+                    notify.setChecked(true);
+                }else{
+                    notify.setChecked(false);
+                }
 //                GetXMLTask task = new GetXMLTask();
 //                // Execute the task
 //                task.execute(new String[]{URL});
@@ -116,12 +118,15 @@ public class ProfileFragment extends Fragment {
             SharedPreferences setting= PreferenceManager.getDefaultSharedPreferences(getContext());
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    currentUser.put("notification",true);
-                    currentUser.saveInBackground();
-                }else{
-                    currentUser.put("notification", false);
-                    currentUser.saveInBackground();}
+                if(currentUser!=null){
+                    if(isChecked){
+                        currentUser.put("notification",true);
+                        currentUser.saveInBackground();
+                    }else{
+                        currentUser.put("notification", false);
+                        currentUser.saveInBackground();
+                    }
+                }
             }
         });
 
