@@ -88,7 +88,12 @@ public class ProfileFragment extends Fragment {
         logOut=(Button) view.findViewById(R.id.user_logout);
         profilePictureView = (ProfilePictureView) view.findViewById(R.id.profile);
 
+
         final ParseUser currentUser=ParseUser.getCurrentUser();
+        boolean get_notification= (boolean) currentUser.get("notification");
+        if(get_notification) notify.setChecked(true);
+        else notify.setChecked(false);
+
         try{
             if(currentUser!=null){
                 userName.setText(currentUser.getString("name"));
@@ -112,12 +117,11 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
-                    setting.edit().putBoolean("notification",true).commit();
-//                    PushService.setDefaultPushCallback(getActivity().getApplicationContext(),AlarmReceiver.class);class
+                    currentUser.put("notification",true);
+                    currentUser.saveInBackground();
                 }else{
-                    setting.edit().putBoolean("notification",false).commit();
-//                    PushService.setDefaultPushCallback(getActivity().getApplicationContext(), null);
-                }
+                    currentUser.put("notification", false);
+                    currentUser.saveInBackground();}
             }
         });
 
