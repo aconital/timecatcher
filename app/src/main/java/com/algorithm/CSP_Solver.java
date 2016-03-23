@@ -22,8 +22,10 @@ public class CSP_Solver  {
 	private ArrayList<TaskAssignment> assignment;
 	private HashMap<Integer, TimeSlice> assignedMap;// <indetifier, TimeSlice>
 	private List<ArrayList<TaskAssignment> >solutions;
+	private int solutionCount;
+	private int solutionCountMax;
 			
-	CSP_Solver(CSP problem1){
+	public CSP_Solver(CSP problem1){
 		this.problem=problem1;
 		constraints=problem.getConstraints();
 		taskMap=problem.getTaskMap();
@@ -33,7 +35,9 @@ public class CSP_Solver  {
 		taskCount=problem.getTaskCount();
 		assignment=new ArrayList<TaskAssignment>(problem.getTaskCount());
 		assignedMap=new HashMap<Integer, TimeSlice>();
-		solutions=new LinkedList< ArrayList<TaskAssignment>>();	
+		solutions=new LinkedList< ArrayList<TaskAssignment>>();
+		solutionCount=0;
+		solutionCountMax=5;
 	}
 	
 	/*
@@ -148,7 +152,7 @@ public class CSP_Solver  {
 		//check constraint from u to v
 		for(int i=0;i<domainU.size() ;i++){
 			if(domainU.get(i).getAvailable()==false) continue;
-			TimeSlice timeSliceOfU=domainU.get(i);
+			TimeSlice timeSliceOfU = domainU.get(i);
 			boolean unavailable=true;	
 			if(graphMatrix[u][v] >0){// edge is u->v 
 				if(timeSliceOfU.isBefore(timeSliceOfV)){// there exists at least one timeSliceOfV making timeSliceOfU can keep staying in domainU as available  
@@ -177,7 +181,7 @@ public class CSP_Solver  {
 	HashMap<Integer, Set<Integer> > directedCheckAndMarkOverlap(int id, HashMap<Integer, Boolean> visited){
 		HashMap<Integer, Set<Integer>> taskDomainChangedSet=new HashMap<Integer,Set<Integer> >();
 		TimeSlice timeSlice1=assignedMap.get(id);
-		int count=taskMap.size();
+		int count = taskMap.size();
 
 		for(int i=0;i<count;i++){
 			if(i==id || visited.get(i)==true) continue;
@@ -347,14 +351,18 @@ public class CSP_Solver  {
 	}
 		
 	/*
-	 * search one possible solutions for the given traverseOrder
+	 * search all possible solutions for the given traverseOrder
 	 */
-	boolean  searchSolutions(int count,int [] traverseOrder,HashMap<Integer, Boolean> visited){
+	void searchSolutions(int count,int [] traverseOrder,HashMap<Integer, Boolean> visited){
 		if(count == taskCount){// one set of task time slice assignment is complete
 			Collections.sort(assignment);//sort in increasing order of timeSlice
 			solutions.add(assignment);
-			return true;
+			solutionCount++;
 		}//if
+
+		if(solutionCount>=solutionCountMax){// find at most 5 solutions for the given problem
+			return;
+		}
 		
 		// choose one task to be considered
 		int id=traverseOrder[count];//except topological sort, we can have other choose strategies regarding which variable should be considered next 
@@ -377,22 +385,20 @@ public class CSP_Solver  {
 			// and update their domain marks
 			// and recored all the changes to these related domain, because we need to recover this changes later
 			HashMap<Integer, Set<Integer>> taskDomainChangedSet=updateRelatedDomainMark(id, visited);
-			if(searchSolutions(count, traverseOrder,visited)== true){//search valid assignment for next task/vertex  
-				return true;
-			}
+			searchSolutions(count, traverseOrder,visited);//search valid assignment for next task/vertex
+
 			assignedMap.remove(id);
 			domainArrayList.get(i).setAvailable(true);//if previous assignment does not lead to a solution then repeal this assignment
 			visited.put(id,false);
 			count--;
 			repealDomainMarkUpdate(taskDomainChangedSet);// repeal previous update of domain marks of related tasks
 		}//for
-		return false;
 	}//method 
 
 	/*
 	 * this method return  a final solution of  possible schedule 
 	 */
-	List<ArrayList<TaskAssignment> > getSolutions(){
+	public List<ArrayList<TaskAssignment> > getSolutions(){
 		if(problem.getOverTime()==true)  return solutions;
 		if(isFixedTaskOverlap()==true) return solutions;
 		if(taskCount==0)return solutions;
@@ -422,21 +428,23 @@ public class CSP_Solver  {
 			markOverlappingDomain();
 			// preprocess the domain constraints
 			constraintConsistencyCheck(arcs); // this function will set some tasks' available as false, but doesn't recover it in next for loop. so in domainInitializationForAllTasks(), we need to reset the avaialbe as true for every fixed task.
-			if(true == searchSolutions(0,traverseOrder,visited)){
+			searchSolutions(0,traverseOrder,visited);
+			if(solutionCount>=solutionCountMax){// find at most 5 solutions for the given problem
 				return solutions;
-			}			
+			}
 		}//for 
 		return solutions;
 	}//method 
 	
-	void printSolutions(){
+	public void printSolutions(){
 		ListIterator<ArrayList<TaskAssignment>> it = solutions.listIterator();
+		int cnt=1;
 		if(solutions.size()==0) {
 			System.out.println("No solutions!");
 			return;
 		}
 		while(it.hasNext()){
-			System.out.println("-------------------------------------------");
+			System.out.println("-------------------  "+cnt+"  ------------------------");
 			System.out.println("Task Id     Start Time     End Time ");
 			// consider sort based on start time, then print 
 			ArrayList<TaskAssignment> AssignList=it.next();
@@ -445,8 +453,29 @@ public class CSP_Solver  {
 				System.out.println("   "+ assign.getTaskId()+ "		 "+assign.getAssignment().getStartTime().getTimeString()
 						+"	  		 "+ assign.getAssignment().getEndTime().getTimeString());
 			}
-			System.out.println("-------------------------------------------");
+			System.out.println("-------------------------------------------------------");
 		}//while
+	}
+
+	public String solutionsString(){
+		ListIterator<ArrayList<TaskAssignment>> it = solutions.listIterator();
+		String solution = "";
+		if(solutions.size()==0) {
+			return "No solutions!\n";
+		}
+		while(it.hasNext()){
+			solution += "-------------------------------------------\n";
+			solution += "Task Id     Start Time     End Time \n";
+			// consider sort based on start time, then print
+			ArrayList<TaskAssignment> AssignList=it.next();
+			for(int i=0; i<Task.taskCount;i++){
+				TaskAssignment assign =AssignList.get(i);
+				solution += "   "+ assign.getTaskId()+ "		 "+assign.getAssignment().getStartTime().getTimeString()
+						+"	  		 "+ assign.getAssignment().getEndTime().getTimeString() + "\n";
+			}
+			solution += "-------------------------------------------\n";
+		}//while
+		return solution;
 	}
 }
 
