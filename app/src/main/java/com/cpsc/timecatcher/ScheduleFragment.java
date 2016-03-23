@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.alamkanak.weekview.MonthLoader;
 import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewEvent;
 import com.cpsc.timecatcher.helper.SimpleItemTouchHelperCallback;
@@ -44,8 +45,7 @@ import adapters.TaskAdapter;
  * Use the {@link ScheduleFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ScheduleFragment extends Fragment implements WeekView.MonthChangeListener,
-        WeekView.EventClickListener, WeekView.EventLongPressListener {
+public class ScheduleFragment extends Fragment implements WeekView.EventClickListener, MonthLoader.MonthChangeListener, WeekView.EventLongPressListener, WeekView.EmptyViewLongPressListener {
     private  long longDate;
     private   WeekView mWeekView;
     private Date date;
@@ -83,7 +83,7 @@ public class ScheduleFragment extends Fragment implements WeekView.MonthChangeLi
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_schedule, container, false);
-        setTitle();
+        setTitle(date);
         mWeekView = (WeekView) view.findViewById(R.id.weekView);
         mWeekView.setOnEventClickListener(this);
         // The week view has infinite scrolling horizontally. We have to provide the events of a
@@ -92,6 +92,14 @@ public class ScheduleFragment extends Fragment implements WeekView.MonthChangeLi
 
         // Set long press listener for events.
         mWeekView.setEventLongPressListener(this);
+        mWeekView.setScrollListener(new WeekView.ScrollListener() {
+            @Override
+            public void onFirstVisibleDayChanged(Calendar newFirstVisibleDay, Calendar oldFirstVisibleDay) {
+                longDate=newFirstVisibleDay.getTime().getTime();
+                setTitle(newFirstVisibleDay.getTime());
+            }
+        });
+
         fab= (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,7 +133,7 @@ public class ScheduleFragment extends Fragment implements WeekView.MonthChangeLi
         super.onResume();
 
     }
-    private void setTitle()
+    private void setTitle(Date date)
     {       SimpleDateFormat newDateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy");
         try {
             date = newDateFormat.parse(date.toString());
@@ -164,7 +172,7 @@ public class ScheduleFragment extends Fragment implements WeekView.MonthChangeLi
                                     Calendar endTime = Calendar.getInstance();
                                     endTime.setTime(t.getEndTime());
                                     WeekViewEvent event = new WeekViewEvent(1,t.getTitle(), startTime, endTime);
-                                    event.setColor(getResources().getColor(R.color.sea));
+                                    event.setColor(getResources().getColor(R.color.grape_light));
                                     events.add(event);
                                 }
 
@@ -233,6 +241,11 @@ public class ScheduleFragment extends Fragment implements WeekView.MonthChangeLi
     @Override
     public void onEventLongPress(WeekViewEvent event, RectF eventRect) {
         Toast.makeText(getActivity(), "Long pressed event: " + event.getName(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onEmptyViewLongPress(Calendar time) {
+
     }
 
     /**

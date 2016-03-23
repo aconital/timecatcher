@@ -2,7 +2,6 @@ package com.cpsc.timecatcher;
 
 import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.algorithm.CSP;
 import com.algorithm.CSP_Solver;
@@ -29,6 +29,7 @@ import com.algorithm.TaskAssignment;
 import com.algorithm.Time;
 import com.cpsc.timecatcher.helper.Constants;
 import com.cpsc.timecatcher.helper.Utility;
+import com.cpsc.timecatcher.importer.ImporterDialog;
 import com.cpsc.timecatcher.model.Constraint;
 import com.cpsc.timecatcher.model.Day;
 import com.cpsc.timecatcher.model.Operator;
@@ -54,7 +55,7 @@ public class TasklistFragment extends Fragment {
     private  long longDate;
     private Date date;
     private final static String DATE_TAG="DATE";
-    private FloatingActionButton fab,schedule_fab;
+    private FloatingActionButton fab, schedule_fab, import_fab;
     private List<Task> taskList = new ArrayList<>();
     private RecyclerView recyclerView;
     private TaskAdapter mAdapter;
@@ -86,7 +87,7 @@ public class TasklistFragment extends Fragment {
         View view= inflater.inflate(R.layout.fragment_tasklist, container, false);
 
 
-       recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         schedule_fab=(FloatingActionButton) view.findViewById(R.id.fab_schedule);
         schedule_fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,6 +158,7 @@ public class TasklistFragment extends Fragment {
                                             }
                                         })
                                 .show();
+                        return;
                     }
 
                     CSP_Solver csp_solver = new CSP_Solver(problem);
@@ -172,6 +174,7 @@ public class TasklistFragment extends Fragment {
                                             }
                                         })
                                 .show();
+                        return;
                     }
                     else {
                     ArrayList<TaskAssignment> solution = solutions.get(0);
@@ -230,6 +233,7 @@ public class TasklistFragment extends Fragment {
                     mAdapter.notifyDataSetChanged();
 
                     Log.d("Algorithm", csp_solver.solutionsString());
+                    Toast.makeText(getActivity(), "Tasks Scheduled!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -242,6 +246,22 @@ public class TasklistFragment extends Fragment {
                 getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
                         .replace(R.id.frame_container, scheduleFragment).commit();
 
+            }
+        });
+
+        import_fab = (FloatingActionButton) view.findViewById(R.id.fab_import);
+        import_fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImporterDialog importerDialog = new ImporterDialog(getContext());
+                importerDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        Log.d("Dismiss", "Dismissed: notifying adaptor");
+                        loadTasks();
+                    }
+                });
+                importerDialog.show();
             }
         });
 

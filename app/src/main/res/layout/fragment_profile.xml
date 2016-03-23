@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:textSize="20sp"
-        android:text="Bob"
+        android:text="UserName"
         android:layout_marginTop="20dp"/>
 
 

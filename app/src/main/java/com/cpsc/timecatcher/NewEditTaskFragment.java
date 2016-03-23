@@ -14,19 +14,18 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.cengalabs.flatui.views.FlatTextView;
+import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
+import com.codetroopers.betterpickers.timepicker.TimePickerDialogFragment;
 import com.cpsc.timecatcher.algorithm.TimeUtils;
 import com.cpsc.timecatcher.gui.MultiSpinner;
 import com.cpsc.timecatcher.gui.NoScrollListView;
@@ -67,7 +66,8 @@ import static com.cpsc.timecatcher.algorithm.TimeUtils.addMinutesToDate;
  */
 
 
-public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiSpinnerListener {
+public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiSpinnerListener,
+        RadialTimePickerDialogFragment.OnTimeSetListener {
     private Date date;
     private boolean newDate = false;
     private Day day;
@@ -76,8 +76,13 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
     private final String OTHER_TASK_LABEL = "otherTasksInDay";
 
     private boolean fixed;
+    private boolean newTask = true;
     private Date startTime;
     private Date endTime;
+    private int totalTimeMinutes = 0;
+    private int totalTimeHours = 0;
+
+    TextView totalTimeTextView;
 
     private final DateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.CANADA);
     private final DateFormat dateFormat = new SimpleDateFormat("EEE, MMM d", Locale.CANADA);
@@ -123,6 +128,8 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
             date = new Date(getArguments().getLong(DATE_TAG));
             String taskString = getArguments().getString(TASK_TAG);
             if (taskString != null) {
+                Log.d(Constants.NEW_EDIT_TASK_TAG, "Not a new task! setting newTask to false");
+                newTask = false; // not a new task
                 ParseQuery<Task> taskParseQuery = Task.getQuery();
                 taskParseQuery.whereEqualTo("objectId", getArguments().getString(TASK_TAG));
                 try {
@@ -163,40 +170,38 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                     Log.e(Constants.NEW_EDIT_TASK_TAG, "Could not fetch categories!");
                 }
                 NewEditTaskFragment.this.categories = new ArrayList<>(allCategories);
-                spinner.setItems(
-                        new ArrayList<>(NewEditTaskFragment.this.categories),
-                        getResources().getString(R.string.new_task_category_hint),
-                        NewEditTaskFragment.this);
-//
-//                if (task != null) {
-//                    List<Category> categoryList = new ArrayList<>();
-//
-//                }
+                if (task != null) {
+                    // Select categories
+                    ParseQuery<Category> selectedCategoryQuery = task.getCategories();
+                    selectedCategoryQuery.findInBackground(new FindCallback<Category>() {
+                        @Override
+                        public void done(List<Category> objects, ParseException e) {
+                            if (e == null) {
+                                int[] selectedIndices = new int[objects.size()];
+                                for (int i = 0; i < objects.size(); i++) {
+                                    selectedIndices[i] =
+                                            NewEditTaskFragment.this.categories.indexOf(objects.get(i).getTitle());
+                                }
+                                spinner.setItems(
+                                        new ArrayList<>(NewEditTaskFragment.this.categories),
+                                        getResources().getString(R.string.new_task_category_hint),
+                                        NewEditTaskFragment.this,
+                                        selectedIndices
+                                );
+                            } else {
+                                Log.e(Constants.NEW_EDIT_TASK_TAG,
+                                        "Could not fetch selected categories!");
+                            }
+                        }
+                    });
+                } else {
+                    spinner.setItems(
+                            new ArrayList<>(NewEditTaskFragment.this.categories),
+                            getResources().getString(R.string.new_task_category_hint),
+                            NewEditTaskFragment.this);
+                }
             }
         });
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // Spinner values cannot be set with onCreateView. This is a fix. God damn it android
-        // why you gotta be like dis.
-        if (task != null) {
-            View view = getView();
-            final Spinner totalTimeHour = (Spinner) view.findViewById(R.id.totalTimeHour);
-            final Spinner totalTimeMinute = (Spinner) view.findViewById(R.id.totalTimeHourMinute);
-
-            int totalTime = task.getTotalTime();
-            int totalTimeHoursTask = totalTime / 60;
-            int totalTimeMinutesTask = totalTime % 60;
-
-            totalTimeHour.setSelection(totalTimeHoursTask);
-            // index should be just the minutes divided by 5, since the selection goes by
-            // 5 minute intervals. This also ensures the minute value is rounded in the strange
-            // case that it wasn't before.
-            totalTimeMinute.setSelection(totalTimeMinutesTask / 5);
-        }
     }
 
     @Override
@@ -214,11 +219,10 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
         final Switch fixedSwitch = (Switch) view.findViewById(R.id.fixed);
         final RelativeLayout startTimeLayout = (RelativeLayout) view.findViewById(R.id.startTimeLayout);
         final RelativeLayout endTimeLayout = (RelativeLayout) view.findViewById(R.id.endTimeLayout);
-        final LinearLayout totalTimeLayout = (LinearLayout) view.findViewById(R.id.totalTimeLayout);
-        final Spinner totalTimeHour = (Spinner) view.findViewById(R.id.totalTimeHour);
-        final Spinner totalTimeMinute = (Spinner) view.findViewById(R.id.totalTimeHourMinute);
+        final RelativeLayout totalTimeLayout = (RelativeLayout) view.findViewById(R.id.totalTimeLayout);
         final Button saveButton = (Button) view.findViewById(R.id.save_button);
         final Button newConstraintButton = (Button) view.findViewById(R.id.add_constraint_button);
+        totalTimeTextView = (TextView) view.findViewById(R.id.totalTime);
 
         if (task != null) {
             title.setText(task.getTitle());
@@ -235,6 +239,8 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                 startTimeLayout.setVisibility(View.GONE);
                 endTimeLayout.setVisibility(View.GONE);
                 totalTimeLayout.setVisibility(View.VISIBLE);
+                totalTimeMinutes = task.getTotalTime() % 60;
+                totalTimeHours = task.getTotalTime() / 60;
             }
         }
 
@@ -269,7 +275,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
 
         // Day
         if (task == null) {
-            day = getOrCreateDay();
+            day = getOrCreateDay(date, calendar);
         } else {
             try {
                 day = task.getDay();
@@ -284,8 +290,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
             }
             date = day.getDate();
         }
-        assert (day != null);
-        assert (date != null);
+        if (day == null || date == null) throw new AssertionError("Day or date is null!");
 
         calendar.setTime(date);
         if (task == null) {
@@ -314,20 +319,18 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
         });
 
         // initialize spinner items
-        ArrayAdapter<CharSequence> totalTimeHourAdapter = ArrayAdapter.createFromResource(
-                getActivity().getBaseContext(),
-                R.array.new_task_set_time_hours, android.R.layout.simple_spinner_item
-        );
-        totalTimeHourAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        totalTimeHour.setAdapter(totalTimeHourAdapter);
-
-        ArrayAdapter<CharSequence> totalTimeMinuteAdapter = ArrayAdapter.createFromResource(
-                getActivity().getBaseContext(),
-                R.array.set_time_minutes, android.R.layout.simple_spinner_item
-        );
-
-        totalTimeMinuteAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        totalTimeMinute.setAdapter(totalTimeMinuteAdapter);
+        totalTimeTextView.setText(
+                getString(R.string.totalTimeString, totalTimeHours, totalTimeMinutes));
+        totalTimeTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RadialTimePickerDialogFragment rtpd = new RadialTimePickerDialogFragment()
+                        .setForced24hFormat()
+                        .setOnTimeSetListener(NewEditTaskFragment.this)
+                        .setStartTime(totalTimeHours, totalTimeMinutes);
+                rtpd.show(getChildFragmentManager(), "FRAG");
+            }
+        });
 
         populateCategoriesSpinner(multiSpinner);
 
@@ -335,11 +338,21 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
         ListView constraintsListView = (NoScrollListView) view.findViewById(R.id.constraints_list);
         if (task != null) {
             ParseQuery<Constraint> taskConstraintsQuery = task.getConstraints();
+            constraints = new ArrayList<>();
             try {
-                constraints = taskConstraintsQuery.find();
+                for (Constraint constraint : taskConstraintsQuery.find()) {
+                    // A deep copy is required here, since when we edit constraints, we delete
+                    // all previous constraints and add the constraints again for simplicity.
+                    // If we do not deep copy, when we delete the constraints, existing constraints
+                    // will not be around anymore to be added.
+
+                    // In this method, a clone of each previous constraint is created. When we
+                    // delete all the previous constraints these are left, and is then saved and
+                    // associated with the current task by a ParseRelation.
+                    constraints.add(constraint.clone());
+                }
             } catch (Exception e) {
                 Log.d(Constants.NEW_EDIT_TASK_TAG, "Could not find constraints! Assume no constraints");
-                constraints = new ArrayList<>();
             }
         } else {
             constraints = new ArrayList<>();
@@ -402,7 +415,6 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
             public void onClick(View v) {
                 final Calendar c = Calendar.getInstance();
                 c.setTime(NewEditTaskFragment.this.endTime);
-
                 int hour = c.get(Calendar.HOUR_OF_DAY);
                 int minute = c.get(Calendar.MINUTE);
                 TimePickerDialog endTimePicker;
@@ -442,8 +454,8 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
             @Override
             public void onClick(View v) {
                 CharSequence error = title.getError();
-                final int totalHours = Integer.parseInt(totalTimeHour.getSelectedItem().toString());
-                final int totalMinutes = Integer.parseInt(totalTimeMinute.getSelectedItem().toString());
+//                final int totalHours = Integer.parseInt(totalTimeHour.getSelectedItem().toString());
+//                final int totalMinutes = Integer.parseInt(totalTimeMinute.getSelectedItem().toString());
                 if (error != null) {
                     // If title is empty
                     title.requestFocus();
@@ -452,14 +464,13 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                     // this check is still necessary
                     title.setError("Task name cannot be empty!");
                     title.requestFocus();
-                } else if (totalHours == 0 && totalMinutes == 0 && !fixed) {
+                } else if (totalTimeHours == 0 && totalTimeMinutes == 0 && !fixed) {
                     // Total time shouldn't be zero
                     new AlertDialog.Builder(getContext())
                             .setTitle("Save Task Error")
                             .setMessage("Can't create a task with no total time!")
                             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    totalTimeMinute.requestFocus();
                                 }
                             }).show();
                 } else {
@@ -490,13 +501,11 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                             .setIcon(android.R.drawable.ic_dialog_alert)
                                             .show();
                                 } else {
-                                    boolean isNew = false;
-                                    if (task == null) {
+                                    if (newTask) {
                                         task = new Task();
-                                        isNew = true;
                                     }
                                     saveButton.setEnabled(false);
-                                    saveButton.setText("Saving...");
+                                    saveButton.setText(R.string.button_saving);
                                     task.setTitle(title.getText().toString());
                                     task.setDescription(description.getText().toString());
                                     task.setFixed(fixed);
@@ -512,10 +521,28 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                                 NewEditTaskFragment.this.endTime);
                                         task.setTotalTime(totalTime);
                                     } else {
-                                        totalTime = totalHours * 60 + totalMinutes;
+                                        totalTime = totalTimeHours * 60 + totalTimeMinutes;
                                         task.setTotalTime(totalTime);
                                     }
                                     // Categories
+                                    try {
+                                        if (!newTask) {
+                                            Log.d(Constants.NEW_EDIT_TASK_TAG,
+                                                    "Not a new task! Removing all previous categories");
+                                            task.removeAllCategories();
+                                        }
+                                    } catch (ParseException e1) {
+                                        new AlertDialog.Builder(getActivity().getBaseContext())
+                                                .setTitle("Error")
+                                                .setMessage("Something went wrong. Please try again!")
+                                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        saveButton.setEnabled(true);
+                                                    }
+                                                })
+                                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                                .show();
+                                    }
                                     if (selected != null) {
                                         for (int i = 0; i < selected.length; i++) {
                                             if (selected[i]) {
@@ -558,14 +585,37 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                     }
 
                                     // save constraints
+                                    try {
+                                        if (!newTask) {
+                                            // If not a newTask, remove all previous constraints
+                                            // and add them again to the task. This is not an
+                                            // efficient approach, but it's very simple. The
+                                            // alternative is cross check which ones are gone and
+                                            // only delete those.
+                                            Log.d(Constants.NEW_EDIT_TASK_TAG,
+                                                    "Not a new task! Removing all previous constraints");
+                                            task.removeAllConstraints();
+                                        }
+                                    } catch (ParseException e1) {
+                                        new AlertDialog.Builder(getActivity().getBaseContext())
+                                                .setTitle("Error")
+                                                .setMessage("Something went wrong. Please try again!")
+                                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        saveButton.setEnabled(true);
+                                                    }
+                                                })
+                                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                                .show();
+                                    }
+
                                     for (final Constraint c : constraints) {
-                                        // remove all previous constraints
+                                        Log.d(Constants.NEW_EDIT_TASK_TAG, "Adding constraint: " + c.toString());
                                         try {
-                                            if (!isNew) {
-                                                task.removeAllConstraints();
-                                            }
+                                            c.save();
                                         } catch (ParseException e1) {
-                                            new AlertDialog.Builder(getActivity().getBaseContext())
+                                            Log.e(Constants.NEW_EDIT_TASK_TAG, "Could not save constraint: " + e1.getMessage());
+                                            new AlertDialog.Builder(getActivity())
                                                     .setTitle("Error")
                                                     .setMessage("Something went wrong. Please try again!")
                                                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -576,8 +626,6 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                                     .setIcon(android.R.drawable.ic_dialog_alert)
                                                     .show();
                                         }
-                                        Log.d(Constants.NEW_EDIT_TASK_TAG, "Adding constraint: " + c.toString());
-                                        c.saveInBackground();
                                         task.addConstraint(c);
                                     }
 
@@ -615,7 +663,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
         return view;
     }
 
-    public Day getOrCreateDay(){
+    public Day getOrCreateDay(Date date, Calendar calendar){
         ParseQuery<Day> dayParseQuery = Day.getQuery();
         dayParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
         dayParseQuery.whereEqualTo("date", date);
@@ -631,7 +679,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                 day.setUser(ParseUser.getCurrentUser());
                 day.setDate(date);
 
-                // reasonable default: 8:30 AM to 9PM
+                // reasonable default: 8:30 AM to 23:59PM
                 calendar.setTime(date);
                 calendar.set(Calendar.HOUR_OF_DAY, 8);
                 calendar.set(Calendar.MINUTE, 30);
@@ -659,7 +707,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
             e.printStackTrace();
             // Couldn't save Day!
             // show error
-            new AlertDialog.Builder(getActivity().getBaseContext())
+            new AlertDialog.Builder(getActivity())
                     .setTitle("Error")
                     .setMessage("Something went wrong. Please try again!")
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -719,5 +767,10 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
         this.selected = selected;
     }
 
-
+    @Override
+    public void onTimeSet(RadialTimePickerDialogFragment dialog, int hourOfDay, int minute) {
+        totalTimeHours = hourOfDay;
+        totalTimeMinutes = minute;
+        totalTimeTextView.setText(getString(R.string.totalTimeString, hourOfDay, minute));
+    }
 }
