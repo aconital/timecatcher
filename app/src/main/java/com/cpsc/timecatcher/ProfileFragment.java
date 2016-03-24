@@ -89,9 +89,16 @@ public class ProfileFragment extends Fragment {
         profilePictureView = (ProfilePictureView) view.findViewById(R.id.profile);
 
         final ParseUser currentUser=ParseUser.getCurrentUser();
+//        boolean get_notification= (boolean) currentUser.get("notification");
+
         try{
             if(currentUser!=null){
                 userName.setText(currentUser.getString("name"));
+                if((boolean) currentUser.get("notification")){
+                    notify.setChecked(true);
+                }else{
+                    notify.setChecked(false);
+                }
 //                GetXMLTask task = new GetXMLTask();
 //                // Execute the task
 //                task.execute(new String[]{URL});
@@ -111,12 +118,14 @@ public class ProfileFragment extends Fragment {
             SharedPreferences setting= PreferenceManager.getDefaultSharedPreferences(getContext());
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    setting.edit().putBoolean("notification",true).commit();
-//                    PushService.setDefaultPushCallback(getActivity().getApplicationContext(),AlarmReceiver.class);class
-                }else{
-                    setting.edit().putBoolean("notification",false).commit();
-//                    PushService.setDefaultPushCallback(getActivity().getApplicationContext(), null);
+                if(currentUser!=null){
+                    if(isChecked){
+                        currentUser.put("notification",true);
+                        currentUser.saveInBackground();
+                    }else{
+                        currentUser.put("notification", false);
+                        currentUser.saveInBackground();
+                    }
                 }
             }
         });

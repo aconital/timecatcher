@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.alamkanak.weekview.MonthLoader;
 import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewEvent;
+import com.cpsc.timecatcher.helper.Constants;
 import com.cpsc.timecatcher.helper.SimpleItemTouchHelperCallback;
 import com.cpsc.timecatcher.model.Day;
 import com.cpsc.timecatcher.model.Task;
@@ -85,6 +86,9 @@ public class ScheduleFragment extends Fragment implements WeekView.EventClickLis
         View view= inflater.inflate(R.layout.fragment_schedule, container, false);
         setTitle(date);
         mWeekView = (WeekView) view.findViewById(R.id.weekView);
+        Calendar calendar=Calendar.getInstance();
+        calendar.setTime(date);
+        mWeekView.goToDate(calendar);
         mWeekView.setOnEventClickListener(this);
         // The week view has infinite scrolling horizontally. We have to provide the events of a
         // month every time the month changes on the week view.
@@ -95,6 +99,10 @@ public class ScheduleFragment extends Fragment implements WeekView.EventClickLis
         mWeekView.setScrollListener(new WeekView.ScrollListener() {
             @Override
             public void onFirstVisibleDayChanged(Calendar newFirstVisibleDay, Calendar oldFirstVisibleDay) {
+                newFirstVisibleDay.set(Calendar.MINUTE,0);
+                newFirstVisibleDay.set(Calendar.HOUR,0);
+                newFirstVisibleDay.set(Calendar.SECOND,0);
+                newFirstVisibleDay.set(Calendar.MILLISECOND,0);
                 longDate=newFirstVisibleDay.getTime().getTime();
                 setTitle(newFirstVisibleDay.getTime());
             }
@@ -107,7 +115,7 @@ public class ScheduleFragment extends Fragment implements WeekView.EventClickLis
 
                 Fragment scheduleFragment= TasklistFragment.newInstance(longDate);
                 getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
-                        .replace(R.id.frame_container, scheduleFragment).commit();
+                        .replace(R.id.frame_container, scheduleFragment).addToBackStack(Constants.SCHEDULE_TAG).commit();
 
             }
         });
@@ -151,39 +159,40 @@ public class ScheduleFragment extends Fragment implements WeekView.EventClickLis
             fetched=true;
         ParseQuery<Day> query = new ParseQuery<Day>("Day");
         query.whereEqualTo("user", ParseUser.getCurrentUser());
-        query.whereEqualTo("date", date);
-        query.getFirstInBackground(new GetCallback<Day>() {
+        query.findInBackground(new FindCallback<Day>() {
             @Override
-            public void done(Day object, com.parse.ParseException e) {
-                if (object != null) {
-                    Day day = object;
-                    ParseQuery<Task> query = new ParseQuery<Task>("Task");
-                    query.whereEqualTo("day", day);
-                      query.whereExists("startTime");
-                       query.whereExists("endTime");
-                    query.addAscendingOrder("startTime");
-                    query.findInBackground(new FindCallback<Task>() {
-                        @Override
-                        public void done(List<Task> objects, com.parse.ParseException e) {
-                            if (objects.size() > 0) {
-                                for (Task t : objects) {
-                                    Calendar startTime = Calendar.getInstance();
-                                    startTime.setTime(t.getStartTime());
-                                    Calendar endTime = Calendar.getInstance();
-                                    endTime.setTime(t.getEndTime());
-                                    WeekViewEvent event = new WeekViewEvent(1,t.getTitle(), startTime, endTime);
-                                    event.setColor(getResources().getColor(R.color.grape_light));
-                                    events.add(event);
-                                }
+            public void done(List<Day> objects, com.parse.ParseException e) {
+                if (objects.size()>0 ) {
+                    for(Day d:objects) {
+                        Day day = d;
+                        ParseQuery<Task> query = new ParseQuery<Task>("Task");
+                        query.whereEqualTo("day", day);
+                        query.whereExists("startTime");
+                        query.whereExists("endTime");
+                        query.addAscendingOrder("startTime");
+                        query.findInBackground(new FindCallback<Task>() {
+                            @Override
+                            public void done(List<Task> objects, com.parse.ParseException e) {
+                                if (objects.size() > 0) {
+                                    for (Task t : objects) {
+                                        Calendar startTime = Calendar.getInstance();
+                                        startTime.setTime(t.getStartTime());
+                                        Calendar endTime = Calendar.getInstance();
+                                        endTime.setTime(t.getEndTime());
+                                        WeekViewEvent event = new WeekViewEvent(1, t.getTitle(), startTime, endTime);
+                                        event.setColor(getResources().getColor(R.color.grape_light));
+                                        events.add(event);
+                                    }
 
-                                        // This line will trigger the method 'onMonthChange()' again.
-                                       mWeekView.notifyDatasetChanged();
+                                    // This line will trigger the method 'onMonthChange()' again.
+                                    mWeekView.notifyDatasetChanged();
 
-                            } else
-                                Log.e("Parse", "No tasks found");
-                        }
-                    });
-                } else
+                                } else
+                                    Log.e("Parse", "No tasks found");
+                            }
+                        });
+                    }
+                    } else
                     Log.e("Parse", "No object returned");
             }
         });
