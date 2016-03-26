@@ -14,7 +14,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.cpsc.timecatcher.R;
 import com.cpsc.timecatcher.algorithm.TimeUtils;
@@ -244,12 +243,16 @@ public class ImporterDialog extends Dialog implements EventPickerDialog.EventPic
                         // final instance of day to use in the next callback
                         final Day finalDay = day;
 
-
+                        // Date:
+                        final Date startTime = new Date(i.begin);
+                        final Date endTime = new Date(i.end);
                         // check if duplicate:
                         // in the case that event already exists, update it
                         ParseQuery<Task> duplicateQuery = Task.getQuery();
                         duplicateQuery.whereEqualTo("user", ParseUser.getCurrentUser());
-                        duplicateQuery.whereEqualTo("instanceId", i.id);
+                        duplicateQuery.whereEqualTo("eventId", i.eventId);
+                        duplicateQuery.whereEqualTo("startTime", startTime);
+                        duplicateQuery.whereEqualTo("endTime", endTime);
                         duplicateQuery.findInBackground(new FindCallback<Task>() {
                             @Override
                             public void done(List<Task> objects, ParseException e) {
@@ -267,7 +270,7 @@ public class ImporterDialog extends Dialog implements EventPickerDialog.EventPic
 
                                     // settings unique to new task
                                     task.setFixed(true);
-                                    task.setInstanceId(i.id);
+                                    task.setEventId(i.eventId);
                                     task.setUser(ParseUser.getCurrentUser());
 
                                 } else {
@@ -278,12 +281,10 @@ public class ImporterDialog extends Dialog implements EventPickerDialog.EventPic
                                 task.setTitle(event.title);
                                 task.setDescription(event.description);
                                 task.setDay(finalDay);
-                                Date startDate = new Date(i.begin);
-                                Date endDate = new Date(i.end);
-                                task.setStartTime(startDate);
-                                task.setEndTime(endDate);
+                                task.setStartTime(startTime);
+                                task.setEndTime(endTime);
 
-                                int totalTime = TimeUtils.getMinutesDiff(startDate, endDate);
+                                int totalTime = TimeUtils.getMinutesDiff(startTime, endTime);
                                 task.setTotalTime(totalTime);
                                 tasks.add(task);
                                 if (tasks.size() == selectedInstances.size()) {
