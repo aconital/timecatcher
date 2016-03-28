@@ -349,6 +349,7 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
                                 for (Task t : objects) {
                                     taskList.add(t);
                                 }
+                                taskList= sortTasks(taskList);
                                 //   taskList=sortTasks(taskList);
                                 mAdapter.notifyDataSetChanged();
                             } else
