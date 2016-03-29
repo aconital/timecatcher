@@ -57,8 +57,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textColor="#CC99FF"
-                android:textStyle="bold"
+                android:textColor="@color/black"
                 android:textSize="20sp"
                 android:text=" " />
     </LinearLayout>
