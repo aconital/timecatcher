@@ -63,7 +63,6 @@ public class GraphFragmentTabHost extends Fragment  {
             }
         });
 
-
         mTabHost.addTab(mTabHost.newTabSpec("Day").setIndicator("Day"),
                 GraphFragmentDay.class, null);
         mTabHost.addTab(mTabHost.newTabSpec("Week").setIndicator("Week"),
