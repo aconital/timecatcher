@@ -108,7 +108,7 @@ public class DrawPieChart {
                         0xFF8BC34A, //grass
                         0XFFFF9800, // Orange
                         0XFF03A9F4, //blue
-                        0XFF9C27B0, //purple
+                        0XFFCDDC39, //Lime
                         0XFFFF5252, //Deep Orange
                 });
 

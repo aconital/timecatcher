@@ -10,6 +10,12 @@
     <color name="colorAccent">#CDDC39</color>
     <!--color name="colorAccent">#FF9800</color-->
 
+    <!-- Color for GRAPH PAGE -->
+    <color name="tab_unselected_background">#8BC34A</color>
+    <color name="text_unselected_background">#FFFFFF</color>
+
+    <color name="tab_selected_background">#FFFFFF</color>
+    <color name="text_selected_background">#8BC34A</color>
 
     <!-- CREATE A COLOR ARRAY IN COLORS XML -->
     <color name="custom_theme_darker">#ad843d</color>
