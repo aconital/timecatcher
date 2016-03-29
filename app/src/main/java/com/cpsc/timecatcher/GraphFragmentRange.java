@@ -69,6 +69,7 @@ public class GraphFragmentRange extends Fragment {
                 Calendar c = Calendar.getInstance();
                 // create a new DatePickerDialog instance and show it
                 new DatePickerDialog(getActivity(),
+                        //R.style.DatePickerTheme,
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker dp, int year,

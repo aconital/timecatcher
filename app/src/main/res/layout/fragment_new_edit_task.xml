@@ -23,7 +23,16 @@
             android:text="@string/new_task_title"
             android:textSize="25sp"></com.cengalabs.flatui.views.FlatTextView>
 
-        <com.cengalabs.flatui.views.FlatButton
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="@string/new_task_save_button"
+            android:textColor="@color/white"
+            android:background="@drawable/button_custom"/>
+
+        <!--com.cengalabs.flatui.views.FlatButton
             android:id="@+id/save_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -31,8 +40,8 @@
             android:text="@string/new_task_save_button"
             android:textStyle="bold"
             flatui:fl_blockButtonEffectHeight="3dp"
-            flatui:fl_theme="@array/candy"
-            flatui:fl_touchEffect="fl_ripple" />
+            flatui:fl_theme="@array/orange"
+            flatui:fl_touchEffect="fl_ripple" /-->
     </RelativeLayout>
 
     <com.cengalabs.flatui.views.FlatTextView
@@ -268,7 +277,18 @@
                     android:text="@string/constraintTitle"
                     android:textSize="20sp"></com.cengalabs.flatui.views.FlatTextView>
 
-                <com.cengalabs.flatui.views.FlatButton
+
+
+                <Button
+                    android:id="@+id/add_constraint_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/addConstraintButton"
+                    android:textColor="@color/white"
+                    android:background="@drawable/button_custom"/>
+
+                <!--com.cengalabs.flatui.views.FlatButton
                     android:id="@+id/add_constraint_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -276,8 +296,9 @@
                     android:text="@string/addConstraintButton"
                     android:textStyle="bold"
                     flatui:fl_blockButtonEffectHeight="3dp"
-                    flatui:fl_theme="@array/candy"
-                    flatui:fl_touchEffect="fl_ripple" />
+                    flatui:fl_theme="@array/grass"
+                    flatui:fl_touchEffect="fl_ripple" /-->
+
             </RelativeLayout>
 
             <com.cpsc.timecatcher.gui.NoScrollListView
