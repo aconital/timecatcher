@@ -279,7 +279,11 @@ public class ImporterDialog extends Dialog implements EventPickerDialog.EventPic
                                     task = objects.get(0);
                                 }
                                 task.setTitle(event.title);
-                                task.setDescription(event.description);
+                                if(event.description == null) {
+                                    task.setDescription("");
+                                } else {
+                                    task.setDescription(event.description);
+                                }
                                 task.setDay(finalDay);
                                 task.setStartTime(startTime);
                                 task.setEndTime(endTime);

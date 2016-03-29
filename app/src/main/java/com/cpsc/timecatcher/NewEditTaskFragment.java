@@ -524,6 +524,8 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                     } else {
                                         totalTime = totalTimeHours * 60 + totalTimeMinutes;
                                         task.setTotalTime(totalTime);
+                                        task.setStartTime(day.getDate());
+
                                     }
                                     // Categories
                                     try {

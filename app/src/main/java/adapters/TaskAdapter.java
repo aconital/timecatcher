@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -132,6 +133,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
             holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext,R.drawable.family));
         else if(firstCat.equals("Work"))
             holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext,R.drawable.work));
+        else
+            holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext,R.drawable.none));
+
 
         int duration=  task.getTotalTime();
         int dur_hr= duration/60;
@@ -149,8 +153,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
             holder.title.setText(title);
 
 
-
-        if(starttime!=null)
+       Calendar c= Calendar.getInstance();
+        c.setTime(starttime);
+        Log.e("OOOO",c.get(Calendar.HOUR_OF_DAY)+":"+c.get(Calendar.MINUTE));
+        if(!(c.get(Calendar.HOUR_OF_DAY) == 0 && c.get(Calendar.MINUTE) == 0))
         {
             Calendar calendar = Calendar.getInstance(); // creates a new calendar instance
             calendar.setTime(starttime);   // assigns calendar to given date
@@ -169,7 +175,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
             holder.start.setText(hour+":"+minute);
         }
         else
-            holder.start.setText("No StartTime");
+            holder.start.setText("Unscheduled");
     }
 
     @Override

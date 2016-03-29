@@ -210,6 +210,7 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
                     assignSolution(solution);
                     Toast.makeText(getActivity(), "Tasks Scheduled!", Toast.LENGTH_SHORT).show();
                 }
+                taskList= sortTasks(taskList);
                 mAdapter.notifyDataSetChanged();
             }
         });
@@ -292,7 +293,7 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
                     Intent i = new Intent(getActivity(), AlarmReceiver.class);
                     i.putExtra("id", task.getObjectId());
                     i.putExtra("msg", task.getTitle());
-                    PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+                    PendingIntent pi = PendingIntent.getBroadcast(getActivity(), task.getObjectId().hashCode(), i, PendingIntent.FLAG_CANCEL_CURRENT);
 
                     Calendar c = Calendar.getInstance();
                     c.setTime(Utility.timeToDate(day.getDate(),
@@ -327,6 +328,7 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
             }
 
         }
+
     }
 
     private  void loadTasks()
@@ -433,6 +435,8 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
                         ArrayList<TaskAssignment> solution = solutions.get(solutionsIndex);
                         assignSolution(solution);
                         solutionsIndex = (solutionsIndex + 1) % numSolutions;
+
+                        taskList= sortTasks(taskList);
                         mAdapter.notifyDataSetChanged();
                     }
                     Log.d("SHAKE", "Shake detected");
