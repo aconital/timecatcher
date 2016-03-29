@@ -199,8 +199,17 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
                 {  isOpen=true;
                     fab_menu.setImageResource(R.drawable.ic_expand_more_white_48dp);
                     fab.setVisibility(View.VISIBLE);
+                    fab.setAlpha(0.0f);
+                    fab.animate()
+                            .alpha(1.0f);
                     import_fab.setVisibility(View.VISIBLE);
+                    import_fab.setAlpha(0.0f);
+                    import_fab.animate()
+                            .alpha(1.0f);
                     schedule_fab.setVisibility(View.VISIBLE);
+                    schedule_fab.setAlpha(0.0f);
+                    schedule_fab.animate()
+                            .alpha(1.0f);
                 }
             }
         });
