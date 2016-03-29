@@ -76,13 +76,14 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
     private long longDate;
     private Date date;
     private final static String DATE_TAG="DATE";
-    private FloatingActionButton fab, schedule_fab, import_fab;
+    private FloatingActionButton fab,fab_menu, schedule_fab, import_fab;
     private List<Task> taskList = new ArrayList<>();
     private RecyclerView recyclerView;
     private TaskAdapter mAdapter;
     private ItemTouchHelper mItemTouchHelper;
     private OnFragmentInteractionListener mListener;
     private Day day;
+    private boolean isOpen=false;
 
     // Solution looper
     private List<ArrayList<TaskAssignment>> solutions;
@@ -183,6 +184,26 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
 
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        fab_menu=(FloatingActionButton) view.findViewById(R.id.fab_menu);
+        fab_menu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isOpen)
+                {   isOpen=false;
+                    fab_menu.setImageResource(R.drawable.ic_expand_less_white_48dp);
+                    fab.setVisibility(View.GONE);
+                    import_fab.setVisibility(View.GONE);
+                    schedule_fab.setVisibility(View.GONE);
+                }
+                else
+                {  isOpen=true;
+                    fab_menu.setImageResource(R.drawable.ic_expand_more_white_48dp);
+                    fab.setVisibility(View.VISIBLE);
+                    import_fab.setVisibility(View.VISIBLE);
+                    schedule_fab.setVisibility(View.VISIBLE);
+                }
+            }
+        });
         schedule_fab=(FloatingActionButton) view.findViewById(R.id.fab_schedule);
         schedule_fab.setOnClickListener(new View.OnClickListener() {
             @Override
