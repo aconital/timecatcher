@@ -115,7 +115,7 @@ public class ProfileFragment extends Fragment {
         }
 
         notify.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            SharedPreferences setting= PreferenceManager.getDefaultSharedPreferences(getContext());
+//            SharedPreferences setting= PreferenceManager.getDefaultSharedPreferences(getContext());
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(currentUser!=null){

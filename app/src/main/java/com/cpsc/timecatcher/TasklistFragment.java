@@ -32,6 +32,7 @@ import com.algorithm.CSP_Solver;
 import com.algorithm.TaskAssignment;
 import com.algorithm.Time;
 import com.cpsc.timecatcher.helper.Constants;
+import com.cpsc.timecatcher.helper.DividerItemDecoration;
 import com.cpsc.timecatcher.helper.Utility;
 import com.cpsc.timecatcher.importer.ImporterDialog;
 import com.cpsc.timecatcher.model.Constraint;
@@ -244,6 +245,7 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
 
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), recyclerView, new ClickListener() {
@@ -349,6 +351,7 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
                                 for (Task t : objects) {
                                     taskList.add(t);
                                 }
+                                taskList= sortTasks(taskList);
                                 //   taskList=sortTasks(taskList);
                                 mAdapter.notifyDataSetChanged();
                             } else
