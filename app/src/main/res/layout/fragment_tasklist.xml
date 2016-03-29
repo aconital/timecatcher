@@ -26,7 +26,6 @@
 
 
 
-
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_import"
         android:layout_width="wrap_content"

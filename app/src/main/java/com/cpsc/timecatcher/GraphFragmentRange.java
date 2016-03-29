@@ -10,7 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.TextView;
+
 import com.github.mikephil.charting.charts.PieChart;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -67,6 +69,7 @@ public class GraphFragmentRange extends Fragment {
                 Calendar c = Calendar.getInstance();
                 // create a new DatePickerDialog instance and show it
                 new DatePickerDialog(getActivity(),
+                        //R.style.DatePickerTheme,
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker dp, int year,

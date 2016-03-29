@@ -35,7 +35,7 @@
     <string name="constraintTitle">Constraints</string>
     <string name="totalTimeHours">hours</string>
     <string name="totalTimeMinutes">min</string>
-    <string name="addConstraintButton">Add Constraint</string>
+    <string name="addConstraintButton"> Add Constraint </string>
 
     <!-- Graph -->
     <string name="graphContainer">graph Container</string>
