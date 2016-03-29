@@ -31,7 +31,7 @@ public class GraphFragmentTabHost extends Fragment {
         mTabHost = (FragmentTabHost)rootView.findViewById(android.R.id.tabhost);
         mTabHost.setup(getActivity(), getChildFragmentManager(), R.id.graphRealTabContent);
 
-        mTabHost.getTabWidget().setBackgroundColor(getResources().getColor(R.color.pale_purple));
+        mTabHost.getTabWidget().setBackgroundColor(getResources().getColor(R.color.grape_light));
 
 
         mTabHost.addTab(mTabHost.newTabSpec("Day").setIndicator("Day"),

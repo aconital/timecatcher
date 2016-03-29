@@ -32,11 +32,11 @@ public class GraphFragmentDay extends Fragment {
         super.onCreate(savedInstanceState);
 //        getActivity().setTitle("Time Spent Distribution Chart");
         Calendar currentTime = Calendar.getInstance();
+        today=currentTime.getTime();
         currentTime.set(Calendar.HOUR_OF_DAY, 0);
         currentTime.set(Calendar.MINUTE, 0);
         currentTime.set(Calendar.SECOND, 0);
         currentTime.set(Calendar.MILLISECOND, 0);
-        today=currentTime.getTime();
         dataInit =new PieChartDataInitialization(today,today);
         yData=dataInit.getYData();
     }
