@@ -23,6 +23,7 @@
         android:layout_marginLeft="@dimen/fab_margin"
         android:layout_marginBottom="35dp"
         android:layout_alignParentBottom="true"
+        app:backgroundTint="@color/cirlce1"
         android:layout_toStartOf="@+id/fab_import" />
 
     <android.support.design.widget.FloatingActionButton
@@ -30,7 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        app:backgroundTint="@color/grass"
+        app:backgroundTint="@color/cirlce2"
         android:src="@drawable/ic_date_range_white_48dp"
 
         android:layout_above="@+id/fab"
@@ -40,7 +41,7 @@
         android:id="@+id/fab_schedule"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:backgroundTint="@color/sand"
+        app:backgroundTint="@color/cirlce3"
         android:layout_gravity="bottom|end"
         android:src="@drawable/ic_alarm_on_white_48dp"
         android:layout_marginRight="@dimen/fab_margin"
