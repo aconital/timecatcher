@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import adapters.TaskAdapter;
 
@@ -58,6 +59,7 @@ public class ScheduleFragment extends Fragment implements WeekView.EventClickLis
     private ItemTouchHelper mItemTouchHelper;
     private OnFragmentInteractionListener mListener;
     private List<WeekViewEvent> events = new ArrayList<WeekViewEvent>();
+    List<Integer> colors=new ArrayList<>();
     public ScheduleFragment() {}
     private boolean fetched =false;
     public static ScheduleFragment newInstance(long date) {
@@ -84,7 +86,9 @@ public class ScheduleFragment extends Fragment implements WeekView.EventClickLis
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_schedule, container, false);
+
         setTitle(date);
+        createRandomColors();
         mWeekView = (WeekView) view.findViewById(R.id.weekView);
         Calendar calendar=Calendar.getInstance();
         calendar.setTime(date);
@@ -119,21 +123,23 @@ public class ScheduleFragment extends Fragment implements WeekView.EventClickLis
 
             }
         });
-     /*   recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-
-
-
-        mAdapter = new TaskAdapter(taskList);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mAdapter);
-
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
-        mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(recyclerView);*/
 
         return view;
+    }
+    private void createRandomColors()
+    {
+        colors.add(getResources().getColor(R.color.grape));
+        colors.add(getResources().getColor(R.color.pale_purple));
+        colors.add(getResources().getColor(R.color.gape_light));
+        colors.add(getResources().getColor(R.color.blood));
+        colors.add(getResources().getColor(R.color.alizarin));
+        colors.add(getResources().getColor(R.color.pomegranate));
+        colors.add(getResources().getColor(R.color.sand));
+        colors.add(getResources().getColor(R.color.orange));
+        colors.add(getResources().getColor(R.color.deep));
+        colors.add(getResources().getColor(R.color.grass));
+        colors.add(getResources().getColor(R.color.emerald));
+        colors.add(getResources().getColor(R.color.sea));
     }
     @Override
     public void onResume()
@@ -180,7 +186,8 @@ public class ScheduleFragment extends Fragment implements WeekView.EventClickLis
                                         Calendar endTime = Calendar.getInstance();
                                         endTime.setTime(t.getEndTime());
                                         WeekViewEvent event = new WeekViewEvent(1, t.getTitle(), startTime, endTime);
-                                        event.setColor(getResources().getColor(R.color.grape_light));
+                                        Random rand=new Random();
+                                        event.setColor(colors.get(rand.nextInt(colors.size())));
                                         events.add(event);
                                     }
 
