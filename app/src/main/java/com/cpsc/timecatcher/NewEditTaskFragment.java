@@ -175,28 +175,27 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                 NewEditTaskFragment.this.categories.add(0, "Select Category");
                 if (task != null) {
                     // Select categories
-                    ParseQuery<Category> selectedCategoryQuery = task.getCategories();
-                    selectedCategoryQuery.findInBackground(new FindCallback<Category>() {
-                        @Override
-                        public void done(List<Category> objects, ParseException e) {
-                            if (e == null) {
-                                ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                                        getContext(),
-                                        android.R.layout.simple_spinner_item,
-                                        new ArrayList<>(NewEditTaskFragment.this.categories));
-
-                                spinner.setAdapter(adapter);
-                                if (objects.size() > 0) {
-                                    int selectedIndex = NewEditTaskFragment.this.categories.indexOf(
-                                            objects.get(0).getTitle());
-                                    spinner.setSelection(selectedIndex);
-                                }
-                            } else {
-                                Log.e(Constants.NEW_EDIT_TASK_TAG,
-                                        "Could not fetch selected categories!");
-                            }
+                    try {
+                        Category selectedCategory = task.getCategory();
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                                getContext(),
+                                android.R.layout.simple_spinner_item,
+                                new ArrayList<>(NewEditTaskFragment.this.categories));
+                        spinner.setAdapter(adapter);
+                        if (selectedCategory != null) {
+                            int selectedIndex = NewEditTaskFragment.this.categories.indexOf(
+                                    selectedCategory.getTitle());
+                            spinner.setSelection(selectedIndex);
                         }
-                    });
+                    } catch (ParseException e1) {
+                        Log.d(Constants.NEW_EDIT_TASK_TAG, "Could not query selected category");
+                    } catch (NullPointerException npe) {
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                                getContext(),
+                                android.R.layout.simple_spinner_item,
+                                new ArrayList<>(NewEditTaskFragment.this.categories));
+                        spinner.setAdapter(adapter);
+                    }
                 } else {
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(
                             getContext(),
@@ -528,26 +527,6 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                         totalTime = totalTimeHours * 60 + totalTimeMinutes;
                                         task.setTotalTime(totalTime);
                                         task.setStartTime(day.getDate());
-
-                                    }
-                                    // Categories
-                                    try {
-                                        if (!newTask) {
-                                            Log.d(Constants.NEW_EDIT_TASK_TAG,
-                                                    "Not a new task! Removing all previous categories");
-                                            task.removeAllCategories();
-                                        }
-                                    } catch (ParseException e1) {
-                                        new AlertDialog.Builder(getActivity().getBaseContext())
-                                                .setTitle("Error")
-                                                .setMessage("Something went wrong. Please try again!")
-                                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        saveButton.setEnabled(true);
-                                                    }
-                                                })
-                                                .setIcon(android.R.drawable.ic_dialog_alert)
-                                                .show();
                                     }
                                     if (categorySpinner.getSelectedItemPosition() > 0) {
                                         int pos = categorySpinner.getSelectedItemPosition();
@@ -569,12 +548,12 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                                         c.saveEventually(new SaveCallback() {
                                                             @Override
                                                             public void done(ParseException e) {
-                                                                task.addCategory(c);
+                                                                task.setCategory(c);
                                                                 day.setTimeSpent(title, totalTime);
                                                             }
                                                         });
                                                     } else if (objects.size() == 1) {
-                                                        task.addCategory(objects.get(0));
+                                                        task.setCategory(objects.get(0));
                                                         day.setTimeSpent(title, totalTime);
                                                     } else {
                                                         Log.e(Constants.NEW_EDIT_TASK_TAG, "Multiple categories returned!");
