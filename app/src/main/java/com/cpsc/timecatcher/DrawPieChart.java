@@ -102,13 +102,24 @@ public class DrawPieChart {
         dataSet.setSliceSpace(3);
         dataSet.setSelectionShift(5);
 
+        // add "FF" to head of 0X type so it has 8 digits
         dataSet.setColors(new int[]
+                {
+                        0xFF8BC34A, //grass
+                        0XFFFF9800, // Orange
+                        0XFF03A9F4, //blue
+                        0XFFCDDC39, //Lime
+                        0XFFFF5252, //Deep Orange
+                });
+
+                /*
                 {Color.rgb(153, 255, 255), //blue
                         Color.rgb(255, 51, 153),  //red
                         Color.rgb(255, 255, 0),//yellow
                         Color.rgb(229, 204, 255),//purple
                         Color.rgb(255, 153, 51),//orange
                 });
+                */
 
         // instantiate pie data object now
         PieData data = new PieData(xVals, dataSet);

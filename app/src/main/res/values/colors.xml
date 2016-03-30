@@ -1,8 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <!--color name="colorPrimary">#3F51B5</color-->
+    <!--color name="colorPrimaryDark">#303F9F</color-->
+    <!--color name="colorAccent">#FF4081</color-->
+
+    <!--color name="colorAccent">#b1a2db</color-->
+    <color name="colorPrimary">#8BC34A</color>
+    <color name="colorPrimaryDark">#689F38</color>
+    <color name="colorAccent">#CDDC39</color>
+    <!--color name="colorAccent">#FF9800</color-->
+
+    <!-- Color for GRAPH PAGE -->
+    <color name="tab_unselected_background">#8BC34A</color>
+    <color name="text_unselected_background">#FFFFFF</color>
+
+    <color name="tab_selected_background">#FFFFFF</color>
+    <color name="text_selected_background">#8BC34A</color>
 
     <!-- CREATE A COLOR ARRAY IN COLORS XML -->
     <color name="custom_theme_darker">#ad843d</color>
@@ -35,10 +48,14 @@
     <color name="blood">#d94332</color>
     <color name="alizarin">#E74C3C</color>
     <color name="pomegranate">#C0392B</color>
+
+    <!--color name="sand">#FFCD00</color-->
+    <!--color name="orange">#F39C12</color-->
     <color name="sand">#fabd5a</color>
-    <color name="orange">#F39C12</color>
+    <color name="dark_yellow">#F39C12</color>
+    <color name="orange">#fc5421</color>
     <color name="deep">#455569</color>
-    <color name="grass">#00b868</color>
+    <color name="grass">#AEF100</color>
     <color name="emerald">#00b868</color>
     <color name="sea">#2e75d9</color>
     <color name="holo_blue_dark">#ff0099cc</color>
@@ -46,6 +63,9 @@
     <color name="view_divider_color_2">#DADADA</color>
     <color name="light_pink">#AFB5C6</color>
     <color name="pale_yellow">#edece6</color>
+    <color name="cirlce1">#FF4081</color>
+    <color name="cirlce2">#03A9F4</color>
+    <color name="cirlce3">#ff9800</color>
 
     <integer-array name="custom_theme">
         <item>@color/custom_theme_darker</item> <!-- really much darker color of main color -->

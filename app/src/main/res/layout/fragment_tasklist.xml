@@ -13,42 +13,52 @@
         android:layout_height="wrap_content"
         android:scrollbars="vertical" />
 
-
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/fab_menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:src="@drawable/ic_add_circle_outline_white_48dp"
-        android:layout_marginLeft="@dimen/fab_margin"
-        android:layout_marginRight="@dimen/fab_margin"
-        android:layout_marginStart="30dp"
-        android:layout_marginBottom="39dp"
-        android:layout_alignParentBottom="true" />
+        app:backgroundTint="@color/emerald"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/ic_expand_less_white_48dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true" />
+
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_import"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:src="@drawable/ic_add_circle_outline_white_48dp"
-        android:layout_marginLeft="@dimen/fab_margin"
-        android:layout_marginRight="@dimen/fab_margin"
-        android:layout_marginStart="30dp"
-        android:layout_marginBottom="15dp"
-        android:layout_above="@+id/fab"/>
+        app:backgroundTint="@color/alizarin"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:visibility="gone"
+        android:src="@drawable/ic_date_range_white_48dp"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/fab_schedule"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_schedule"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:backgroundTint="@color/sand"
-        android:layout_gravity="bottom|end"
+        android:layout_marginRight="10dp"
+        android:visibility="gone"
+        android:layout_marginBottom="10dp"
         android:src="@drawable/ic_alarm_on_white_48dp"
-        android:layout_marginLeft="@dimen/fab_margin"
-        android:layout_marginRight="@dimen/fab_margin"
-        android:layout_marginEnd="30dp"
-        android:layout_marginBottom="39dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/fab_menu"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:backgroundTint="@color/deep"
+        android:visibility="gone"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/ic_add_circle_outline_white_48dp"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/fab_import"/>
 </RelativeLayout>

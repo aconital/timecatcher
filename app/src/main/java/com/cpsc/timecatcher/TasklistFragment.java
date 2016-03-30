@@ -6,6 +6,10 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -21,6 +25,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
 import com.algorithm.CSP;
@@ -28,6 +34,7 @@ import com.algorithm.CSP_Solver;
 import com.algorithm.TaskAssignment;
 import com.algorithm.Time;
 import com.cpsc.timecatcher.helper.Constants;
+import com.cpsc.timecatcher.helper.DividerItemDecoration;
 import com.cpsc.timecatcher.helper.Utility;
 import com.cpsc.timecatcher.importer.ImporterDialog;
 import com.cpsc.timecatcher.model.Constraint;
@@ -50,18 +57,39 @@ import adapters.TaskAdapter;
 /**
  * Created by hroshandel on 2016-02-23.
  */
-public class TasklistFragment extends Fragment {
+public class TasklistFragment extends Fragment implements SensorEventListener {
 
-    private  long longDate;
+
+    // Shake
+
+    private SensorManager sensorManager;
+    private Sensor sensor;
+    private static final int FORCE_THRESHOLD = 350;
+    private static final int TIME_THRESHOLD = 100;
+    private static final int SHAKE_TIMEOUT = 500;
+    private static final int SHAKE_DURATION = 1000;
+    private static final int SHAKE_COUNT = 3;
+    private float mLastX=-1.0f, mLastY=-1.0f, mLastZ=-1.0f;
+    private long mLastTime;
+    private int mShakeCount = 0;
+    private long mLastShake;
+    private long mLastForce;
+
+    private long longDate;
     private Date date;
     private final static String DATE_TAG="DATE";
-    private FloatingActionButton fab, schedule_fab, import_fab;
+    private FloatingActionButton fab,fab_menu, schedule_fab, import_fab;
     private List<Task> taskList = new ArrayList<>();
     private RecyclerView recyclerView;
     private TaskAdapter mAdapter;
     private ItemTouchHelper mItemTouchHelper;
     private OnFragmentInteractionListener mListener;
     private Day day;
+    private boolean isOpen=false;
+
+    // Solution looper
+    private List<ArrayList<TaskAssignment>> solutions;
+    private int solutionsIndex = 0, numSolutions = 0;
 
     public TasklistFragment(){}
     public static TasklistFragment newInstance(long date) {
@@ -78,7 +106,77 @@ public class TasklistFragment extends Fragment {
         {   //convert long to Date
             longDate=getArguments().getLong(DATE_TAG);
             date = new Date(longDate);
+        }
 
+        // Shake listener
+        sensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
+        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+    }
+
+    public void getSolutions() {
+        if ( taskList.size() == 0 ) {
+            Toast.makeText(getContext(), "No tasks to schedule!", Toast.LENGTH_SHORT).show();
+        } else if (day != null) {
+            ArrayList<Pair> constraintsInt = new ArrayList<>();
+            CSP problem = new CSP(Utility.dateToTime(day.getDayStart()),
+                    Utility.dateToTime(day.getDayEnd()));
+
+            boolean overtime = false;
+            for (int i = 0; i < taskList.size(); i++) {
+                Task currentTask = taskList.get(i);
+                if (currentTask.getFixed()) {
+                    overtime = overtime || problem.addFixedTask(
+                            Utility.dateToTime(currentTask.getStartTime()),
+                            Utility.dateToTime(currentTask.getEndTime()));
+                } else {
+                    int hours = currentTask.getTotalTime() / 60;
+                    int minutes = currentTask.getTotalTime() % 60;
+                    overtime = overtime || problem.addFlexibleTask(new Time(hours, minutes));
+                }
+                if (overtime) {
+                    Log.d("Algorithm", "Could not add flexible task: not enough time");
+                }
+                List<Constraint> constraints;
+                ParseQuery<Constraint> taskConstraintsQuery = currentTask.getConstraints();
+                try {
+                    constraints = taskConstraintsQuery.find();
+                    for (Constraint constraint : constraints) {
+                        if (constraint.getOperator() == Operator.BEFORE) {
+                            constraintsInt.add(
+                                    Pair.create(i, taskList.indexOf(constraint.getOther())));
+                        } else {
+                            constraintsInt.add(
+                                    Pair.create(taskList.indexOf(constraint.getOther()), i));
+                        }
+
+                    }
+                } catch (Exception e) {
+                    Log.d(Constants.NEW_EDIT_TASK_TAG,
+                            "Could not find constraints! Assume no constraints");
+                }
+            }
+            problem.createConstraintGraph();
+            for (Pair constraintPair : constraintsInt) {
+                problem.addConstraint((int) constraintPair.first,
+                        (int) constraintPair.second, 0);
+            }
+
+            if (problem.isConstraintsConflict()) {
+                new AlertDialog.Builder(getActivity())
+                        .setTitle("Error")
+                        .setMessage("You have conflicting constraints!" +
+                                " Please edit your tasks and try again.")
+                        .setPositiveButton(android.R.string.ok,
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                    }
+                                })
+                        .show();
+                return;
+            }
+            CSP_Solver csp_solver = new CSP_Solver(problem);
+            solutions = csp_solver.getSolutions();
+            Log.d("Algorithm", csp_solver.solutionsString());
         }
     }
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -88,153 +186,84 @@ public class TasklistFragment extends Fragment {
 
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        fab_menu=(FloatingActionButton) view.findViewById(R.id.fab_menu);
+        fab_menu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isOpen)
+                {   isOpen=false;
+                    fab_menu.setImageResource(R.drawable.ic_expand_less_white_48dp);
+                    Animation slideUp = AnimationUtils.loadAnimation(getActivity(), R.anim.slide_down);
+                    slideUp.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+                            import_fab.setVisibility(View.GONE);
+                            fab.setVisibility(View.GONE);
+                            schedule_fab.setVisibility(View.GONE);
+
+                        }
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {}
+                        @Override
+                        public void onAnimationStart(Animation animation) {}
+                    });
+                    fab.startAnimation(slideUp);
+                    schedule_fab.startAnimation(slideUp);
+                    import_fab.startAnimation(slideUp);
+                }
+                else
+                {  isOpen=true;
+                    fab_menu.setImageResource(R.drawable.ic_expand_more_white_48dp);
+                    import_fab.setVisibility(View.VISIBLE);
+                    fab.setVisibility(View.VISIBLE);
+                    schedule_fab.setVisibility(View.VISIBLE);
+                    Animation slideUp = AnimationUtils.loadAnimation(getActivity(), R.anim.slide_up);
+                    slideUp.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+
+
+                        }
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {}
+                        @Override
+                        public void onAnimationStart(Animation animation) {}
+                    });
+                    fab.startAnimation(slideUp);
+                    schedule_fab.startAnimation(slideUp);
+                    import_fab.startAnimation(slideUp);
+                }
+            }
+        });
         schedule_fab=(FloatingActionButton) view.findViewById(R.id.fab_schedule);
         schedule_fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // SCHEDULE
-                if ( taskList.size() == 0 ) {
+                getSolutions();
+                if (solutions == null) {
+                    // no scheduling happened
+                    return;
+                } else if (solutions.size() == 0) {
                     new AlertDialog.Builder(getActivity())
                             .setTitle("Error")
-                            .setMessage("No tasks to schedule!")
+                            .setMessage("Could not schedule your day!" +
+                                    " Please edit your tasks and try again.")
                             .setPositiveButton(android.R.string.ok,
                                     new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int which) {}})
+                                        public void onClick(DialogInterface dialog, int which) {
+                                        }
+                                    })
                             .show();
-                }
-                else if (day != null) {
-                    ArrayList<Pair> constraintsInt = new ArrayList<>();
-                    CSP problem = new CSP(Utility.dateToTime(day.getDayStart()),
-                            Utility.dateToTime(day.getDayEnd()));
-
-                    boolean overtime = false;
-                    for (int i = 0; i < taskList.size(); i++) {
-                        Task currentTask = taskList.get(i);
-                        if (currentTask.getFixed()) {
-                            overtime = overtime || problem.addFixedTask(
-                                    Utility.dateToTime(currentTask.getStartTime()),
-                                    Utility.dateToTime(currentTask.getEndTime()));
-                        } else {
-                            int hours = currentTask.getTotalTime() / 60;
-                            int minutes = currentTask.getTotalTime() % 60;
-                            overtime = overtime || problem.addFlexibleTask(new Time(hours, minutes));
-                        }
-                        if (overtime) {
-                            Log.d("Algorithm", "Could not add flexible task: not enough time");
-                        }
-                        List<Constraint> constraints;
-                        ParseQuery<Constraint> taskConstraintsQuery = currentTask.getConstraints();
-                        try {
-                            constraints = taskConstraintsQuery.find();
-                            for (Constraint constraint : constraints) {
-                                if (constraint.getOperator() == Operator.BEFORE) {
-                                    constraintsInt.add(
-                                            Pair.create(i, taskList.indexOf(constraint.getOther())));
-                                } else {
-                                    constraintsInt.add(
-                                            Pair.create(taskList.indexOf(constraint.getOther()), i));
-                                }
-
-                            }
-                        } catch (Exception e) {
-                            Log.d(Constants.NEW_EDIT_TASK_TAG,
-                                    "Could not find constraints! Assume no constraints");
-                        }
-                    }
-                    problem.createConstraintGraph();
-                    for (Pair constraintPair : constraintsInt) {
-                        problem.addConstraint((int) constraintPair.first,
-                                (int) constraintPair.second, 0);
-                    }
-
-                    if (problem.isConstraintsConflict()) {
-                        new AlertDialog.Builder(getActivity())
-                                .setTitle("Error")
-                                .setMessage("You have conflicting constraints!" +
-                                        " Please edit your tasks and try again.")
-                                .setPositiveButton(android.R.string.ok,
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int which) {
-                                            }
-                                        })
-                                .show();
-                        return;
-                    }
-
-                    CSP_Solver csp_solver = new CSP_Solver(problem);
-                    List<ArrayList<TaskAssignment>> solutions = csp_solver.getSolutions();
-                    if (solutions.size() == 0) {
-                        new AlertDialog.Builder(getActivity())
-                                .setTitle("Error")
-                                .setMessage("Could not schedule your day!" +
-                                        " Please edit your tasks and try again.")
-                                .setPositiveButton(android.R.string.ok,
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int which) {
-                                            }
-                                        })
-                                .show();
-                        return;
-                    }
-                    else {
-                    ArrayList<TaskAssignment> solution = solutions.get(0);
-                    for (TaskAssignment taskAssignment : solution) {
-                        Task task = taskList.get(taskAssignment.getTaskId());
-                        if (!task.getFixed()) {
-                            // assign task to slot
-                            // start time
-                            task.setStartTime(Utility.timeToDate(day.getDate(),
-                                    taskAssignment.getAssignment().getStartTime()));
-
-                            // end time
-                            task.setEndTime(Utility.timeToDate(day.getDate(),
-                                    taskAssignment.getAssignment().getEndTime()));
-                            try {
-                                AlarmManager am = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
-                                Intent i = new Intent(getActivity(), AlarmReceiver.class);
-                                i.putExtra("id", task.getObjectId());
-                                i.putExtra("msg", task.getTitle());
-                                PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
-
-                                Calendar c = Calendar.getInstance();
-                                c.setTime(Utility.timeToDate(day.getDate(),
-                                        taskAssignment.getAssignment().getStartTime()));
-                                c.add(Calendar.MINUTE, -15);
-                                c.set(Calendar.SECOND, 0);
-                                c.set(Calendar.MILLISECOND, 0);
-
-                                long time = c.getTime().getTime();
-                                am.set(AlarmManager.RTC_WAKEUP, time, pi);
-                                task.save();
-                            } catch (ParseException e) {
-                                Log.e("Algorithm", "Could not save task: " + task.getObjectId());
-                                e.printStackTrace();
-                            }
-                        } else {
-                            AlarmManager am = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
-                            Intent i = new Intent(getActivity(), AlarmReceiver.class);
-                            i.putExtra("id", task.getObjectId());
-                            i.putExtra("msg", task.getTitle());
-                            PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
-                            //15 min before
-                            Calendar c = Calendar.getInstance();
-                            c.setTime(task.getStartTime());
-                            c.add(Calendar.MINUTE, -15);
-                            c.set(Calendar.SECOND, 0);
-                            c.set(Calendar.MILLISECOND, 0);
-
-                            long time = c.getTime().getTime();
-                            am.set(AlarmManager.RTC_WAKEUP, time, pi);
-                        }
-
-
-                    }
-                }
-                    mAdapter.notifyDataSetChanged();
-
-                    Log.d("Algorithm", csp_solver.solutionsString());
+                    return;
+                } else {
+                    numSolutions = solutions.size();
+                    ArrayList<TaskAssignment> solution = solutions.get(solutionsIndex);
+                    assignSolution(solution);
                     Toast.makeText(getActivity(), "Tasks Scheduled!", Toast.LENGTH_SHORT).show();
                 }
+                taskList= sortTasks(taskList);
+                mAdapter.notifyDataSetChanged();
             }
         });
         fab= (FloatingActionButton) view.findViewById(R.id.fab);
@@ -244,7 +273,7 @@ public class TasklistFragment extends Fragment {
 
                 Fragment scheduleFragment= NewEditTaskFragment.newInstance(longDate);
                 getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
-                        .replace(R.id.frame_container, scheduleFragment).commit();
+                        .replace(R.id.frame_container, scheduleFragment).addToBackStack(Constants.NEW_EDIT_TASK_TAG).commit();
 
             }
         });
@@ -269,6 +298,7 @@ public class TasklistFragment extends Fragment {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
 
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), recyclerView, new ClickListener() {
@@ -297,6 +327,62 @@ public class TasklistFragment extends Fragment {
 */
         return view;
     }
+
+    private void assignSolution(ArrayList<TaskAssignment> solution) {
+        for (TaskAssignment taskAssignment : solution) {
+            Task task = taskList.get(taskAssignment.getTaskId());
+            if (!task.getFixed()) {
+                // assign task to slot
+                // start time
+                task.setStartTime(Utility.timeToDate(day.getDate(),
+                        taskAssignment.getAssignment().getStartTime()));
+
+                // end time
+                task.setEndTime(Utility.timeToDate(day.getDate(),
+                        taskAssignment.getAssignment().getEndTime()));
+                try {
+                    AlarmManager am = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+                    Intent i = new Intent(getActivity(), AlarmReceiver.class);
+                    i.putExtra("id", task.getObjectId());
+                    i.putExtra("msg", task.getTitle());
+                    PendingIntent pi = PendingIntent.getBroadcast(getActivity(), task.getObjectId().hashCode(), i, PendingIntent.FLAG_CANCEL_CURRENT);
+
+                    Calendar c = Calendar.getInstance();
+                    c.setTime(Utility.timeToDate(day.getDate(),
+                            taskAssignment.getAssignment().getStartTime()));
+                    c.add(Calendar.MINUTE, -15);
+                    c.set(Calendar.SECOND, 0);
+                    c.set(Calendar.MILLISECOND, 0);
+
+                    long time = c.getTime().getTime();
+                    am.set(AlarmManager.RTC_WAKEUP, time, pi);
+                    task.save();
+                } catch (ParseException e) {
+                    Log.e("Algorithm", "Could not save task: " + task.getObjectId());
+                    e.printStackTrace();
+                }
+            } else {
+                AlarmManager am = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+
+                Intent i = new Intent(getActivity(), AlarmReceiver.class);
+                i.putExtra("id", task.getObjectId());
+                i.putExtra("msg", task.getTitle());
+                PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+                //15 min before
+                Calendar c = Calendar.getInstance();
+                c.setTime(task.getStartTime());
+                c.add(Calendar.MINUTE, -15);
+                c.set(Calendar.SECOND, 0);
+                c.set(Calendar.MILLISECOND, 0);
+
+                long time = c.getTime().getTime();
+                am.set(AlarmManager.RTC_WAKEUP, time, pi);
+            }
+
+        }
+
+    }
+
     private  void loadTasks()
     {
         taskList.clear();
@@ -319,6 +405,7 @@ public class TasklistFragment extends Fragment {
                                 for (Task t : objects) {
                                     taskList.add(t);
                                 }
+                                taskList= sortTasks(taskList);
                                 //   taskList=sortTasks(taskList);
                                 mAdapter.notifyDataSetChanged();
                             } else
@@ -350,7 +437,14 @@ public class TasklistFragment extends Fragment {
     public void onResume()
     {
         super.onResume();
-       loadTasks();
+        sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+        loadTasks();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(this);
     }
 
     @Override
@@ -368,6 +462,52 @@ public class TasklistFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER) return;
+
+        long now = System.currentTimeMillis();
+        float values[] = event.values;
+
+        if ((now - mLastForce) > SHAKE_TIMEOUT) {
+            mShakeCount = 0;
+        }
+
+        if ((now - mLastTime) > TIME_THRESHOLD) {
+            long diff = now - mLastTime;
+            float speed = Math.abs(values[0] + values[1] + values[2] - mLastX - mLastY - mLastZ) / diff * 10000;
+            if (speed > FORCE_THRESHOLD) {
+                if ((++mShakeCount >= SHAKE_COUNT) && (now - mLastShake > SHAKE_DURATION)) {
+                    mLastShake = now;
+                    mShakeCount = 0;
+                    if (solutions != null) {
+                        Toast.makeText(getContext(), "New Schedule!", Toast.LENGTH_SHORT).show();
+                        Log.d("SHAKE", "Getting solution: " + (solutionsIndex + 1) + "/" + numSolutions);
+                        ArrayList<TaskAssignment> solution = solutions.get(solutionsIndex);
+                        assignSolution(solution);
+                        solutionsIndex = (solutionsIndex + 1) % numSolutions;
+
+                        taskList= sortTasks(taskList);
+                        mAdapter.notifyDataSetChanged();
+                    }
+                    Log.d("SHAKE", "Shake detected");
+                }
+                mLastForce = now;
+            }
+            mLastTime = now;
+            mLastX = values[0];
+            mLastY = values[1];
+            mLastZ = values[2];
+        }
+
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void addTask(long date);

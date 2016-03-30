@@ -10,7 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.TextView;
+
 import com.github.mikephil.charting.charts.PieChart;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -33,7 +35,7 @@ public class GraphFragmentRange extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().setTitle("Time Spent Distribution Chart");
+//        getActivity().setTitle("Time Spent Distribution Chart");
         Calendar currentTime = Calendar.getInstance();
         currentTime.set(Calendar.HOUR_OF_DAY, 0);
         currentTime.set(Calendar.MINUTE, 0);
@@ -67,6 +69,7 @@ public class GraphFragmentRange extends Fragment {
                 Calendar c = Calendar.getInstance();
                 // create a new DatePickerDialog instance and show it
                 new DatePickerDialog(getActivity(),
+                        //R.style.DatePickerTheme,
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker dp, int year,

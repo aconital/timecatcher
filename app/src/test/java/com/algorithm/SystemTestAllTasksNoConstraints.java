@@ -41,7 +41,7 @@ public class SystemTestAllTasksNoConstraints extends TimedTest {
         problem.createConstraintGraph();
         CSP_Solver solver = new CSP_Solver(problem);
         solutions = solver.getSolutions();
-        assertEquals(1, solutions.size());
+        assertEquals(5, solutions.size());
         assertEquals(new Time(1, 0), solutions.get(0).get(0).getAssignment().getStartTime());
     }
 

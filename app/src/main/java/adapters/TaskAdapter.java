@@ -7,10 +7,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -57,6 +59,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
             ItemTouchHelperViewHolder {
         public TextView title, end, start;
         public LinearLayout tagsLayout;
+        public ImageView logo;
 
         public MyViewHolder(View view) {
             super(view);
@@ -64,6 +67,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
             end = (TextView) view.findViewById(R.id.end);
             start = (TextView) view.findViewById(R.id.start);
             tagsLayout=(LinearLayout) view.findViewById(R.id.tags);
+            logo=(ImageView) view.findViewById(R.id.logo);
 
         }
 
@@ -108,8 +112,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
             categories=new ArrayList<>();
         }
         holder.tagsLayout.removeAllViews();
+        String firstCat="";
         for(Category c:categories)
-        {
+        {   firstCat=c.getTitle();
             TextView cat =new TextView(mContext);
             cat.setText(c.getTitle());
             cat.setPadding(25,5,25,5);
@@ -118,45 +123,40 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
             cat.setTextColor(ContextCompat.getColor(mContext,R.color.white));
             holder.tagsLayout.addView(cat);
         }
+        if(firstCat.equals("Gym"))
+            holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext,R.drawable.gym));
+        else if(firstCat.equals("School"))
+            holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext,R.drawable.school));
+        else if(firstCat.equals("Housework"))
+            holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext,R.drawable.housework));
+        else if(firstCat.equals("Family"))
+            holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext,R.drawable.family));
+        else if(firstCat.equals("Work"))
+            holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext,R.drawable.work));
+        else
+            holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext,R.drawable.none));
 
-        boolean isFixed = task.getFixed();
-        //different color for fixed tasks
-        if(isFixed)
-        {
-            holder.start.setBackgroundResource(R.color.holo_blue_dark);
-            holder.end.setBackgroundResource(R.color.holo_blue_dark);
-        }
 
-        Date endtime= task.getEndTime();
+        int duration=  task.getTotalTime();
+        int dur_hr= duration/60;
+        int dur_min = duration %60;
+        if(dur_hr<1)
+            holder.end.setText(dur_min+" min");
+        else
+            holder.end.setText(dur_hr+" h");
+
         Date starttime=task.getStartTime();
+
 
         String title=   task.getTitle();
         if(title !=null)
             holder.title.setText(title);
-        else
-            holder.end.setText("No Title");
 
-        if(endtime !=null) {
-            Calendar calendar = Calendar.getInstance(); // creates a new calendar instance
-            calendar.setTime(endtime);   // assigns calendar to given date
-            String minute= Integer.toString(calendar.get(Calendar.MINUTE));
-            String hour=Integer.toString(calendar.get(Calendar.HOUR_OF_DAY));
-            //changing 0 to 00
-            if(calendar.get(Calendar.MINUTE) < 10)
-            {
-                minute= "0"+calendar.get(Calendar.MINUTE);
-            }
-            if(calendar.get(Calendar.HOUR_OF_DAY) < 10)
-            {
-                hour= "0"+calendar.get(Calendar.HOUR_OF_DAY);
-            }
 
-            holder.end.setText(hour+":"+ minute);
-        }
-        else
-            holder.end.setText("No EndTime");
-
-        if(starttime!=null)
+       Calendar c= Calendar.getInstance();
+        c.setTime(starttime);
+        Log.e("OOOO",c.get(Calendar.HOUR_OF_DAY)+":"+c.get(Calendar.MINUTE));
+        if(!(c.get(Calendar.HOUR_OF_DAY) == 0 && c.get(Calendar.MINUTE) == 0))
         {
             Calendar calendar = Calendar.getInstance(); // creates a new calendar instance
             calendar.setTime(starttime);   // assigns calendar to given date
@@ -175,7 +175,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
             holder.start.setText(hour+":"+minute);
         }
         else
-            holder.start.setText("No StartTime");
+            holder.start.setText("Unscheduled");
     }
 
     @Override

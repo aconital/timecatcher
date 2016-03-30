@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.alamkanak.weekview.MonthLoader;
 import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewEvent;
+import com.cpsc.timecatcher.helper.Constants;
 import com.cpsc.timecatcher.helper.SimpleItemTouchHelperCallback;
 import com.cpsc.timecatcher.model.Day;
 import com.cpsc.timecatcher.model.Task;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import adapters.TaskAdapter;
 
@@ -57,6 +59,7 @@ public class ScheduleFragment extends Fragment implements WeekView.EventClickLis
     private ItemTouchHelper mItemTouchHelper;
     private OnFragmentInteractionListener mListener;
     private List<WeekViewEvent> events = new ArrayList<WeekViewEvent>();
+    List<Integer> colors=new ArrayList<>();
     public ScheduleFragment() {}
     private boolean fetched =false;
     public static ScheduleFragment newInstance(long date) {
@@ -83,8 +86,13 @@ public class ScheduleFragment extends Fragment implements WeekView.EventClickLis
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_schedule, container, false);
+
         setTitle(date);
+        createRandomColors();
         mWeekView = (WeekView) view.findViewById(R.id.weekView);
+        Calendar calendar=Calendar.getInstance();
+        calendar.setTime(date);
+        mWeekView.goToDate(calendar);
         mWeekView.setOnEventClickListener(this);
         // The week view has infinite scrolling horizontally. We have to provide the events of a
         // month every time the month changes on the week view.
@@ -95,6 +103,10 @@ public class ScheduleFragment extends Fragment implements WeekView.EventClickLis
         mWeekView.setScrollListener(new WeekView.ScrollListener() {
             @Override
             public void onFirstVisibleDayChanged(Calendar newFirstVisibleDay, Calendar oldFirstVisibleDay) {
+                newFirstVisibleDay.set(Calendar.MINUTE,0);
+                newFirstVisibleDay.set(Calendar.HOUR,0);
+                newFirstVisibleDay.set(Calendar.SECOND,0);
+                newFirstVisibleDay.set(Calendar.MILLISECOND,0);
                 longDate=newFirstVisibleDay.getTime().getTime();
                 setTitle(newFirstVisibleDay.getTime());
             }
@@ -107,25 +119,27 @@ public class ScheduleFragment extends Fragment implements WeekView.EventClickLis
 
                 Fragment scheduleFragment= TasklistFragment.newInstance(longDate);
                 getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
-                        .replace(R.id.frame_container, scheduleFragment).commit();
+                        .replace(R.id.frame_container, scheduleFragment).addToBackStack(Constants.SCHEDULE_TAG).commit();
 
             }
         });
-     /*   recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-
-
-
-        mAdapter = new TaskAdapter(taskList);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mAdapter);
-
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
-        mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(recyclerView);*/
 
         return view;
+    }
+    private void createRandomColors()
+    {
+        colors.add(getResources().getColor(R.color.grape));
+        colors.add(getResources().getColor(R.color.pale_purple));
+        colors.add(getResources().getColor(R.color.gape_light));
+        colors.add(getResources().getColor(R.color.blood));
+        colors.add(getResources().getColor(R.color.alizarin));
+        colors.add(getResources().getColor(R.color.pomegranate));
+        colors.add(getResources().getColor(R.color.sand));
+        colors.add(getResources().getColor(R.color.orange));
+        colors.add(getResources().getColor(R.color.deep));
+        colors.add(getResources().getColor(R.color.grass));
+        colors.add(getResources().getColor(R.color.emerald));
+        colors.add(getResources().getColor(R.color.sea));
     }
     @Override
     public void onResume()
@@ -151,39 +165,41 @@ public class ScheduleFragment extends Fragment implements WeekView.EventClickLis
             fetched=true;
         ParseQuery<Day> query = new ParseQuery<Day>("Day");
         query.whereEqualTo("user", ParseUser.getCurrentUser());
-        query.whereEqualTo("date", date);
-        query.getFirstInBackground(new GetCallback<Day>() {
+        query.findInBackground(new FindCallback<Day>() {
             @Override
-            public void done(Day object, com.parse.ParseException e) {
-                if (object != null) {
-                    Day day = object;
-                    ParseQuery<Task> query = new ParseQuery<Task>("Task");
-                    query.whereEqualTo("day", day);
-                      query.whereExists("startTime");
-                       query.whereExists("endTime");
-                    query.addAscendingOrder("startTime");
-                    query.findInBackground(new FindCallback<Task>() {
-                        @Override
-                        public void done(List<Task> objects, com.parse.ParseException e) {
-                            if (objects.size() > 0) {
-                                for (Task t : objects) {
-                                    Calendar startTime = Calendar.getInstance();
-                                    startTime.setTime(t.getStartTime());
-                                    Calendar endTime = Calendar.getInstance();
-                                    endTime.setTime(t.getEndTime());
-                                    WeekViewEvent event = new WeekViewEvent(1,t.getTitle(), startTime, endTime);
-                                    event.setColor(getResources().getColor(R.color.grape_light));
-                                    events.add(event);
-                                }
+            public void done(List<Day> objects, com.parse.ParseException e) {
+                if (objects.size()>0 ) {
+                    for(Day d:objects) {
+                        Day day = d;
+                        ParseQuery<Task> query = new ParseQuery<Task>("Task");
+                        query.whereEqualTo("day", day);
+                        query.whereExists("startTime");
+                        query.whereExists("endTime");
+                        query.addAscendingOrder("startTime");
+                        query.findInBackground(new FindCallback<Task>() {
+                            @Override
+                            public void done(List<Task> objects, com.parse.ParseException e) {
+                                if (objects.size() > 0) {
+                                    for (Task t : objects) {
+                                        Calendar startTime = Calendar.getInstance();
+                                        startTime.setTime(t.getStartTime());
+                                        Calendar endTime = Calendar.getInstance();
+                                        endTime.setTime(t.getEndTime());
+                                        WeekViewEvent event = new WeekViewEvent(1, t.getTitle(), startTime, endTime);
+                                        Random rand=new Random();
+                                        event.setColor(colors.get(rand.nextInt(colors.size())));
+                                        events.add(event);
+                                    }
 
-                                        // This line will trigger the method 'onMonthChange()' again.
-                                       mWeekView.notifyDatasetChanged();
+                                    // This line will trigger the method 'onMonthChange()' again.
+                                    mWeekView.notifyDatasetChanged();
 
-                            } else
-                                Log.e("Parse", "No tasks found");
-                        }
-                    });
-                } else
+                                } else
+                                    Log.e("Parse", "No tasks found");
+                            }
+                        });
+                    }
+                    } else
                     Log.e("Parse", "No object returned");
             }
         });
@@ -235,12 +251,12 @@ public class ScheduleFragment extends Fragment implements WeekView.EventClickLis
 
     @Override
     public void onEventClick(WeekViewEvent event, RectF eventRect) {
-        Toast.makeText(getActivity(), "Clicked " + event.getName(), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getActivity(), "Clicked " + event.getName(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onEventLongPress(WeekViewEvent event, RectF eventRect) {
-        Toast.makeText(getActivity(), "Long pressed event: " + event.getName(), Toast.LENGTH_SHORT).show();
+       // Toast.makeText(getActivity(), "Long pressed event: " + event.getName(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
