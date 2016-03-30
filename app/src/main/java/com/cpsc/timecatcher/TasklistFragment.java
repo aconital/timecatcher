@@ -25,6 +25,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
 import com.algorithm.CSP;
@@ -191,25 +193,45 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
                 if(isOpen)
                 {   isOpen=false;
                     fab_menu.setImageResource(R.drawable.ic_expand_less_white_48dp);
-                    fab.setVisibility(View.GONE);
-                    import_fab.setVisibility(View.GONE);
-                    schedule_fab.setVisibility(View.GONE);
+                    Animation slideUp = AnimationUtils.loadAnimation(getActivity(), R.anim.slide_down);
+                    slideUp.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+                            import_fab.setVisibility(View.GONE);
+                            fab.setVisibility(View.GONE);
+                            schedule_fab.setVisibility(View.GONE);
+
+                        }
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {}
+                        @Override
+                        public void onAnimationStart(Animation animation) {}
+                    });
+                    fab.startAnimation(slideUp);
+                    schedule_fab.startAnimation(slideUp);
+                    import_fab.startAnimation(slideUp);
                 }
                 else
                 {  isOpen=true;
                     fab_menu.setImageResource(R.drawable.ic_expand_more_white_48dp);
-                    fab.setVisibility(View.VISIBLE);
-                    fab.setAlpha(0.0f);
-                    fab.animate()
-                            .alpha(1.0f);
                     import_fab.setVisibility(View.VISIBLE);
-                    import_fab.setAlpha(0.0f);
-                    import_fab.animate()
-                            .alpha(1.0f);
+                    fab.setVisibility(View.VISIBLE);
                     schedule_fab.setVisibility(View.VISIBLE);
-                    schedule_fab.setAlpha(0.0f);
-                    schedule_fab.animate()
-                            .alpha(1.0f);
+                    Animation slideUp = AnimationUtils.loadAnimation(getActivity(), R.anim.slide_up);
+                    slideUp.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+
+
+                        }
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {}
+                        @Override
+                        public void onAnimationStart(Animation animation) {}
+                    });
+                    fab.startAnimation(slideUp);
+                    schedule_fab.startAnimation(slideUp);
+                    import_fab.startAnimation(slideUp);
                 }
             }
         });
