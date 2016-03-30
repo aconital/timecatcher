@@ -15,17 +15,21 @@
 
     <TextView
         android:id="@+id/constraint_list_other"
-        android:layout_weight="0.4"
+        android:layout_weight="0.5"
         android:layout_width="0dp"
         android:textAppearance="?android:attr/textAppearanceListItem"
         android:layout_height="wrap_content" />
 
     <Button
         android:id="@+id/constraint_delete"
-        android:layout_weight="0.4"
+        android:layout_weight="0.3"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/constraint_delete_button"/>
+        android:background="@drawable/button_custom"
+        android:text="@string/constraint_delete_button"
+
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"/>
 
 
 </LinearLayout>

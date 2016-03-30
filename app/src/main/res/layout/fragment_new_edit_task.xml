@@ -265,7 +265,8 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp">
 
                 <com.cengalabs.flatui.views.FlatTextView
                     android:layout_width="match_parent"
@@ -285,19 +286,9 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:text="@string/addConstraintButton"
+                    android:paddingEnd="5dp"
                     android:textColor="@color/white"
                     android:background="@drawable/button_custom"/>
-
-                <!--com.cengalabs.flatui.views.FlatButton
-                    android:id="@+id/add_constraint_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:text="@string/addConstraintButton"
-                    android:textStyle="bold"
-                    flatui:fl_blockButtonEffectHeight="3dp"
-                    flatui:fl_theme="@array/grass"
-                    flatui:fl_touchEffect="fl_ripple" /-->
 
             </RelativeLayout>
 
