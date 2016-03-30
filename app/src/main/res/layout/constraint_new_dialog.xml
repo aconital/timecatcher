@@ -45,19 +45,16 @@
 
         <Button
             android:id="@+id/button_save"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@drawable/button_custom"
-            android:textColor="@color/white"
+            android:layout_weight="0.5"
             android:text="OK" />
 
         <Button
             android:id="@+id/button_cancel"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:background="@drawable/button_custom"
-            android:textColor="@color/white"
+            android:layout_weight="0.5"
             android:text="CANCEL" />
 
     </LinearLayout>
