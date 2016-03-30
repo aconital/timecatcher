@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/button_custom"
         android:text="@string/constraint_delete_button"
-
+        android:textColor="@color/white"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"/>
 
