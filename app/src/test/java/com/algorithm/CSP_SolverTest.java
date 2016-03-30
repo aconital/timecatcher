@@ -79,9 +79,10 @@ public class CSP_SolverTest {
         dayEnd=new Time(13,0);
 
         problem= new CSP(dayStart,dayEnd);
-        problem.addFixedTask(new Time(1, 30), new Time(2, 0)); // 0
-        problem.addFixedTask(new Time(4, 0), new Time(7, 20)); // 1
-        problem.addFlexibleTask(new Time(2, 0)); // 2
+        //problem.addFixedTask(new Time(1, 0), new Time(2, 0)); // 0
+        problem.addFlexibleTask(new Time(1, 0));
+        problem.addFlexibleTask(new Time(2, 0));
+        problem.addFlexibleTask(new Time(3, 0));
 
         problem.createConstraintGraph();
         //problem.addConstraint(2, 1, 0);
