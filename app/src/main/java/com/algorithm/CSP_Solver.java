@@ -358,10 +358,11 @@ public class CSP_Solver  {
 			return;
 		}
 		if(count == taskCount){// one set of task time slice assignment is complete
+			ArrayList<TaskAssignment> unsortedAssignment = new ArrayList<TaskAssignment>(assignment);
 			Collections.sort(assignment);//sort in increasing order of timeSlice
 			solutions.add(assignment);
 			solutionCount++;
-			assignment=new ArrayList<TaskAssignment>(assignment);
+			assignment=unsortedAssignment;
 			return;
 		}//if
 
@@ -371,6 +372,7 @@ public class CSP_Solver  {
 		
 		for(int i=0;i< domainArrayList.size() ;i++ ){
 			if(domainArrayList.get(i).getAvailable()==false) continue;
+
 			TimeSlice slice=domainArrayList.get(i);
 			if(assignment.size()<=count){
 				assignment.add(new TaskAssignment(id,slice));
@@ -387,7 +389,7 @@ public class CSP_Solver  {
 			// and recored all the changes to these related domain, because we need to recover this changes later
 			HashMap<Integer, Set<Integer>> taskDomainChangedSet=updateRelatedDomainMark(id, visited);
 
-			searchSolutions(count, traverseOrder,visited);//search valid assignment for next task/vertex
+			searchSolutions(count,traverseOrder,visited);//search valid assignment for next task/vertex
 
 			assignedMap.remove(id);
 			domainArrayList.get(i).setAvailable(true);//if previous assignment does not lead to a solution then repeal this assignment

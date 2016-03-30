@@ -73,15 +73,43 @@ public class CSP_SolverTest {
     }
 */
 
+
     @Test
     public void test1() throws Exception {
         dayStart=new Time(1,0);
         dayEnd=new Time(13,0);
 
         problem= new CSP(dayStart,dayEnd);
-        problem.addFixedTask(new Time(1, 30), new Time(2, 0)); // 0
-        //problem.addFixedTask(new Time(4, 0), new Time(7, 20)); // 1
-        //problem.addFlexibleTask(new Time(2, 0)); // 2
+        // mixed taskes
+        problem.addFixedTask(new Time(1, 0), new Time(2, 0)); // 0
+        problem.addFlexibleTask(new Time(2, 0)); // 2
+        problem.addFlexibleTask(new Time(3, 0)); // 2
+
+        problem.createConstraintGraph();
+        //problem.addConstraint(2, 1, 0);
+        //problem.addConstraint(0, 2, 0);
+        CSP_Solver solver = new CSP_Solver(problem);
+        solutions = solver.getSolutions();
+
+        solver.printSolutions();
+        try {
+            //AlgorithmTestUtils.noOverLap(solutions);
+            assertEquals(false, solutions.isEmpty());
+        } catch (AssertionError e) {
+            // print out problematic solution
+            solver.printSolutions();
+            throw e;
+        }
+    }
+
+    @Test
+    public void test2() throws Exception {
+        dayStart=new Time(1,0);
+        dayEnd=new Time(13,0);
+
+        problem= new CSP(dayStart,dayEnd);
+        // all flexible taskes
+        problem.addFlexibleTask(new Time(2, 0)); // 2
         problem.addFlexibleTask(new Time(3, 0)); // 2
         problem.addFlexibleTask(new Time(1, 0)); // 2
 
