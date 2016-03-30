@@ -277,8 +277,6 @@
                     android:text="@string/constraintTitle"
                     android:textSize="20sp"></com.cengalabs.flatui.views.FlatTextView>
 
-
-
                 <Button
                     android:id="@+id/add_constraint_button"
                     android:layout_width="wrap_content"
