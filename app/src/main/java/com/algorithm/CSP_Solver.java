@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
+
 public class CSP_Solver  {
 	private CSP problem;
 	
@@ -22,7 +23,6 @@ public class CSP_Solver  {
 	private ArrayList<TaskAssignment> assignment;
 	private HashMap<Integer, TimeSlice> assignedMap;// <indetifier, TimeSlice>
 	private List<ArrayList<TaskAssignment> >solutions;
-	private int solutionCount;
 	private int solutionCountMax;
 			
 	public CSP_Solver(CSP problem1){
@@ -36,7 +36,6 @@ public class CSP_Solver  {
 		assignment=new ArrayList<TaskAssignment>(problem.getTaskCount());
 		assignedMap=new HashMap<Integer, TimeSlice>();
 		solutions=new LinkedList< ArrayList<TaskAssignment>>();
-		solutionCount=0;
 		solutionCountMax=5;
 	}
 	
@@ -349,20 +348,56 @@ public class CSP_Solver  {
 			}//for
 		}//for
 	}
-		
+
+	// euqal: return  true
+	// not euqal : return false
+	boolean isEuqalArrayList(ArrayList<TaskAssignment> a1,ArrayList<TaskAssignment> a2){
+		if(a1.size() != a2.size()) return false;
+
+		for(int i=0;i<a1.size();i++){
+			if(a1.get(i).equals(a2.get(i)) == false){
+				return false;
+			}
+		}//for
+		return true;
+	}
+
+	// duplicate: return true
+	//no duplicate: return false
+	boolean isDuplicatedSolution(ArrayList<TaskAssignment> a1){
+			ListIterator<ArrayList<TaskAssignment>> it = solutions.listIterator();
+			while(it.hasNext()){
+				ArrayList<TaskAssignment> a2=it.next();
+				if(isEuqalArrayList(a1, a2)){
+					return true;
+				}
+			}//while
+		return false;
+	}
+
+	ArrayList<TaskAssignment> deepCopyArrayList(ArrayList<TaskAssignment> assignList ){
+		ArrayList<TaskAssignment> newAssignment= new ArrayList<TaskAssignment>();
+		for(TaskAssignment item : assignList){
+			TaskAssignment copy= new TaskAssignment(item);
+			newAssignment.add(copy);
+		}//for
+
+		return newAssignment;
+	}
 	/*
 	 * search all possible solutions for the given traverseOrder
 	 */
 	void searchSolutions(int count,int [] traverseOrder,HashMap<Integer, Boolean> visited){
-		if(solutionCount>=solutionCountMax){// find at most 5 solutions for the given problem
+		if(solutions.size()>=solutionCountMax){// find at most 5 solutions for the given problem
 			return;
 		}
+
 		if(count == taskCount){// one set of task time slice assignment is complete
-			ArrayList<TaskAssignment> unsortedAssignment = new ArrayList<TaskAssignment>(assignment);
-			Collections.sort(assignment);//sort in increasing order of timeSlice
-			solutions.add(assignment);
-			solutionCount++;
-			assignment=unsortedAssignment;
+			ArrayList<TaskAssignment> newAssignment = deepCopyArrayList(assignment);
+			Collections.sort(newAssignment);
+			if(false == isDuplicatedSolution(newAssignment)){// do not store duplicated assignment
+				solutions.add(newAssignment);
+			}
 			return;
 		}//if
 
@@ -389,7 +424,7 @@ public class CSP_Solver  {
 			// and recored all the changes to these related domain, because we need to recover this changes later
 			HashMap<Integer, Set<Integer>> taskDomainChangedSet=updateRelatedDomainMark(id, visited);
 
-			searchSolutions(count,traverseOrder,visited);//search valid assignment for next task/vertex
+			searchSolutions(count, traverseOrder, visited);//search valid assignment for next task/vertex
 
 			assignedMap.remove(id);
 			domainArrayList.get(i).setAvailable(true);//if previous assignment does not lead to a solution then repeal this assignment
@@ -434,12 +469,19 @@ public class CSP_Solver  {
 			// preprocess the domain constraints
 			constraintConsistencyCheck(arcs); // this function will set some tasks' available as false, but doesn't recover it in next for loop. so in domainInitializationForAllTasks(), we need to reset the avaialbe as true for every fixed task.
 			searchSolutions(0,traverseOrder,visited);
-			if(solutionCount>=solutionCountMax){// find at most 5 solutions for the given problem
-				return solutions;
+			if(solutions.size()>=solutionCountMax){// find at most 5 solutions for the given problem
+				break;
 			}
-		}//for 
+		}//for
 		return solutions;
-	}//method 
+	}//method
+
+	public void sortSolutions(){
+		ListIterator<ArrayList<TaskAssignment>> it = solutions.listIterator();
+		while(it.hasNext()){
+			Collections.sort(it.next());
+		}//while
+	}
 	
 	public void printSolutions(){
 		ListIterator<ArrayList<TaskAssignment>> it = solutions.listIterator();

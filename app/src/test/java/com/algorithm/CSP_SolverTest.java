@@ -6,8 +6,6 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * Created by fujiaoyang1 on 3/5/16.
  */
@@ -71,22 +69,20 @@ public class CSP_SolverTest {
         solutions = solver.getSolutions();
         solver.printSolutions();
     }
-*/
-
 
     @Test
-    public void test1() throws Exception {
+    public void test3() throws Exception {
         dayStart=new Time(1,0);
         dayEnd=new Time(13,0);
 
         problem= new CSP(dayStart,dayEnd);
         // mixed taskes
         problem.addFixedTask(new Time(1, 0), new Time(2, 0)); // 0
-        problem.addFlexibleTask(new Time(2, 0)); // 2
+        problem.addFlexibleTask(new Time(2, 0)); // 1
         problem.addFlexibleTask(new Time(3, 0)); // 2
 
         problem.createConstraintGraph();
-        //problem.addConstraint(2, 1, 0);
+        //problem.addConstraint(1, 2, 0);
         //problem.addConstraint(0, 2, 0);
         CSP_Solver solver = new CSP_Solver(problem);
         solutions = solver.getSolutions();
@@ -101,21 +97,24 @@ public class CSP_SolverTest {
             throw e;
         }
     }
+*/
 
     @Test
-    public void test2() throws Exception {
-        dayStart=new Time(0,0);
+    public void test4() throws Exception {
+        dayStart=new Time(8,0);
         dayEnd=new Time(20,0);
 
         problem= new CSP(dayStart,dayEnd);
-        //problem.addFixedTask(new Time(4, 0), new Time(5, 0)); // 0
-        problem.addFixedTask(new Time(0, 25), new Time(0, 55)); // 0
-        problem.addFlexibleTask(new Time(1, 0));// 1
-        problem.addFlexibleTask(new Time(2, 20));// 2
+
+        problem.addFixedTask(new Time(8, 0), new Time(9, 0)); // 0
+        problem.addFixedTask(new Time(17, 0), new Time(18, 0)); // 1
+        problem.addFlexibleTask(new Time(1, 0));// 2
+
+        //problem.addFlexibleTask(new Time(2, 20));// 3
         //problem.addFlexibleTask(new Time(1, 0));
 
         problem.createConstraintGraph();
-        //problem.addConstraint(2, 1, 0);
+        problem.addConstraint(1, 2, 0);
         problem.addConstraint(0, 2, 0);
         CSP_Solver solver = new CSP_Solver(problem);
         solutions = solver.getSolutions();
@@ -130,4 +129,6 @@ public class CSP_SolverTest {
             throw e;
         }
     }
+
+
 }

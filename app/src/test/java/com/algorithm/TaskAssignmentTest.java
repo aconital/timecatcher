@@ -48,4 +48,13 @@ public class TaskAssignmentTest {
         assertEquals(-1,taskAssignment.compareTo(t2));
         assertEquals(1,taskAssignment.compareTo(t3));
     }
+
+    @Test
+    public void testEuqals() throws Exception {
+        TaskAssignment t1 = new TaskAssignment(3,new TimeSlice (new Time(7,0), new Time(9,0),true));
+        TaskAssignment t2 = new TaskAssignment(3,new TimeSlice (new Time(7,0), new Time(9,0),true));
+        TaskAssignment t3 = new TaskAssignment(5,new TimeSlice (new Time(5,0), new Time(6,0),true));
+        assertEquals(true,t1.equals(t2));
+        assertEquals(false,t1.equals(t3));
+    }
 }

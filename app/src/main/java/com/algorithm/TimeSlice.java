@@ -11,6 +11,12 @@ public class TimeSlice implements Comparable<TimeSlice>{
 			available=a;
 		}
 	}
+
+	TimeSlice(TimeSlice t){
+		startTime= new Time(t.getStartTime());
+		endTime=new Time(t.getEndTime());
+		available=t.available;
+	}
 	
 	public Time getStartTime(){
 		return startTime;

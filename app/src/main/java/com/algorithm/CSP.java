@@ -110,6 +110,8 @@ public class CSP {
 	}
 	
 	public void addConstraint(int id1,int id2,int weight){// id1 -> id2 (task with id1 before task with id2)
+		//if(id1 >= Task.taskCount || id2 <=Task.taskCount) return;
+
 		constraints.addConstraint(id1, id2, weight);
 	}
 	

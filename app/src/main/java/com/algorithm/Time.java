@@ -19,8 +19,8 @@ public class Time{
 	}
 	
 	Time (Time t){
-		hour=t.hour;
-		minute=t.minute;
+		hour=t.getHour();
+		minute=t.getMinute();
 	}
 
 	public int getHour()	{return hour;}

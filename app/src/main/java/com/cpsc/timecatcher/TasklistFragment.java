@@ -395,7 +395,7 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
             public void done(Day object, com.parse.ParseException e) {
                 if (object != null) {
                     day = object;
-                    ParseQuery<Task> query = new ParseQuery<Task>("Task");
+                    ParseQuery<Task> query = new ParseQuery<>("Task");
                     query.whereEqualTo("day", day);
                     query.addAscendingOrder("startTime");
                     query.findInBackground(new FindCallback<Task>() {
@@ -416,7 +416,6 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
                     Log.e("Parse", "No object returned");
             }
         });
-
     }
     private List<Task> sortTasks(List<Task> tasks) {
         int n = tasks.size();
