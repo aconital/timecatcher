@@ -162,7 +162,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
 
        Calendar c= Calendar.getInstance();
         c.setTime(starttime);
-        Log.e("OOOO",c.get(Calendar.HOUR_OF_DAY)+":"+c.get(Calendar.MINUTE));
         if(!(c.get(Calendar.HOUR_OF_DAY) == 0 && c.get(Calendar.MINUTE) == 0))
         {
             Calendar calendar = Calendar.getInstance(); // creates a new calendar instance

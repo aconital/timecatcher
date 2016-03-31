@@ -482,10 +482,10 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
                     mShakeCount = 0;
                     if (solutions != null) {
                         Toast.makeText(getContext(), "New Schedule!", Toast.LENGTH_SHORT).show();
+                        solutionsIndex = (solutionsIndex + 1) % numSolutions;
                         Log.d("SHAKE", "Getting solution: " + (solutionsIndex + 1) + "/" + numSolutions);
                         ArrayList<TaskAssignment> solution = solutions.get(solutionsIndex);
                         assignSolution(solution);
-                        solutionsIndex = (solutionsIndex + 1) % numSolutions;
 
                         taskList= sortTasks(taskList);
                         mAdapter.notifyDataSetChanged();
