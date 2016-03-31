@@ -36,7 +36,7 @@ public class SystemTestAllFlexibleNoConstraints extends TimedTest {
     }
 
     @Test
-    public void fiveFitInDay() throws Exception {
+    public void testFiveFitInDay() throws Exception {
         problem.addFlexibleTask(new Time(2,0));
         problem.addFlexibleTask(new Time(2,0));
         problem.addFlexibleTask(new Time(2,0));
@@ -58,7 +58,7 @@ public class SystemTestAllFlexibleNoConstraints extends TimedTest {
     }
 
     @Test
-    public void OneHundredTasksFitInDay() throws Exception {
+    public void testOneHundredTasksFitInDay() throws Exception {
         for (int i = 0; i < 100; i++) {
             problem.addFlexibleTask(new Time(0,1));
         }
@@ -79,7 +79,7 @@ public class SystemTestAllFlexibleNoConstraints extends TimedTest {
     }
 
     @Test
-    public void TaskFitExactly() throws Exception {
+    public void testTaskFitExactly() throws Exception {
         problem.addFlexibleTask(new Time(10, 0));
         problem.addFlexibleTask(new Time(10, 0));
         problem.addFlexibleTask(new Time(2, 0));
@@ -98,11 +98,10 @@ public class SystemTestAllFlexibleNoConstraints extends TimedTest {
             solver.printSolutions();
             throw e;
         }
-        solver.printSolutions();
     }
 
     @Test
-    public void TaskDoesNotFit() throws Exception {
+    public void testTaskDoesNotFit() throws Exception {
         problem.addFlexibleTask(new Time(10, 0));
         problem.addFlexibleTask(new Time(10, 0));
         problem.addFlexibleTask(new Time(2, 0));
@@ -114,5 +113,4 @@ public class SystemTestAllFlexibleNoConstraints extends TimedTest {
         solutions = solver.getSolutions();
         assertEquals(true, solutions.isEmpty());
     }
-
 }
