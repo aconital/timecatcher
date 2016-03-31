@@ -92,59 +92,12 @@ public class Task extends ParseObject implements ITimeSlot {
         getParseObject("day").fetchIfNeededInBackground(callback);
     }
 
-    public void addCategory(final Category category) {
-        final ParseObject that = this;
-        category.saveInBackground(new SaveCallback() {
-            public void done(ParseException e) {
-                if (e != null) {
-                    Log.d(TAG, e.getMessage());
-                } else {
-                    ParseRelation relation = that.getRelation("categories");
-                    relation.add(category);
-                    that.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if (e != null) {
-                                Log.d(TAG, e.getMessage());
-                            }
-                        }
-                    });
-                }
-            }
-        });
+    public void setCategory(Category category) {
+        put("category", category);
     }
 
-    public void addCategory(String categoryId) {
-        ParseObject category = ParseObject.createWithoutData("Category", categoryId);
-        ParseRelation relation = this.getRelation("categories");
-        relation.add(category);
-        this.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    Log.d(TAG, e.getMessage());
-                }
-            }
-        });
-    }
-
-    public void removeCategory(Category category) {
-        ParseRelation relation = this.getRelation("categories");
-        relation.remove(category);
-        this.saveInBackground();
-    }
-
-    public void removeAllCategories() throws ParseException {
-        ParseRelation relation = this.getRelation("categories");
-        List<Category> categories = getCategories().find();
-        for (Category c : categories) {
-            relation.remove(c);
-        }
-    }
-
-    public ParseQuery<Category> getCategories() {
-        ParseRelation relation = this.getRelation("categories");
-        return relation.getQuery();
+    public Category getCategory() throws ParseException {
+        return getParseObject("category").fetchIfNeeded();
     }
 
     public void addConstraint(final Constraint constraint) {

@@ -103,38 +103,45 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Task task = taskList.get(position);
-        ParseQuery<Category> queryCategories= task.getCategories();
+        Category category;
         List<Category> categories;
         try {
-            categories=queryCategories.find();
-        } catch (ParseException e) {
-            e.printStackTrace();
-            categories=new ArrayList<>();
+            category = task.getCategory();
+        } catch (ParseException | NullPointerException e) {
+            category = null;
         }
         holder.tagsLayout.removeAllViews();
-        String firstCat="";
-        for(Category c:categories)
-        {   firstCat=c.getTitle();
+        String firstCat = category != null ? category.getTitle() : "";
+        if (category != null) {
             TextView cat =new TextView(mContext);
-            cat.setText(c.getTitle());
+            cat.setText(category.getTitle());
             cat.setPadding(25,5,25,5);
             cat.setGravity(Gravity.CENTER);
             cat.setBackgroundResource(R.drawable.bg_round);
             cat.setTextColor(ContextCompat.getColor(mContext,R.color.white));
             holder.tagsLayout.addView(cat);
         }
-        if(firstCat.equals("Gym"))
-            holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext,R.drawable.gym));
-        else if(firstCat.equals("School"))
-            holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext,R.drawable.school));
-        else if(firstCat.equals("Housework"))
-            holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext,R.drawable.housework));
-        else if(firstCat.equals("Family"))
-            holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext,R.drawable.family));
-        else if(firstCat.equals("Work"))
-            holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext,R.drawable.work));
-        else
-            holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext,R.drawable.none));
+
+        switch (firstCat) {
+            case "Gym":
+                holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.gym));
+                break;
+            case "School":
+                holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.school));
+                break;
+            case "Housework":
+                holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.housework));
+                break;
+            case "Family":
+                holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.family));
+                break;
+            case "Work":
+                holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.work));
+                break;
+            default:
+                holder.logo.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.none));
+                break;
+        }
 
 
         int duration=  task.getTotalTime();
@@ -155,7 +162,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
 
        Calendar c= Calendar.getInstance();
         c.setTime(starttime);
-        Log.e("OOOO",c.get(Calendar.HOUR_OF_DAY)+":"+c.get(Calendar.MINUTE));
         if(!(c.get(Calendar.HOUR_OF_DAY) == 0 && c.get(Calendar.MINUTE) == 0))
         {
             Calendar calendar = Calendar.getInstance(); // creates a new calendar instance

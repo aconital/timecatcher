@@ -9,7 +9,11 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
 import com.cpsc.timecatcher.helper.Utility;
+import com.cpsc.timecatcher.model.Category;
+import com.cpsc.timecatcher.model.Constraint;
+import com.cpsc.timecatcher.model.Day;
 import com.cpsc.timecatcher.model.Task;
+import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -17,6 +21,7 @@ import com.parse.ParseQuery;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by hroshandel on 3/17/2016.
@@ -55,25 +60,66 @@ public class AlertDFragment extends DialogFragment {
                         query.whereEqualTo("objectId", objId);
                         query.getFirstInBackground(new GetCallback<Task>() {
                             @Override
-                            public void done(Task object, ParseException e) {
-                                    Calendar c= Calendar.getInstance();
-                                    long dateLong = Utility.getTodayLong();
+                            public void done(final Task object, ParseException e) {
+                                Calendar c = Calendar.getInstance();
+                                long dateLong = Utility.getTodayLong();
                                 try {
                                     c.setTime(object.getDay().getDate());
                                     c.set(Calendar.HOUR_OF_DAY, 0);
                                     c.set(Calendar.MINUTE, 0);
-                                    c.set(Calendar.SECOND,0);
+                                    c.set(Calendar.SECOND, 0);
                                     c.set(Calendar.MILLISECOND, 0);
-                                     dateLong= c.getTime().getTime();
+                                    dateLong = c.getTime().getTime();
                                 } catch (ParseException e1) {
                                     e1.printStackTrace();
                                 }
-                                object.deleteInBackground();
-                                Fragment scheduleFragment= TasklistFragment.newInstance(dateLong);
-                                activity.getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
-                                        .replace(R.id.frame_container, scheduleFragment).commit();
+                                // also delete all references in constraints
+                                ParseQuery<Constraint> constraintParseQuery = Constraint.getQuery();
+                                constraintParseQuery.whereEqualTo("other", object);
+                                final int totalTime = object.getTotalTime();
+                                Category category;
+                                try {
+                                    category = object.getCategory();
+                                } catch (ParseException | NullPointerException e1) {
+                                    category = null;
+                                }
 
+                                final String title = category != null ? category.getTitle() : "";
 
+                                // finalize
+                                final long finalDateLong = dateLong;
+                                constraintParseQuery.findInBackground(new FindCallback<Constraint>() {
+                                    @Override
+                                    public void done(final List<Constraint> constraints, ParseException e) {
+                                        object.deleteInBackground(new DeleteCallback() {
+                                            @Override
+                                            public void done(ParseException e) {
+                                                // also remove constraints
+                                                for (Constraint constraint : constraints) {
+                                                    constraint.deleteInBackground();
+                                                }
+
+                                                // remove time spent
+                                                if (!Objects.equals(title, "")) {
+                                                    try {
+                                                        final Day day = object.getDay();
+                                                        int timeSpent = day.getTimeSpentOn(title);
+                                                        timeSpent -= totalTime;
+                                                        day.setTimeSpent(title, timeSpent);
+                                                        day.saveInBackground();
+                                                    } catch (ParseException e1) {
+                                                        Log.e("Delete Dialog", "Could not get day!");
+                                                    }
+                                                }
+
+                                                // dismiss dialog
+                                                Fragment scheduleFragment = TasklistFragment.newInstance(finalDateLong);
+                                                activity.getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
+                                                        .replace(R.id.frame_container, scheduleFragment).commit();
+                                            }
+                                        });
+                                    }
+                                });
                             }
                         });
                     }
@@ -81,7 +127,7 @@ public class AlertDFragment extends DialogFragment {
 
                 // Negative Button
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,	int which) {
+                    public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 }).create();

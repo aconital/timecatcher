@@ -177,6 +177,7 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
             CSP_Solver csp_solver = new CSP_Solver(problem);
             solutions = csp_solver.getSolutions();
             Log.d("Algorithm", csp_solver.solutionsString());
+            numSolutions = (solutions != null) ? solutions.size() : 0;
         }
     }
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -257,7 +258,6 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
                             .show();
                     return;
                 } else {
-                    numSolutions = solutions.size();
                     ArrayList<TaskAssignment> solution = solutions.get(solutionsIndex);
                     assignSolution(solution);
                     Toast.makeText(getActivity(), "Tasks Scheduled!", Toast.LENGTH_SHORT).show();
@@ -395,7 +395,7 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
             public void done(Day object, com.parse.ParseException e) {
                 if (object != null) {
                     day = object;
-                    ParseQuery<Task> query = new ParseQuery<Task>("Task");
+                    ParseQuery<Task> query = new ParseQuery<>("Task");
                     query.whereEqualTo("day", day);
                     query.addAscendingOrder("startTime");
                     query.findInBackground(new FindCallback<Task>() {
@@ -416,7 +416,6 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
                     Log.e("Parse", "No object returned");
             }
         });
-
     }
     private List<Task> sortTasks(List<Task> tasks) {
         int n = tasks.size();
@@ -481,17 +480,24 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
                 if ((++mShakeCount >= SHAKE_COUNT) && (now - mLastShake > SHAKE_DURATION)) {
                     mLastShake = now;
                     mShakeCount = 0;
+                    if (solutions == null) {
+                        getSolutions();
+                    }
+
+                    // this seems weird, but after call to getSolutions, solutions can still be null
+                    // in the case that a solution was not found
                     if (solutions != null) {
                         Toast.makeText(getContext(), "New Schedule!", Toast.LENGTH_SHORT).show();
+                        solutionsIndex = (solutionsIndex + 1) % numSolutions;
                         Log.d("SHAKE", "Getting solution: " + (solutionsIndex + 1) + "/" + numSolutions);
                         ArrayList<TaskAssignment> solution = solutions.get(solutionsIndex);
                         assignSolution(solution);
-                        solutionsIndex = (solutionsIndex + 1) % numSolutions;
 
                         taskList= sortTasks(taskList);
                         mAdapter.notifyDataSetChanged();
+                        Log.d("SHAKE", "Shake detected");
                     }
-                    Log.d("SHAKE", "Shake detected");
+
                 }
                 mLastForce = now;
             }

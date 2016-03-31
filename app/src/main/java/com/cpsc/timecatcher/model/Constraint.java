@@ -5,6 +5,7 @@ import android.util.Log;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 /**
  * Created by yutongluo on 2/7/16.
@@ -54,6 +55,10 @@ public class Constraint extends ParseObject {
         } catch (Exception e) {
             return getOperator().toString() + ": ?";
         }
-
     }
+
+    public static ParseQuery<Constraint> getQuery() {
+        return ParseQuery.getQuery(Constraint.class);
+    }
+
 }

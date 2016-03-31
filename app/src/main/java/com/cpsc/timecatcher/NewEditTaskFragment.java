@@ -14,11 +14,13 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -26,7 +28,6 @@ import android.widget.Toast;
 
 import com.cengalabs.flatui.views.FlatTextView;
 import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
-import com.codetroopers.betterpickers.timepicker.TimePickerDialogFragment;
 import com.cpsc.timecatcher.algorithm.TimeUtils;
 import com.cpsc.timecatcher.gui.MultiSpinner;
 import com.cpsc.timecatcher.gui.NoScrollListView;
@@ -153,7 +154,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
         }
     }
 
-    private void populateCategoriesSpinner(final MultiSpinner spinner) {
+    private void populateCategoriesSpinner(final Spinner spinner) {
         final String[] defaultCategories = getResources().getStringArray(
                 R.array.new_task_default_categories_array);
 
@@ -171,35 +172,36 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                     Log.e(Constants.NEW_EDIT_TASK_TAG, "Could not fetch categories!");
                 }
                 NewEditTaskFragment.this.categories = new ArrayList<>(allCategories);
+                NewEditTaskFragment.this.categories.add(0, "Select Category");
                 if (task != null) {
                     // Select categories
-                    ParseQuery<Category> selectedCategoryQuery = task.getCategories();
-                    selectedCategoryQuery.findInBackground(new FindCallback<Category>() {
-                        @Override
-                        public void done(List<Category> objects, ParseException e) {
-                            if (e == null) {
-                                int[] selectedIndices = new int[objects.size()];
-                                for (int i = 0; i < objects.size(); i++) {
-                                    selectedIndices[i] =
-                                            NewEditTaskFragment.this.categories.indexOf(objects.get(i).getTitle());
-                                }
-                                spinner.setItems(
-                                        new ArrayList<>(NewEditTaskFragment.this.categories),
-                                        getResources().getString(R.string.new_task_category_hint),
-                                        NewEditTaskFragment.this,
-                                        selectedIndices
-                                );
-                            } else {
-                                Log.e(Constants.NEW_EDIT_TASK_TAG,
-                                        "Could not fetch selected categories!");
-                            }
+                    try {
+                        Category selectedCategory = task.getCategory();
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                                getContext(),
+                                android.R.layout.simple_spinner_item,
+                                new ArrayList<>(NewEditTaskFragment.this.categories));
+                        spinner.setAdapter(adapter);
+                        if (selectedCategory != null) {
+                            int selectedIndex = NewEditTaskFragment.this.categories.indexOf(
+                                    selectedCategory.getTitle());
+                            spinner.setSelection(selectedIndex);
                         }
-                    });
+                    } catch (ParseException e1) {
+                        Log.d(Constants.NEW_EDIT_TASK_TAG, "Could not query selected category");
+                    } catch (NullPointerException npe) {
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                                getContext(),
+                                android.R.layout.simple_spinner_item,
+                                new ArrayList<>(NewEditTaskFragment.this.categories));
+                        spinner.setAdapter(adapter);
+                    }
                 } else {
-                    spinner.setItems(
-                            new ArrayList<>(NewEditTaskFragment.this.categories),
-                            getResources().getString(R.string.new_task_category_hint),
-                            NewEditTaskFragment.this);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                            getContext(),
+                            android.R.layout.simple_spinner_item,
+                            new ArrayList<>(NewEditTaskFragment.this.categories));
+                    spinner.setAdapter(adapter);
                 }
             }
         });
@@ -216,7 +218,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
         final TextView startTime = (TextView) view.findViewById(R.id.startTime);
         final TextView endTime = (TextView) view.findViewById(R.id.endTime);
         final TextView dateTextView = (TextView) view.findViewById(R.id.title_date);
-        final MultiSpinner multiSpinner = (MultiSpinner) view.findViewById(R.id.categories);
+        final Spinner categorySpinner = (Spinner) view.findViewById(R.id.categories);
         final Switch fixedSwitch = (Switch) view.findViewById(R.id.fixed);
         final RelativeLayout startTimeLayout = (RelativeLayout) view.findViewById(R.id.startTimeLayout);
         final RelativeLayout endTimeLayout = (RelativeLayout) view.findViewById(R.id.endTimeLayout);
@@ -229,7 +231,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
             title.setText(task.getTitle());
             description.setText(task.getDescription());
             taskPageTitle.setText(R.string.edit_task_title);
-            // start time, end time, dateTextView, multiSpinner are initiated later.
+            // start time, end time, dateTextView, categorySpinner are initiated later.
             fixed = task.getFixed();
             fixedSwitch.setChecked(task.getFixed());
             if (task.getFixed()) {
@@ -333,7 +335,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
             }
         });
 
-        populateCategoriesSpinner(multiSpinner);
+        populateCategoriesSpinner(categorySpinner);
 
         // Initialize Constraints List View
         ListView constraintsListView = (NoScrollListView) view.findViewById(R.id.constraints_list);
@@ -513,7 +515,13 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                     task.setUser(ParseUser.getCurrentUser());
 
                                     // Time
+
                                     final int totalTime;
+                                    int previousTotalTime = 0;
+                                    if (!newTask) {
+                                        previousTotalTime = task.getTotalTime();
+                                    }
+
                                     if (fixed) {
                                         task.setStartTime(NewEditTaskFragment.this.startTime);
                                         task.setEndTime(NewEditTaskFragment.this.endTime);
@@ -525,66 +533,59 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                         totalTime = totalTimeHours * 60 + totalTimeMinutes;
                                         task.setTotalTime(totalTime);
                                         task.setStartTime(day.getDate());
+                                    }
 
-                                    }
-                                    // Categories
-                                    try {
-                                        if (!newTask) {
-                                            Log.d(Constants.NEW_EDIT_TASK_TAG,
-                                                    "Not a new task! Removing all previous categories");
-                                            task.removeAllCategories();
+                                    // category
+
+                                    // remove previous time spent on category
+                                    if (!newTask) {
+                                        try {
+                                            String previousCategoryName = task.getCategory().getTitle();
+                                            int prevTimeSpentOn = day.getTimeSpentOn(previousCategoryName);
+                                            prevTimeSpentOn -= previousTotalTime;
+                                            day.setTimeSpent(
+                                                    previousCategoryName,
+                                                    prevTimeSpentOn
+                                                    );
+                                        } catch (ParseException | NullPointerException e1) {
+                                            Log.d(Constants.NEW_EDIT_TASK_TAG, "No previous category found!");
                                         }
-                                    } catch (ParseException e1) {
-                                        new AlertDialog.Builder(getActivity().getBaseContext())
-                                                .setTitle("Error")
-                                                .setMessage("Something went wrong. Please try again!")
-                                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        saveButton.setEnabled(true);
-                                                    }
-                                                })
-                                                .setIcon(android.R.drawable.ic_dialog_alert)
-                                                .show();
                                     }
-                                    if (selected != null) {
-                                        for (int i = 0; i < selected.length; i++) {
-                                            if (selected[i]) {
-                                                // this category is selected, look it up on Parse
-                                                ParseQuery<Category> categoryParseQuery = Category.getQuery();
-                                                categoryParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
-                                                categoryParseQuery.whereEqualTo("title", categories.get(i));
-                                                final String title = categories.get(i);
-                                                categoryParseQuery.findInBackground(new FindCallback<Category>() {
-                                                    @Override
-                                                    public void done(List<Category> objects, ParseException e) {
-                                                        if (e == null) {
-                                                            if (objects.size() == 0) {
-                                                                // no objects fetched, create category
-                                                                // This is for one of the 5 default categories each
-                                                                // user has.
-                                                                final Category c = new Category();
-                                                                c.setTitle(title);
-                                                                c.setUser(ParseUser.getCurrentUser());
-                                                                c.saveEventually(new SaveCallback() {
-                                                                    @Override
-                                                                    public void done(ParseException e) {
-                                                                        task.addCategory(c);
-                                                                        day.setTimeSpent(title, totalTime);
-                                                                    }
-                                                                });
-                                                            } else if (objects.size() == 1) {
-                                                                task.addCategory(objects.get(0));
+                                    if (categorySpinner.getSelectedItemPosition() > 0) {
+                                        int pos = categorySpinner.getSelectedItemPosition();
+                                        ParseQuery<Category> categoryParseQuery = Category.getQuery();
+                                        categoryParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+                                        categoryParseQuery.whereEqualTo("title", categories.get(pos));
+                                        final String title = categories.get(pos);
+                                        categoryParseQuery.findInBackground(new FindCallback<Category>() {
+                                            @Override
+                                            public void done(List<Category> objects, ParseException e) {
+                                                if (e == null) {
+                                                    if (objects.size() == 0) {
+                                                        // no objects fetched, create category
+                                                        // This is for one of the 5 default categories each
+                                                        // user has.
+                                                        final Category c = new Category();
+                                                        c.setTitle(title);
+                                                        c.setUser(ParseUser.getCurrentUser());
+                                                        c.saveEventually(new SaveCallback() {
+                                                            @Override
+                                                            public void done(ParseException e) {
+                                                                task.setCategory(c);
                                                                 day.setTimeSpent(title, totalTime);
-                                                            } else {
-                                                                Log.e(Constants.NEW_EDIT_TASK_TAG, "Multiple categories returned!");
                                                             }
-                                                        } else {
-                                                            Log.e(Constants.NEW_EDIT_TASK_TAG, "Could not fetch categories!");
-                                                        }
+                                                        });
+                                                    } else if (objects.size() == 1) {
+                                                        task.setCategory(objects.get(0));
+                                                        day.setTimeSpent(title, totalTime);
+                                                    } else {
+                                                        Log.e(Constants.NEW_EDIT_TASK_TAG, "Multiple categories returned!");
                                                     }
-                                                });
+                                                } else {
+                                                    Log.e(Constants.NEW_EDIT_TASK_TAG, "Could not fetch categories!");
+                                                }
                                             }
-                                        }
+                                        });
                                     }
 
                                     // save constraints
