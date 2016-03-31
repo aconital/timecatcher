@@ -557,6 +557,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                         categoryParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
                                         categoryParseQuery.whereEqualTo("title", categories.get(pos));
                                         final String title = categories.get(pos);
+                                        final int previousTimeSpent = day.getTimeSpentOn(title);
                                         categoryParseQuery.findInBackground(new FindCallback<Category>() {
                                             @Override
                                             public void done(List<Category> objects, ParseException e) {
@@ -572,12 +573,12 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                                             @Override
                                                             public void done(ParseException e) {
                                                                 task.setCategory(c);
-                                                                day.setTimeSpent(title, totalTime);
+                                                                day.setTimeSpent(title, previousTimeSpent + totalTime);
                                                             }
                                                         });
                                                     } else if (objects.size() == 1) {
                                                         task.setCategory(objects.get(0));
-                                                        day.setTimeSpent(title, totalTime);
+                                                        day.setTimeSpent(title, previousTimeSpent + totalTime);
                                                     } else {
                                                         Log.e(Constants.NEW_EDIT_TASK_TAG, "Multiple categories returned!");
                                                     }
