@@ -32,7 +32,6 @@ public class SystemTestAllTasksNoConstraints extends TimedTest {
         CSP_Solver solver = new CSP_Solver(problem);
         solutions = solver.getSolutions();
         assertEquals(true, solutions.isEmpty());
-        //assertEquals(0, solutions.get(0).size());
     }
 
     @Test
@@ -43,6 +42,27 @@ public class SystemTestAllTasksNoConstraints extends TimedTest {
         solutions = solver.getSolutions();
         assertEquals(1, solutions.size());
         assertEquals(new Time(1, 0), solutions.get(0).get(0).getAssignment().getStartTime());
+    }
+
+    @Test
+    public void testTaskBeforeDayStart() throws Exception {
+        problem.addFixedTask(new Time(0, 0), new Time(0, 1));
+        problem.createConstraintGraph();
+        CSP_Solver solver = new CSP_Solver(problem);
+        solutions = solver.getSolutions();
+        assertEquals(true, solutions.isEmpty());
+    }
+
+    @Test
+    public void testMixedTasksBeforeDayStart() throws Exception {
+        problem.addFixedTask(new Time(0, 0), new Time(0, 1));
+        problem.addFlexibleTask(new Time(0, 30));
+        problem.addFlexibleTask(new Time(0, 40));
+        problem.createConstraintGraph();
+        problem.addConstraint(0, 2, 0);
+        CSP_Solver solver = new CSP_Solver(problem);
+        solutions = solver.getSolutions();
+        assertEquals(true, solutions.isEmpty());
     }
 
     @Test
