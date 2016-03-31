@@ -112,15 +112,6 @@ public class DrawPieChart {
                         0XFFFF5252, //Deep Orange
                 });
 
-                /*
-                {Color.rgb(153, 255, 255), //blue
-                        Color.rgb(255, 51, 153),  //red
-                        Color.rgb(255, 255, 0),//yellow
-                        Color.rgb(229, 204, 255),//purple
-                        Color.rgb(255, 153, 51),//orange
-                });
-                */
-
         // instantiate pie data object now
         PieData data = new PieData(xVals, dataSet);
         data.setValueFormatter(new PercentFormatter());

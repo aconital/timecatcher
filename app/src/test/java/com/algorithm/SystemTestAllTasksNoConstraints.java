@@ -158,7 +158,8 @@ public class SystemTestAllTasksNoConstraints extends TimedTest {
     }
 
     @Test
-    public void testFiveMinuteGapsForFourUnitFlexibleTasks() throws Exception {
+
+    public void test4OneMinuteGapsFor4UnitFlexibleTasks() throws Exception {
         for (int min = 61; min < 23 * 60-15; ) {
             Time A = new Time(min / 60 , min % 60);
             min += 14;
