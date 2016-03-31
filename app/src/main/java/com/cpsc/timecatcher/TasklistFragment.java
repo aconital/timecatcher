@@ -177,6 +177,7 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
             CSP_Solver csp_solver = new CSP_Solver(problem);
             solutions = csp_solver.getSolutions();
             Log.d("Algorithm", csp_solver.solutionsString());
+            numSolutions = (solutions != null) ? solutions.size() : 0;
         }
     }
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -257,7 +258,6 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
                             .show();
                     return;
                 } else {
-                    numSolutions = solutions.size();
                     ArrayList<TaskAssignment> solution = solutions.get(solutionsIndex);
                     assignSolution(solution);
                     Toast.makeText(getActivity(), "Tasks Scheduled!", Toast.LENGTH_SHORT).show();
@@ -480,6 +480,12 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
                 if ((++mShakeCount >= SHAKE_COUNT) && (now - mLastShake > SHAKE_DURATION)) {
                     mLastShake = now;
                     mShakeCount = 0;
+                    if (solutions == null) {
+                        getSolutions();
+                    }
+
+                    // this seems weird, but after call to getSolutions, solutions can still be null
+                    // in the case that a solution was not found
                     if (solutions != null) {
                         Toast.makeText(getContext(), "New Schedule!", Toast.LENGTH_SHORT).show();
                         solutionsIndex = (solutionsIndex + 1) % numSolutions;
@@ -489,8 +495,9 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
 
                         taskList= sortTasks(taskList);
                         mAdapter.notifyDataSetChanged();
+                        Log.d("SHAKE", "Shake detected");
                     }
-                    Log.d("SHAKE", "Shake detected");
+
                 }
                 mLastForce = now;
             }
