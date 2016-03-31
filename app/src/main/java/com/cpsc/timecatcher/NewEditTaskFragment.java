@@ -515,7 +515,13 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                     task.setUser(ParseUser.getCurrentUser());
 
                                     // Time
+
                                     final int totalTime;
+                                    int previousTotalTime = 0;
+                                    if (!newTask) {
+                                        previousTotalTime = task.getTotalTime();
+                                    }
+
                                     if (fixed) {
                                         task.setStartTime(NewEditTaskFragment.this.startTime);
                                         task.setEndTime(NewEditTaskFragment.this.endTime);
@@ -527,6 +533,23 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                         totalTime = totalTimeHours * 60 + totalTimeMinutes;
                                         task.setTotalTime(totalTime);
                                         task.setStartTime(day.getDate());
+                                    }
+
+                                    // category
+
+                                    // remove previous time spent on category
+                                    if (!newTask) {
+                                        try {
+                                            String previousCategoryName = task.getCategory().getTitle();
+                                            int prevTimeSpentOn = day.getTimeSpentOn(previousCategoryName);
+                                            prevTimeSpentOn -= previousTotalTime;
+                                            day.setTimeSpent(
+                                                    previousCategoryName,
+                                                    prevTimeSpentOn
+                                                    );
+                                        } catch (ParseException | NullPointerException e1) {
+                                            Log.d(Constants.NEW_EDIT_TASK_TAG, "No previous category found!");
+                                        }
                                     }
                                     if (categorySpinner.getSelectedItemPosition() > 0) {
                                         int pos = categorySpinner.getSelectedItemPosition();
