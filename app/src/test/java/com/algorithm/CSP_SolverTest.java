@@ -6,6 +6,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Created by fujiaoyang1 on 3/5/16.
  */
@@ -78,8 +80,8 @@ public class CSP_SolverTest {
         problem= new CSP(dayStart,dayEnd);
         // mixed taskes
         problem.addFixedTask(new Time(1, 0), new Time(2, 0)); // 0
-        problem.addFlexibleTask(new Time(2, 0)); // 1
-        problem.addFlexibleTask(new Time(3, 0)); // 2
+        problem.addFixedTask(new Time(4, 0), new Time(5, 0)); // 1
+        problem.addFlexibleTask(new Time(2, 0)); // 2
 
         problem.createConstraintGraph();
         //problem.addConstraint(1, 2, 0);
@@ -88,38 +90,6 @@ public class CSP_SolverTest {
         solutions = solver.getSolutions();
 
         //solver.printSolutions();
-        try {
-            //AlgorithmTestUtils.noOverLap(solutions);
-            assertEquals(false, solutions.isEmpty());
-        } catch (AssertionError e) {
-            // print out problematic solution
-            solver.printSolutions();
-            throw e;
-        }
-    }
-*/
-
-    @Test
-    public void test4() throws Exception {
-        dayStart=new Time(8,0);
-        dayEnd=new Time(20,0);
-
-        problem= new CSP(dayStart,dayEnd);
-
-        problem.addFixedTask(new Time(6, 0), new Time(7, 0)); // 0
-        problem.addFixedTask(new Time(17, 0), new Time(18, 0)); // 1
-        problem.addFlexibleTask(new Time(3, 0));// 2
-
-        //problem.addFlexibleTask(new Time(2, 20));// 3
-        //problem.addFlexibleTask(new Time(1, 0));
-
-        problem.createConstraintGraph();
-        //problem.addConstraint(1, 2, 0);
-        //problem.addConstraint(0, 2, 0);
-        CSP_Solver solver = new CSP_Solver(problem);
-        solutions = solver.getSolutions();
-
-        solver.printSolutions();
         try {
             //AlgorithmTestUtils.noOverLap(solutions);
             //assertEquals(false, solutions.isEmpty());
@@ -131,4 +101,56 @@ public class CSP_SolverTest {
     }
 
 
+    @Test
+    public void testFlexibleOneHourSnugFit() throws Exception {
+        dayStart = new Time(1,0);
+        dayEnd = new Time(23,59);
+        // 22 hours available
+        problem = new CSP(dayStart,dayEnd);
+        problem.addFixedTask(new Time(1, 0), new Time(12, 30));
+        problem.addFixedTask(new Time(13, 30), new Time(23, 0));
+        problem.addFlexibleTask(new Time(1, 0));
+        problem.createConstraintGraph();
+        CSP_Solver solver = new CSP_Solver(problem);
+        solutions = solver.getSolutions();
+        solver.printSolutions();
+        try {
+            AlgorithmTestUtils.noOverLap(solutions);
+            assertEquals(false, solutions.isEmpty());
+        } catch (AssertionError e) {
+             //print out problematic solution
+            solver.printSolutions();
+            throw e;
+        }
+    }
+    */
+
+    @Test
+    public void testFiveMinuteGapsForFourUnitFlexibleTasks() throws Exception {
+        dayStart = new Time(1,0);
+        dayEnd = new Time(23,0);
+        // 22 hours available
+        problem = new CSP(dayStart,dayEnd);
+        for (int min = 61; min < 23 * 60-15; ) {
+            Time A = new Time(min / 60 , min % 60);
+            min += 14;
+            Time B = new Time(min / 60 , min % 60);
+            problem.addFixedTask(A, B);
+        }
+        problem.addFlexibleTask(new Time(0, 1));
+        problem.addFlexibleTask(new Time(0, 1));
+        problem.addFlexibleTask(new Time(0, 1));
+        problem.addFlexibleTask(new Time(0, 1));
+        problem.createConstraintGraph();
+        CSP_Solver solver = new CSP_Solver(problem);
+        solutions = solver.getSolutions();
+        try {
+            AlgorithmTestUtils.noOverLap(solutions);
+            assertEquals(false, solutions.isEmpty());
+        } catch (AssertionError e) {
+            // print out problematic solution
+            solver.printSolutions();
+            throw e;
+        }
+    }
 }

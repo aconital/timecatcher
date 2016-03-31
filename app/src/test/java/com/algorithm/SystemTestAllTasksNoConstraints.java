@@ -41,7 +41,7 @@ public class SystemTestAllTasksNoConstraints extends TimedTest {
         problem.createConstraintGraph();
         CSP_Solver solver = new CSP_Solver(problem);
         solutions = solver.getSolutions();
-        assertEquals(5, solutions.size());
+        assertEquals(1, solutions.size());
         assertEquals(new Time(1, 0), solutions.get(0).get(0).getAssignment().getStartTime());
     }
 
@@ -96,7 +96,8 @@ public class SystemTestAllTasksNoConstraints extends TimedTest {
             solver.printSolutions();
             throw e;
         }
-        solver.printSolutions();
+       //
+       // solver.printSolutions();
     }
 
     @Test
@@ -138,7 +139,7 @@ public class SystemTestAllTasksNoConstraints extends TimedTest {
 
     @Test
     public void testFiveMinuteGapsForFourUnitFlexibleTasks() throws Exception {
-        for (int min = 61; min < 23 * 60; ) {
+        for (int min = 61; min < 23 * 60-15; ) {
             Time A = new Time(min / 60 , min % 60);
             min += 14;
             Time B = new Time(min / 60 , min % 60);

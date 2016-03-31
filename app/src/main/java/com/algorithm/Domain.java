@@ -38,7 +38,7 @@ public class Domain {
 		Time start,end,startPoint;
 		end=new Time(dayStart);
 		startPoint= new Time(dayStart);
-		for(int i=1;(startPoint.addTime(duration)).compareTime(dayEnd) <=0 ;i++){	
+		for(int i=1;(startPoint.addTime(duration)).compareTime(dayEnd) <=0 ;i++){
 			//System.out.println("startPoint  " + startPoint.getHour() + ":"+ startPoint.getMinute() );
 			start=new Time(startPoint);
 			end=start.addTime(duration);
@@ -50,7 +50,7 @@ public class Domain {
 				start=new Time(end);
 				end=start.addTime(duration);
 			}//while
-			
+
 			if(i!=0){
 				startPoint=startPoint.addTime(step);
 			}//if

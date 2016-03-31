@@ -51,7 +51,7 @@ public class PieChartDataInitialization {
                 timeSpentOnCategory[3]+=day.getTimeSpentOn(xData[3]);
                 timeSpentOnCategory[4]+=day.getTimeSpentOn(xData[4]);
             }
-
+            // { "School", "Work", "Housework","Family","Gym"};
             for(int i=0;i<5;i++) {
                 total+=timeSpentOnCategory[i];
             }
