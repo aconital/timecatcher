@@ -106,16 +106,16 @@ public class CSP_SolverTest {
 
         problem= new CSP(dayStart,dayEnd);
 
-        problem.addFixedTask(new Time(8, 0), new Time(9, 0)); // 0
+        problem.addFixedTask(new Time(6, 0), new Time(7, 0)); // 0
         problem.addFixedTask(new Time(17, 0), new Time(18, 0)); // 1
-        problem.addFlexibleTask(new Time(1, 0));// 2
+        problem.addFlexibleTask(new Time(3, 0));// 2
 
         //problem.addFlexibleTask(new Time(2, 20));// 3
         //problem.addFlexibleTask(new Time(1, 0));
 
         problem.createConstraintGraph();
-        problem.addConstraint(1, 2, 0);
-        problem.addConstraint(0, 2, 0);
+        //problem.addConstraint(1, 2, 0);
+        //problem.addConstraint(0, 2, 0);
         CSP_Solver solver = new CSP_Solver(problem);
         solutions = solver.getSolutions();
 

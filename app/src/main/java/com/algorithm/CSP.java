@@ -72,7 +72,7 @@ public class CSP {
 	}
 	
 	public boolean addFixedTask(Time startTime,Time endTime){
-		if(startTime.compareTime(dayStart)<0 || endTime.compareTime(dayEnd)>0) return false;
+		//if(startTime.compareTime(dayStart)<0 || endTime.compareTime(dayEnd)>0) return false;
 		
 		Time duration= endTime.substractTime(startTime);
 		//System.out.println("duration: "+duration.getHour()+ ":"+ duration.getMinute());
@@ -111,7 +111,6 @@ public class CSP {
 	
 	public void addConstraint(int id1,int id2,int weight){// id1 -> id2 (task with id1 before task with id2)
 		//if(id1 >= Task.taskCount || id2 <=Task.taskCount) return;
-
 		constraints.addConstraint(id1, id2, weight);
 	}
 	
