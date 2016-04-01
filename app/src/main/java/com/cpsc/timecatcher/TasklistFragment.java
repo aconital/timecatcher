@@ -486,7 +486,7 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
 
                     // this seems weird, but after call to getSolutions, solutions can still be null
                     // in the case that a solution was not found
-                    if (solutions != null) {
+                    if (solutions != null && numSolutions > 0) {
                         Toast.makeText(getContext(), "New Schedule!", Toast.LENGTH_SHORT).show();
                         solutionsIndex = (solutionsIndex + 1) % numSolutions;
                         Log.d("SHAKE", "Getting solution: " + (solutionsIndex + 1) + "/" + numSolutions);
