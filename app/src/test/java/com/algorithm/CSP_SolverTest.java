@@ -6,8 +6,6 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * Created by fujiaoyang1 on 3/5/16.
  */
@@ -123,7 +121,7 @@ public class CSP_SolverTest {
             throw e;
         }
     }
-    */
+
 
     @Test
     public void testFiveMinuteGapsForFourUnitFlexibleTasks() throws Exception {
@@ -153,4 +151,34 @@ public class CSP_SolverTest {
             throw e;
         }
     }
+    */
+
+    @Test
+    public void test4() throws Exception {
+        dayStart=new Time(8,0);
+        dayEnd=new Time(23,59);
+
+        problem= new CSP(dayStart,dayEnd);
+        // mixed taskes
+
+        problem.addFlexibleTask(new Time(1, 0)); // 0
+        problem.addFlexibleTask(new Time(1, 0)); // 1
+
+        problem.createConstraintGraph();
+        //problem.addConstraint(1, 2, 0);
+        //problem.addConstraint(0, 2, 0);
+        CSP_Solver solver = new CSP_Solver(problem);
+        solutions = solver.getSolutions();
+
+        solver.printSolutions();
+        try {
+            //AlgorithmTestUtils.noOverLap(solutions);
+            //assertEquals(false, solutions.isEmpty());
+        } catch (AssertionError e) {
+            // print out problematic solution
+            solver.printSolutions();
+            throw e;
+        }
+    }
+
 }
