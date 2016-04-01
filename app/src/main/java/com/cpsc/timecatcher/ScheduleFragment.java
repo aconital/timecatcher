@@ -183,12 +183,16 @@ public class ScheduleFragment extends Fragment implements WeekView.EventClickLis
                                     for (Task t : objects) {
                                         Calendar startTime = Calendar.getInstance();
                                         startTime.setTime(t.getStartTime());
-                                        Calendar endTime = Calendar.getInstance();
-                                        endTime.setTime(t.getEndTime());
-                                        WeekViewEvent event = new WeekViewEvent(1, t.getTitle(), startTime, endTime);
-                                        Random rand=new Random();
-                                        event.setColor(colors.get(rand.nextInt(colors.size())));
-                                        events.add(event);
+                                        if (!(startTime.get(Calendar.HOUR_OF_DAY) == 0 &&
+                                                startTime.get(Calendar.MINUTE) == 0)) {
+                                            // if not unscheduled
+                                            Calendar endTime = Calendar.getInstance();
+                                            endTime.setTime(t.getEndTime());
+                                            WeekViewEvent event = new WeekViewEvent(1, t.getTitle(), startTime, endTime);
+                                            Random rand=new Random();
+                                            event.setColor(colors.get(rand.nextInt(colors.size())));
+                                            events.add(event);
+                                        }
                                     }
 
                                     // This line will trigger the method 'onMonthChange()' again.
