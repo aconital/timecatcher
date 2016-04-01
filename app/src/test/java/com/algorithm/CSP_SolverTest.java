@@ -162,7 +162,7 @@ public class CSP_SolverTest {
         // mixed taskes
 
         problem.addFlexibleTask(new Time(1, 0)); // 0
-        problem.addFlexibleTask(new Time(1, 0)); // 1
+        problem.addFixedTask(new Time(12, 30), new Time(13, 30));//1
 
         problem.createConstraintGraph();
         //problem.addConstraint(1, 2, 0);

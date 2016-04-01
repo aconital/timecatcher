@@ -439,6 +439,9 @@ public class CSP_Solver  {
 	 * this method return  a final solution of  possible schedule 
 	 */
 	public List<ArrayList<TaskAssignment> > getSolutions(){
+		if( (problem.getFixedTaskIdSet().size()+ problem.getFlexibleTaskIdSet().size()) != Task.taskCount){
+			return solutions;
+		}
 		if(problem.getOverTime()==true)  return solutions;
 		if(isFixedTaskOverlap()==true) return solutions;
 		if(taskCount==0)return solutions;
