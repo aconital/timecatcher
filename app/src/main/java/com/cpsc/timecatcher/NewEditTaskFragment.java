@@ -551,6 +551,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                             Log.d(Constants.NEW_EDIT_TASK_TAG, "No previous category found!");
                                         }
                                     }
+                                    Log.d("CATEGORY", categorySpinner.getSelectedItemPosition()+"");
                                     if (categorySpinner.getSelectedItemPosition() > 0) {
                                         int pos = categorySpinner.getSelectedItemPosition();
                                         ParseQuery<Category> categoryParseQuery = Category.getQuery();
@@ -560,9 +561,9 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                         final int previousTimeSpent = day.getTimeSpentOn(title);
                                         categoryParseQuery.findInBackground(new FindCallback<Category>() {
                                             @Override
-                                            public void done(List<Category> objects, ParseException e) {
+                                            public void done(List<Category> categories, ParseException e) {
                                                 if (e == null) {
-                                                    if (objects.size() == 0) {
+                                                    if (categories.size() == 0) {
                                                         // no objects fetched, create category
                                                         // This is for one of the 5 default categories each
                                                         // user has.
@@ -576,12 +577,13 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                                                 day.setTimeSpent(title, previousTimeSpent + totalTime);
                                                             }
                                                         });
-                                                    } else if (objects.size() == 1) {
-                                                        task.setCategory(objects.get(0));
+                                                    } else if (categories.size() == 1) {
+                                                        task.setCategory(categories.get(0));
                                                         day.setTimeSpent(title, previousTimeSpent + totalTime);
                                                     } else {
                                                         Log.e(Constants.NEW_EDIT_TASK_TAG, "Multiple categories returned!");
                                                     }
+                                                    task.saveEventually();
                                                 } else {
                                                     Log.e(Constants.NEW_EDIT_TASK_TAG, "Could not fetch categories!");
                                                 }
@@ -649,7 +651,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                                             Toast.makeText(
                                                                     getActivity(),
                                                                     "Saved",
-                                                                    Toast.LENGTH_LONG).show();
+                                                                    Toast.LENGTH_SHORT).show();
                                                             getFragmentManager().popBackStackImmediate();
                                                             getFragmentManager().beginTransaction().commit();
 
