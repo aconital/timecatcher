@@ -50,7 +50,9 @@ import com.parse.ParseUser;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import adapters.TaskAdapter;
 
@@ -87,6 +89,8 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
     private Day day;
     private boolean isOpen=false;
 
+    private Map<Integer, Task> taskMap = new HashMap<>();
+
     // Solution looper
     private List<ArrayList<TaskAssignment>> solutions;
     private int solutionsIndex = 0, numSolutions = 0;
@@ -114,6 +118,7 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
     }
 
     public void getSolutions() {
+        taskMap.clear();
         if ( taskList.size() == 0 ) {
             Toast.makeText(getContext(), "No tasks to schedule!", Toast.LENGTH_SHORT).show();
         } else if (day != null) {
@@ -124,6 +129,9 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
             boolean overtime = false;
             for (int i = 0; i < taskList.size(); i++) {
                 Task currentTask = taskList.get(i);
+                // need to put taskList in a different map, because taskList might get sorted
+                // and the Id becomes wrong. resulting in incorrect alternative solutions
+                taskMap.put(i, currentTask);
                 if (currentTask.getFixed()) {
                     overtime = overtime || problem.addFixedTask(
                             Utility.dateToTime(currentTask.getStartTime()),
@@ -330,12 +338,16 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
 
     private void assignSolution(ArrayList<TaskAssignment> solution) {
         for (TaskAssignment taskAssignment : solution) {
-            Task task = taskList.get(taskAssignment.getTaskId());
+            Task task = taskMap.get(taskAssignment.getTaskId());
             if (!task.getFixed()) {
                 // assign task to slot
                 // start time
                 task.setStartTime(Utility.timeToDate(day.getDate(),
                         taskAssignment.getAssignment().getStartTime()));
+
+                Log.d("TEST", "assigning " + taskAssignment.getTaskId() + " times: "  +
+                        taskAssignment.getAssignment().getStartTime().getHour() + ":" +
+                        taskAssignment.getAssignment().getStartTime().getMinute());
 
                 // end time
                 task.setEndTime(Utility.timeToDate(day.getDate(),
