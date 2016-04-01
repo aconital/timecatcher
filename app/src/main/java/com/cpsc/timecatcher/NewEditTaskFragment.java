@@ -496,8 +496,8 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                     title.setError("Already have a task with the same name!");
                                 } else if (NewEditTaskFragment.this.fixed &&
                                         NewEditTaskFragment.this.endTime.before(
-                                        NewEditTaskFragment.this.startTime
-                                )){
+                                                NewEditTaskFragment.this.startTime
+                                        )){
                                     new AlertDialog.Builder(getContext())
                                             .setTitle("Error")
                                             .setMessage("Start time cannot be after end time!")
@@ -546,13 +546,16 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                             day.setTimeSpent(
                                                     previousCategoryName,
                                                     prevTimeSpentOn
-                                                    );
+                                            );
                                         } catch (ParseException | NullPointerException e1) {
                                             Log.d(Constants.NEW_EDIT_TASK_TAG, "No previous category found!");
                                         }
                                     }
-                                    Log.d("CATEGORY", categorySpinner.getSelectedItemPosition()+"");
-                                    if (categorySpinner.getSelectedItemPosition() > 0) {
+                                    if (categorySpinner.getSelectedItemPosition() == 0) {
+                                        // user unset category
+                                        task.remove("category");
+                                        task.saveEventually();
+                                    } else if (categorySpinner.getSelectedItemPosition() > 0) {
                                         int pos = categorySpinner.getSelectedItemPosition();
                                         ParseQuery<Category> categoryParseQuery = Category.getQuery();
                                         categoryParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
@@ -589,6 +592,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                                 }
                                             }
                                         });
+
                                     }
 
                                     // save constraints
