@@ -107,8 +107,9 @@ public class StructureActivity extends AppCompatActivity
 //        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
 //        .replace(R.id.frame_container, ParseLoginFragment).commit();
         Intent intent=new Intent();
-        intent.setClass(StructureActivity.this,com.parse.ui.ParseLoginActivity.class);
+        intent.setClass(StructureActivity.this, com.parse.ui.ParseLoginActivity.class);
         startActivity(intent);
+        StructureActivity.this.finish();
     }
 
     public void addTask(long date)
