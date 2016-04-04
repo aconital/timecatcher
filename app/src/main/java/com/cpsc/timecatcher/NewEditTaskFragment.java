@@ -260,22 +260,6 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
             Log.e(Constants.NEW_EDIT_TASK_TAG, "USER IS NULL! SAVING WILL NOT WORK");
         }
 
-        // Initialize Texts
-        if (task == null) {
-            this.startTime = calendar.getTime();
-            this.endTime = addMinutesToDate(calendar, 30).getTime();
-        } else {
-            this.startTime = task.getStartTime();
-            this.endTime = task.getEndTime();
-        }
-        if (this.startTime != null) {
-            startTime.setText(timeFormat.format(this.startTime));
-        }
-
-        if (this.endTime != null) {
-            endTime.setText(timeFormat.format(this.endTime));
-        }
-
         // Day
         if (task == null) {
             day = getOrCreateDay(date, calendar);
@@ -300,6 +284,29 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
             dateTextView.setText(dateFormat.format(calendar.getTime()));
         } else {
             dateTextView.setText(dateFormat.format(day.getDate()));
+        }
+
+        // Initialize Texts
+
+        final Calendar currentTimeCalendar = Calendar.getInstance();
+        currentTimeCalendar.set(
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH));
+        
+        if (task == null) {
+            this.startTime = currentTimeCalendar.getTime();
+            this.endTime = addMinutesToDate(currentTimeCalendar, 30).getTime();
+        } else {
+            this.startTime = task.getStartTime();
+            this.endTime = task.getEndTime();
+        }
+        if (this.startTime != null) {
+            startTime.setText(timeFormat.format(this.startTime));
+        }
+
+        if (this.endTime != null) {
+            endTime.setText(timeFormat.format(this.endTime));
         }
 
         // Validate field inputs
