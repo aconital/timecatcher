@@ -151,7 +151,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
             holder.end.setText(dur_min+" min");
         else
             if(dur_min ==0)
-            holder.end.setText(dur_hr+" h ");
+            holder.end.setText(dur_hr+" h "
+            );
             else
             holder.end.setText(dur_hr+" h "+dur_min+" min");
 

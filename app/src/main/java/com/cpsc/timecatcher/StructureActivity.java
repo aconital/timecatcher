@@ -16,6 +16,7 @@ import android.widget.Button;
 import com.cpsc.timecatcher.helper.Constants;
 import com.cpsc.timecatcher.helper.Utility;
 import com.facebook.appevents.AppEventsLogger;
+import com.vungle.publisher.VunglePub;
 
 public class StructureActivity extends AppCompatActivity
         implements ScheduleFragment.OnFragmentInteractionListener,
@@ -26,12 +27,14 @@ public class StructureActivity extends AppCompatActivity
 
     private Button schedule,calendar,graph,profile;
 
+    final VunglePub vunglePub = VunglePub.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.structure_activity);
         final long todayLong= Utility.getTodayLong();
+        vunglePub.playAd();
         //    getActionBar().hide();
         if(null == savedInstanceState) {
             //default schedule is today
@@ -179,12 +182,14 @@ public class StructureActivity extends AppCompatActivity
     {
         super.onResume();
         AppEventsLogger.activateApp(this);
+        vunglePub.onResume();
     }
     @Override
     public void onPause()
     {
         super.onPause();
         AppEventsLogger.deactivateApp(this);
+        vunglePub.onPause();
     }
 
     @Override
