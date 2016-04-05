@@ -152,7 +152,7 @@ public class SystemTestAllTasksWithConstraints extends TimedTest {
         CSP_Solver solver = new CSP_Solver(problem);
         solutions = solver.getSolutions();
         try {
-            assertEquals(false, solutions.isEmpty());
+            assertEquals(true, solutions.isEmpty());
             AlgorithmTestUtils.noOverLap(solutions);
             AlgorithmTestUtils.checkConstraints(solutions, problem);
         } catch (AssertionError e) {
@@ -178,7 +178,7 @@ public class SystemTestAllTasksWithConstraints extends TimedTest {
         CSP_Solver solver = new CSP_Solver(problem);
         solutions = solver.getSolutions();
         try {
-            assertEquals(false, solutions.isEmpty());
+            assertEquals(true, solutions.isEmpty());
             AlgorithmTestUtils.noOverLap(solutions);
             AlgorithmTestUtils.checkConstraints(solutions, problem);
         } catch (AssertionError e) {
