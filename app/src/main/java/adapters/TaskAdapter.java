@@ -150,7 +150,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
         if(dur_hr<1)
             holder.end.setText(dur_min+" min");
         else
-            holder.end.setText(dur_hr+" h");
+            if(dur_min ==0)
+            holder.end.setText(dur_hr+" h ");
+            else
+            holder.end.setText(dur_hr+" h "+dur_min+" min");
 
         Date starttime=task.getStartTime();
 
