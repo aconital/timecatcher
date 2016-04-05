@@ -278,7 +278,7 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+              Log.e("XXXX","long date is "+longDate);
                 Fragment scheduleFragment= NewEditTaskFragment.newInstance(longDate);
                 getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
                         .replace(R.id.frame_container, scheduleFragment).addToBackStack(Constants.NEW_EDIT_TASK_TAG).commit();
