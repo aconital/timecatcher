@@ -51,8 +51,8 @@ public class TimeTest {
 
     @Test
     public void testSubstractTime() throws Exception {
-        assertEquals(new Time(0,30),new Time(1,45).substractTime(new Time(1,15)));
-        assertEquals(new Time(2,0),new Time(9,0).substractTime(new Time(7, 0)));
+        assertEquals(new Time(0,30),new Time(1,45).subtractTime(new Time(1, 15)));
+        assertEquals(new Time(2,0),new Time(9,0).subtractTime(new Time(7, 0)));
     }
 
     @Test

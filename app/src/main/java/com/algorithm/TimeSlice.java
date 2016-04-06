@@ -4,18 +4,18 @@ public class TimeSlice implements Comparable<TimeSlice>{
 	private Time endTime; //this point in time instead of a duration 
 	private boolean available; 
 	
-	TimeSlice(Time start,Time end,boolean a){
-		if(start.compareTime(end) <=0){
-			startTime=start;
-			endTime=end;
-			available=a;
+	TimeSlice(Time start, Time end, boolean a){
+		if(start.compareTime(end) <= 0){
+			startTime = start;
+			endTime = end;
+			available = a;
 		}
 	}
 
 	TimeSlice(TimeSlice t){
-		startTime= new Time(t.getStartTime());
-		endTime=new Time(t.getEndTime());
-		available=t.available;
+		startTime = new Time(t.getStartTime());
+		endTime = new Time(t.getEndTime());
+		available = t.available;
 	}
 	
 	public Time getStartTime(){
@@ -34,37 +34,27 @@ public class TimeSlice implements Comparable<TimeSlice>{
 		available=a;
 	}
 	
-	void setTimeSlice(Time start,Time end){
-		startTime=start;
-		endTime=end;
+	void setTimeSlice(Time start, Time end){
+		startTime = start;
+		endTime = end;
 	}
 	
-	/*
+	/**
 	 * check if calling object timeSlice slice1 is before argument slice
-	 * result true  => slice1 is before slice 
-	 * return false => overlapping or slice1 is 
+	 *
+	 * @return true if slice1 is before slice, false if overlapping
 	 */
 	boolean isBefore(TimeSlice slice){
-		if(endTime.compareTime(slice.getStartTime()) <=0){
-			return true;
-		}
-		else{
-			return false;
-		}
+		return endTime.compareTime(slice.getStartTime()) <= 0;
 	}
 	
-	/*
+	/**
 	 * check if calling object timeSlice slice1  overlap  with slice
-	 * result true  => overlapping 
-	 * return false => separate  
+	 *
+	 * @return true there is overlap. else false
 	 */
 	boolean isOverlap(TimeSlice slice){
-		if(this.isBefore(slice) || slice.isBefore(this)){
-			return false;
-		}
-		else{
-			return true;
-		}
+        return !(this.isBefore(slice) || slice.isBefore(this));
 	}
 
 	@Override
@@ -102,9 +92,9 @@ public class TimeSlice implements Comparable<TimeSlice>{
 		return true;
 	}
 
-	public int compareTo (TimeSlice t1) {
+	public int compareTo(TimeSlice t1) {
         /* For Ascending order*/
-		return  startTime.compareTime(t1.getStartTime());
+		return startTime.compareTime(t1.getStartTime());
 	}
 	
 

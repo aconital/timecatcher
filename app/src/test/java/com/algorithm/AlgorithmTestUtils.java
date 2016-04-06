@@ -40,7 +40,7 @@ public class AlgorithmTestUtils {
     public static void checkConstraints(List<ArrayList<TaskAssignment>> solutions,
                                         CSP problem) {
         ConstraintGraph constraintGraph = problem.getConstraints();
-        LinkedList<AdjListNode>[] adjacencyList = constraintGraph.getAdjcentList();
+        LinkedList<AdjListNode>[] adjacencyList = constraintGraph.getAdjacentList();
         for (List<TaskAssignment> taskAssignmentList : solutions) {
             int i = 0;
             for (LinkedList<AdjListNode> adjListNodes : adjacencyList) {

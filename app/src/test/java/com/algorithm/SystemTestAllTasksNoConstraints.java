@@ -50,7 +50,15 @@ public class SystemTestAllTasksNoConstraints extends TimedTest {
         problem.createConstraintGraph();
         CSP_Solver solver = new CSP_Solver(problem);
         solutions = solver.getSolutions();
-        assertEquals(true, solutions.isEmpty());
+        try {
+            AlgorithmTestUtils.noOverLap(solutions);
+            assertEquals(false, solutions.isEmpty());
+            AlgorithmTestUtils.checkConstraints(solutions, problem);
+        } catch (AssertionError e) {
+            // print out problematic solution
+            solver.printSolutions();
+            throw e;
+        }
     }
 
     @Test
@@ -62,13 +70,21 @@ public class SystemTestAllTasksNoConstraints extends TimedTest {
         problem.addConstraint(0, 2, 0);
         CSP_Solver solver = new CSP_Solver(problem);
         solutions = solver.getSolutions();
-        assertEquals(true, solutions.isEmpty());
+        try {
+            AlgorithmTestUtils.noOverLap(solutions);
+            assertEquals(false, solutions.isEmpty());
+            AlgorithmTestUtils.checkConstraints(solutions, problem);
+        } catch (AssertionError e) {
+            // print out problematic solution
+            solver.printSolutions();
+            throw e;
+        }
     }
 
     @Test
     public void testOverlapFixed() throws Exception {
         problem.addFixedTask(new Time(1, 30), new Time(2, 30));
-        problem.addFixedTask(new Time(2, 00), new Time(2, 30));
+        problem.addFixedTask(new Time(2, 0), new Time(2, 30));
         problem.createConstraintGraph();
         CSP_Solver solver = new CSP_Solver(problem);
         solutions = solver.getSolutions();

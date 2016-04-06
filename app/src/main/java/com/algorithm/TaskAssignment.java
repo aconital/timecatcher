@@ -3,16 +3,16 @@ public class TaskAssignment implements Comparable<TaskAssignment>{
 	private int taskId;// identifier of each task
 	private TimeSlice assignment;// specific assigned TimeSlice for current task 
 
-	TaskAssignment(int id,TimeSlice slice){
-		assignment=slice;
-		taskId=id;
+	TaskAssignment(int id, TimeSlice slice){
+		assignment = slice;
+		taskId = id;
 	}
 
-	TaskAssignment(TaskAssignment a ){
-		assignment=new TimeSlice(a.getAssignment());
-		taskId=a.taskId;
+	TaskAssignment(TaskAssignment a){
+		assignment = new TimeSlice(a.getAssignment());
+		taskId = a.taskId;
 	}
-	
+
 	void setAssignment(TimeSlice slice){
 		assignment=slice;
 	}
@@ -30,12 +30,12 @@ public class TaskAssignment implements Comparable<TaskAssignment>{
 	}
 	
     public int compareTo (TaskAssignment t1) {
-    	TimeSlice slice =((TaskAssignment)t1).getAssignment();
+    	TimeSlice slice = t1.getAssignment();
     	Time start,start1;
-    	start=assignment.getStartTime();
-    	start1=slice.getStartTime();
+    	start = assignment.getStartTime();
+    	start1 = slice.getStartTime();
         /* For Ascending order*/
-        return  start.compareTime(start1);
+        return start.compareTime(start1);
     }
 
 	@Override
@@ -50,21 +50,24 @@ public class TaskAssignment implements Comparable<TaskAssignment>{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		final TaskAssignment other = (TaskAssignment) obj;
 		if (assignment == null) {
-			if (other.assignment != null)
+			if (other.assignment != null) {
 				return false;
-		} else if (!assignment.equals(other.assignment))
+			}
+		} else if (!assignment.equals(other.assignment)) {
 			return false;
-		if (taskId != other.taskId)
-			return false;
-		return true;
+		}
+		return taskId == other.taskId;
 	}
 
 }

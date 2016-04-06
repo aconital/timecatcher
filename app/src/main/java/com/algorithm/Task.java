@@ -7,11 +7,11 @@ import java.util.*;
  * 
  */
 public class Task {
-	static int taskCount=0;// the number of task including both flexible and fixed task 
-	protected Domain domain;//a list of possible time slice 
+	static int taskCount = 0;// the number of task including both flexible and fixed task
+	protected Domain domain;//a list of possible time slice
 	
 	Task(){
-		domain=new Domain();
+		domain = new Domain();
 	}
 	
 	static void setTaskCount(int cnt){
@@ -30,7 +30,9 @@ public class Task {
 		return domain.getDomainArrayList();
 	}
 	
-	int getTaskId(){return -1;}// overridden by subclass 
+	int getTaskId() {
+		return -1;
+	}
 	
 	Time getDuration(){
 		return new Time (0,0);
@@ -40,11 +42,11 @@ public class Task {
 	//void initializeDomainSet(){}// overridden by subclass
 }
 
-class FlexibleTask extends Task{
+class FlexibleTask extends Task {
 	private int taskId; 
 	private Time duration;// planed working time for this flexible task
 	
-	FlexibleTask(Time duration){
+	FlexibleTask(Time duration) {
 		domain=new Domain();
 		this.duration= duration;
 		
@@ -60,38 +62,33 @@ class FlexibleTask extends Task{
 		return duration;
 	}
 
-	void initializeDomainSet(Time dayStart,Time dayEnd, Time step){
+	void initializeDomainSet(Time dayStart, Time dayEnd, Time step) {
 		domain.initializeDomainSet(dayStart, dayEnd, duration, step);
 	}	
 }
 
-class FixedTask extends Task{
+class FixedTask extends Task {
 	private Time startTime;
 	private Time endTime;
 	private int taskId; 
 	
 	FixedTask(Time s, Time e){
-		if(s.compareTime(e) <0){
-			domain=new Domain();
-			startTime=s;
-			endTime=e;
-			taskId=Task.taskCount;
+		if(s.compareTime(e) < 0){
+			domain = new Domain();
+			startTime = s;
+			endTime = e;
+			taskId = Task.taskCount;
 			Task.increaseTaskCount();
 			domain.initializeDomainSet(startTime, endTime);
 		}
 	}
 	
 	Time getDuration(){
-		return endTime.substractTime(startTime);
+		return endTime.subtractTime(startTime);
 	}
 	int getTaskId(){
 		return taskId;
 	}
-	/*
-	void initializeDomainSet(){
-		domain.initializeDomainSet(startTime, endTime);
-	}
-	*/
 }
 
 
