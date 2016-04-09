@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -18,26 +19,7 @@ public class FixedTaskTest {
 
     @Before
     public void setUp() throws Exception {
-        task=new FixedTask(new Time (3,0),new Time (4,0));
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        Task.setTaskCount(0);
-    }
-
-    @Test
-    public void testIncreaseTaskCount() throws Exception {
-        assertEquals(1, Task.taskCount);
-        Task.increaseTaskCount();
-        Task.increaseTaskCount();
-        assertEquals(3, Task.taskCount);
-    }
-
-    @Test
-    public void testSetTaskCount() throws Exception {
-        Task.setTaskCount(10);
-        assertEquals(10, Task.taskCount);
+        task=new FixedTask(new Time (3,0), new Time (4,0), 0);
     }
 
     @Test
@@ -48,8 +30,7 @@ public class FixedTaskTest {
     @Test
     public void testGetTaskId() throws Exception {
         assertEquals(0, task.getTaskId());
-        assertEquals(1, Task.taskCount);
-        Task task1=new FixedTask(new Time (6,0),new Time (7,0));
+        Task task1=new FixedTask(new Time (6,0),new Time (7,0), 1);
         assertEquals(1, task1.getTaskId());
     }
 
@@ -62,8 +43,8 @@ public class FixedTaskTest {
         domainSet1.add(new TimeSlice(new Time(3, 0), new Time(4, 0), true));
         assertEquals(true, domainSet1.containsAll(domainSet2) && domainSet2.containsAll(domainSet1));
 
-        ArrayList<TimeSlice> domainArrayList1=new ArrayList<TimeSlice>(domainSet1);
-        ArrayList<TimeSlice> domainArrayList2=task.getDomainArrayList();
+        List<TimeSlice> domainArrayList1=new ArrayList<TimeSlice>(domainSet1);
+        List<TimeSlice> domainArrayList2=task.getDomainArrayList();
         assertEquals(true, domainArrayList1.equals(domainArrayList2));
     }
 }

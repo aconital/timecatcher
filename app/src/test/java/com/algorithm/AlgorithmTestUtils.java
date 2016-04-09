@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
  * Created by yutongluo on 3/6/16.
  */
 public class AlgorithmTestUtils {
-    public static void noOverLap(List<ArrayList<TaskAssignment>> solutions) {
+    public static void noOverLap(List<List<TaskAssignment>> solutions) {
         for (List<TaskAssignment> taskAssignmentList : solutions) {
             // this is slow but i'm too lazy to implement an interval tree for a test
             // so #dealwithit
@@ -37,7 +37,7 @@ public class AlgorithmTestUtils {
         return null;
     }
 
-    public static void checkConstraints(List<ArrayList<TaskAssignment>> solutions,
+    public static void checkConstraints(List<List<TaskAssignment>> solutions,
                                         CSP problem) {
         ConstraintGraph constraintGraph = problem.getConstraints();
         LinkedList<AdjListNode>[] adjacencyList = constraintGraph.getAdjacentList();

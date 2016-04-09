@@ -1,7 +1,5 @@
 package com.algorithm;
 
-import android.util.SparseArray;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -16,15 +15,15 @@ public class CSP_Solver  {
 	private CSP problem;
 	
 	private ConstraintGraph constraints;
-	private SparseArray<Task> taskMap;// <identifier, task>
+	private Map<Integer, Task> taskMap;// <identifier, task>
 	private LinkedList<AdjListNode> undirectedAdj[];
 	private LinkedList<Arc> arcs;
 	private int[][] graphMatrix;
 	
 	private int taskCount;
-	private ArrayList<TaskAssignment> assignment;
-	private HashMap<Integer, TimeSlice> assignedMap;// <identifier, TimeSlice>
-	private List<ArrayList<TaskAssignment>> solutions;
+	private List<TaskAssignment> assignment;
+	private Map<Integer, TimeSlice> assignedMap;// <identifier, TimeSlice>
+	private List<List<TaskAssignment>> solutions;
 	private int solutionCountMax;
 			
 	public CSP_Solver(CSP problem1) {
@@ -37,8 +36,22 @@ public class CSP_Solver  {
 		taskCount = problem.getTaskCount();
 		assignment = new ArrayList<TaskAssignment>(problem.getTaskCount());
 		assignedMap = new HashMap<Integer, TimeSlice>();
-		solutions = new LinkedList< ArrayList<TaskAssignment>>();
+		solutions = new LinkedList<>();
 		solutionCountMax = 5;
+	}
+
+	public CSP_Solver(CSP problem1, int solutionCountMax) {
+		this.problem = problem1;
+		constraints = problem.getConstraints();
+		taskMap = problem.getTaskMap();
+		undirectedAdj = constraints.getUndirectedAdjacentList();// reference to original object
+		arcs = constraints.getArcs();// reference to original object
+		graphMatrix = constraints.getMatrix(); // reference to original object
+		taskCount = problem.getTaskCount();
+		assignment = new ArrayList<TaskAssignment>(problem.getTaskCount());
+		assignedMap = new HashMap<Integer, TimeSlice>();
+		solutions = new LinkedList<>();
+		this.solutionCountMax = solutionCountMax;
 	}
 	
 	/**
@@ -80,8 +93,8 @@ public class CSP_Solver  {
 	 */	
 	boolean markInconsistentValues(final int u,final int v, final Set<Integer> domainChangedSet) {
 		boolean inconsistent = false;
-		ArrayList<TimeSlice> domainU = taskMap.get(u).getDomainArrayList();
-		ArrayList<TimeSlice> domainV = taskMap.get(v).getDomainArrayList();
+		List<TimeSlice> domainU = taskMap.get(u).getDomainArrayList();
+		List<TimeSlice> domainV = taskMap.get(v).getDomainArrayList();
 		
 		//check constraint from u to v
 		for(int i=0;i<domainU.size() ;i++) {
@@ -133,7 +146,7 @@ public class CSP_Solver  {
 			Set<Integer> domainChangedSet = new HashSet<Integer>();
 			// edges' direction can be u->v or v->u
 			// check from u to v  and mark inconsistent domain value of vertex u 
-			if (markInconsistentValues2(u, v, domainChangedSet)){
+			if (markInconsistentValues2(u, v, domainChangedSet)) {
 				taskDomainChangedSet.put(u, domainChangedSet);
 			}//if
 			queue.remove();//remove the first element of this list 
@@ -150,7 +163,7 @@ public class CSP_Solver  {
 	 */	
 	boolean markInconsistentValues2(final int u, final int v, final Set<Integer> domainChangedSet) {
 		boolean inconsistent = false;
-		ArrayList<TimeSlice> domainU = taskMap.get(u).getDomainArrayList();
+		List<TimeSlice> domainU = taskMap.get(u).getDomainArrayList();
 		TimeSlice timeSliceOfV = assignedMap.get(v);
 		
 		//check constraint from u to v
@@ -190,16 +203,16 @@ public class CSP_Solver  {
 		TimeSlice timeSlice1 = assignedMap.get(id);
 		int count = taskMap.size();
 
-		for (int i = 0; i < count; i++){
+		for (int i = 0; i < count; i++) {
 			if(i==id || visited.get(i)) continue;
-			ArrayList<TimeSlice> domainArrayList = taskMap.get(i).getDomainArrayList();
+			List<TimeSlice> domainArrayList = taskMap.get(i).getDomainArrayList();
 			Set<Integer> domainChangedSet = new HashSet<Integer>();
 
-			for(int j = 0; j < domainArrayList.size(); j++){
+			for(int j = 0; j < domainArrayList.size(); j++) {
 				if(!domainArrayList.get(j).getAvailable()) continue;
 
 				TimeSlice timeSlice2 = domainArrayList.get(j);
-				if(timeSlice1.isOverlap(timeSlice2)){
+				if(timeSlice1.isOverlap(timeSlice2)) {
 					timeSlice2.setAvailable(false);
 					domainChangedSet.add(j);
 				}
@@ -272,9 +285,9 @@ public class CSP_Solver  {
 	 * set domain mark as available for domain values of each task given in taskDomainChangedSet
 	 */	
 	void repealDomainMarkUpdate(HashMap<Integer, Set<Integer>> taskDomainChangedSet) {
-		ArrayList<TimeSlice> domainArrayList;
+		List<TimeSlice> domainArrayList;
 		Set<Integer> indices;
-		for (Integer key : taskDomainChangedSet.keySet()){
+		for (Integer key : taskDomainChangedSet.keySet()) {
 			indices = taskDomainChangedSet.get(key);
 			domainArrayList = taskMap.get(key).getDomainArrayList();
 			for (Integer i : indices) {
@@ -291,12 +304,11 @@ public class CSP_Solver  {
 	 */
 	void domainInitializationForAllTasks(Time step) {
 		// do not forget to set all available  as true when step is give a new value
-		for(int i = 0; i < taskMap.size(); i++) {
-			int key = taskMap.keyAt(i);
+		for (Integer key : taskMap.keySet()) {
 			Task task = taskMap.get(key);
 			if (task instanceof FlexibleTask) {
 				task.initializeDomainSet(problem.getDayStart(), problem.getDayEnd(), step);
-			} else{
+			} else {
 				task.getDomainArrayList().get(0).setAvailable(true);
 			}
 		}//for
@@ -312,17 +324,17 @@ public class CSP_Solver  {
 		if (fixedTaskIdSet.size() <= 1) {
             return false;
         }
-		for (Integer id: fixedTaskIdSet){
+		for (Integer id: fixedTaskIdSet) {
 			TimeSlice slice=taskMap.get(id).getDomainArrayList().get(0);
 			sliceArrayList.add(slice);
 		}
 		//Ascending order
 		Collections.sort(sliceArrayList);
 		TimeSlice slice1, slice2;
-		for (int i = 0; i + 1 < sliceArrayList.size(); i++){
+		for (int i = 0; i + 1 < sliceArrayList.size(); i++) {
 			slice1 = sliceArrayList.get(i);
 			slice2 = sliceArrayList.get(i + 1);
-			if(slice1.isOverlap(slice2)){
+			if(slice1.isOverlap(slice2)) {
 				return true;
 			}
 		}//for
@@ -337,15 +349,15 @@ public class CSP_Solver  {
 		Set<Integer> flexibleTaskIdSet;
 		fixedTaskIdSet=problem.getFixedTaskIdSet();
 		flexibleTaskIdSet=problem.getFlexibleTaskIdSet();
-		ArrayList<TimeSlice> domain2;
+		List<TimeSlice> domain2;
 		
-		for(Integer id1: fixedTaskIdSet){
+		for(Integer id1: fixedTaskIdSet) {
 			TimeSlice slice1 = taskMap.get(id1).getDomainArrayList().get(0);// fixed task only has one domain variable
-			for(Integer id2 : flexibleTaskIdSet){
+			for(Integer id2 : flexibleTaskIdSet) {
 				domain2 = taskMap.get(id2).getDomainArrayList();
-				for(int i = 0; i < domain2.size(); i++){
-					TimeSlice slice2=domain2.get(i);
-					if(slice1.isOverlap(slice2)){//overlap 
+				for(int i = 0; i < domain2.size(); i++) {
+					TimeSlice slice2 = domain2.get(i);
+					if(slice1.isOverlap(slice2)) {//overlap 
 						slice2.setAvailable(false);
 					}
 				}//for
@@ -355,11 +367,13 @@ public class CSP_Solver  {
 
 	// equal: return true
 	// not equal : return false
-	boolean isEqualArrayList(ArrayList<TaskAssignment> a1, ArrayList<TaskAssignment> a2) {
-		if(a1.size() != a2.size()) return false;
+	boolean isEqualArrayList(List<TaskAssignment> a1, List<TaskAssignment> a2) {
+		if (a1.size() != a2.size()) {
+			return false;
+		}
 
-		for(int i=0;i<a1.size();i++){
-			if(!a1.get(i).equals(a2.get(i))){
+		for (int i = 0; i < a1.size(); i++) {
+			if (!a1.get(i).equals(a2.get(i))) {
 				return false;
 			}
 		}//for
@@ -368,8 +382,8 @@ public class CSP_Solver  {
 
 	// duplicate: return true
 	//no duplicate: return false
-	boolean isDuplicatedSolution(ArrayList<TaskAssignment> a1) {
-        for (ArrayList<TaskAssignment> a2 : solutions) {
+	boolean isDuplicatedSolution(List<TaskAssignment> a1) {
+        for (List<TaskAssignment> a2 : solutions) {
             if (isEqualArrayList(a1, a2)) {
                 return true;
             }
@@ -377,10 +391,10 @@ public class CSP_Solver  {
 		return false;
 	}
 
-	ArrayList<TaskAssignment> deepCopyArrayList(ArrayList<TaskAssignment> assignList) {
-		ArrayList<TaskAssignment> newAssignment= new ArrayList<TaskAssignment>();
-		for(TaskAssignment item : assignList){
-			TaskAssignment copy= new TaskAssignment(item);
+	ArrayList<TaskAssignment> deepCopyArrayList(List<TaskAssignment> assignList) {
+		ArrayList<TaskAssignment> newAssignment = new ArrayList<TaskAssignment>();
+		for (TaskAssignment item : assignList) {
+			TaskAssignment copy = new TaskAssignment(item);
 			newAssignment.add(copy);
 		}//for
 
@@ -399,7 +413,7 @@ public class CSP_Solver  {
             // one set of task time slice assignment is complete
 			ArrayList<TaskAssignment> newAssignment = deepCopyArrayList(assignment);
 			Collections.sort(newAssignment);
-			if(!isDuplicatedSolution(newAssignment)){// do not store duplicated assignment
+			if(!isDuplicatedSolution(newAssignment)) {// do not store duplicated assignment
 				solutions.add(newAssignment);
 			}
 			return;
@@ -409,7 +423,7 @@ public class CSP_Solver  {
         // besides topological sort, we can have other choose strategies regarding which variable
         // should be considered next
 		int id = traverseOrder[count];
-		ArrayList<TimeSlice> domainArrayList = taskMap.get(id).getDomainArrayList();
+		List<TimeSlice> domainArrayList = taskMap.get(id).getDomainArrayList();
 		
 		for (int i = 0; i < domainArrayList.size(); i++) {
 			if (!domainArrayList.get(i).getAvailable()) {
@@ -450,9 +464,9 @@ public class CSP_Solver  {
 	/**
 	 * this method return a final solution of possible schedule
 	 */
-	public List<ArrayList<TaskAssignment>> getSolutions() {
+	public List<List<TaskAssignment>> getSolutions() {
 		if ((problem.getFixedTaskIdSet().size() + problem.getFlexibleTaskIdSet().size())
-                != Task.taskCount) {
+                != taskCount) {
 			return solutions;
 		}
 		if (problem.getOverTime()) {
@@ -507,21 +521,20 @@ public class CSP_Solver  {
 	}//method
 
 	public String solutionsString() {
-		ListIterator<ArrayList<TaskAssignment>> it = solutions.listIterator();
 		String solution = "";
 		if (solutions.size() == 0) {
 			return "No solutions!\n";
 		}
-		while (it.hasNext()) {
+		for (List<TaskAssignment> solution1 : solutions) {
 			solution += "-------------------------------------------\n";
 			solution += "Task Id     Start Time     End Time \n";
 			// consider sort based on start time, then print
-			ArrayList<TaskAssignment> assignList = it.next();
-			for (int i = 0; i < Task.taskCount; i++) {
+			List<TaskAssignment> assignList = solution1;
+			for (int i = 0; i < taskCount; i++) {
 				TaskAssignment assign = assignList.get(i);
 				solution += "   " + assign.getTaskId() + "		 "
-                        + assign.getAssignment().getStartTime().getTimeString()
-                        + "	  		 " + assign.getAssignment().getEndTime().getTimeString() + "\n";
+						+ assign.getAssignment().getStartTime().getTimeString()
+						+ "	  		 " + assign.getAssignment().getEndTime().getTimeString() + "\n";
 			}
 			solution += "-------------------------------------------\n";
 		} // while
@@ -529,7 +542,7 @@ public class CSP_Solver  {
 	}
 
     public void printSolutions() {
-        System.out.println(solutionsString());
+        System.out.print(solutionsString());
     }
 }
 

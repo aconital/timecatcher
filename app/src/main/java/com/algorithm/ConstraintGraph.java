@@ -25,17 +25,17 @@ public class ConstraintGraph {
     private int [][] graphMatrix;
       
     //argument v is the number of vertices in total of this graph
-	ConstraintGraph(int VertexCnt){
+	ConstraintGraph(int VertexCnt) {
         this.VertexCnt = VertexCnt;
         adj = new LinkedList[VertexCnt];
         undirectedAdj = new LinkedList[VertexCnt];
         arcs = new LinkedList<Arc>();
         graphMatrix = new int[VertexCnt][VertexCnt];
         
-        for (int i = 0; i < VertexCnt; ++i){
+        for (int i = 0; i < VertexCnt; ++i) {
         	adj[i] = new LinkedList<AdjListNode>();
         	undirectedAdj[i] = new LinkedList<AdjListNode>();
-        }//for      
+        }//for
     }
 	
 	int getVertexCnt() {
@@ -110,15 +110,15 @@ public class ConstraintGraph {
       * return false => has no cycle
       *
      */
-    boolean isCyclic(){
+    boolean isCyclic() {
     	boolean visited[] = new boolean[VertexCnt];
     	boolean recursiveStack[] = new boolean[VertexCnt];
-    	for(int i = 0; i < VertexCnt; i++){
+    	for(int i = 0; i < VertexCnt; i++) {
     		visited[i] = false;
     		recursiveStack[i] = false;
     	}//for
     	
-    	for(int i = 0; i < VertexCnt; i++){
+    	for(int i = 0; i < VertexCnt; i++) {
     		if(isCyclicHelper(i, visited, recursiveStack)) {
                 // has cycle
                 return true;
@@ -127,8 +127,8 @@ public class ConstraintGraph {
     	return false;//no cycle 
     }
     
-    private boolean isCyclicHelper(int v, boolean visited[], boolean recursiveStack[]){
-    	if(!visited[v]){
+    private boolean isCyclicHelper(int v, boolean visited[], boolean recursiveStack[]) {
+    	if(!visited[v]) {
     		visited[v] = true;
     		recursiveStack[v] = true;
 
@@ -154,8 +154,8 @@ public class ConstraintGraph {
     	return false;
     }
     
-    int[] GetTopologicalSort(){
-    	if(isCyclic()){
+    int[] GetTopologicalSort() {
+    	if(isCyclic()) {
             // if a graph has cycle, it doesn't have Topological Sort
     		return null;
     	}
@@ -164,24 +164,24 @@ public class ConstraintGraph {
         int[] vertexList = new int[VertexCnt];
         
         boolean visited[] = new boolean[VertexCnt];
-        for (int i = 0; i < VertexCnt; i++){
+        for (int i = 0; i < VertexCnt; i++) {
             // mark all vertices as unvisited
         	visited[i] = false;
         }//for
             
-        for (int i = 0; i < VertexCnt; i++){
-            if (!visited[i]){
+        for (int i = 0; i < VertexCnt; i++) {
+            if (!visited[i]) {
             	topologicalSortHelper(i, visited, stack);
             }//if     
         }//for
         int i=0;
-        while (!stack.empty()){
+        while (!stack.empty()) {
         	vertexList[i++]= stack.pop();
         }//while
         return vertexList;
     }
     
-    private void topologicalSortHelper(int v, boolean visited[], Stack<Integer> stack){
+    private void topologicalSortHelper(int v, boolean visited[], Stack<Integer> stack) {
         visited[v] = true;// Mark the current node as visited.
         int u;
         

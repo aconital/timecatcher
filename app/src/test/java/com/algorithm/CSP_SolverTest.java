@@ -13,7 +13,7 @@ public class CSP_SolverTest {
     private Time dayStart;
     private Time dayEnd;
     private CSP problem;
-    private List<ArrayList<TaskAssignment>> solutions;
+    private List<List<TaskAssignment>> solutions;
 
     @Before
     public void setUp() throws Exception {

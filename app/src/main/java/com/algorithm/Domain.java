@@ -2,6 +2,7 @@ package com.algorithm;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Domain {
@@ -9,7 +10,8 @@ public class Domain {
 	private Set<TimeSlice> domainSet;
 
     // possible time slice stored in an array list
-	private ArrayList<TimeSlice> domainArrayList;
+	private List<TimeSlice> domainArrayList;
+
 	Domain() {
 		domainSet = new HashSet<TimeSlice>();
 		domainArrayList = new ArrayList<TimeSlice>();
@@ -19,7 +21,7 @@ public class Domain {
 		return domainSet;
 	}
 
-	ArrayList<TimeSlice> getDomainArrayList(){
+	List<TimeSlice> getDomainArrayList(){
 		return domainArrayList;
 	}
 	

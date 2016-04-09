@@ -2,8 +2,10 @@ package com.algorithm;
 
 import android.util.SparseArray;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 
 /*
@@ -13,9 +15,10 @@ import java.util.Set;
 
 public class CSP {
 	private ConstraintGraph constraints;
-	private SparseArray<Task> taskMap;
+	private final Map<Integer, Task> taskMap;
 	private final Time dayStart;
 	private final Time dayEnd;
+	private int taskCount;
 
 	// used to trace accumulated working time point
 	private Time accumulatedTime;
@@ -29,18 +32,18 @@ public class CSP {
 		this.dayStart = dayStart;
 		this.dayEnd = dayEnd;
 		accumulatedTime = new Time(dayStart);
-		taskMap = new SparseArray<Task>();
+		taskMap = new HashMap<Integer, Task>();
 		fixedTaskIdSet = new HashSet<Integer>();
 		flexibleTaskIdSet = new HashSet<Integer>();
-		Task.setTaskCount(0);
 		overtime = false;
+		taskCount = 0;
 	}
 
 	ConstraintGraph getConstraints() {
         return constraints;
     }
 
-	SparseArray<Task> getTaskMap() {
+	Map<Integer, Task> getTaskMap() {
         return taskMap;
     }
 
@@ -77,7 +80,7 @@ public class CSP {
 		// if the remaining working time is sufficient for this duration
 		if (accumulatedTime.addTime(duration).compareTime(dayEnd) <= 0) {
 			accumulatedTime = accumulatedTime.addTime(duration);
-			Task task = new FlexibleTask(duration);
+			Task task = new FlexibleTask(duration, taskCount++);
 			taskMap.put(task.getTaskId(), task);
 			flexibleTaskIdSet.add(task.getTaskId());
 		} else {
@@ -93,12 +96,12 @@ public class CSP {
      * @param endTime the end time of the task
      * @return boolean true if adding task resulted in a overtime. else false
      */
-	public boolean addFixedTask(final Time startTime, final Time endTime){
+	public boolean addFixedTask(final Time startTime, final Time endTime) {
         Time duration = endTime.subtractTime(startTime);
 		// if the remaining working time is sufficient for this duration
-		if (accumulatedTime.addTime(duration).compareTime(dayEnd) <= 0){
+		if (accumulatedTime.addTime(duration).compareTime(dayEnd) <= 0) {
 			accumulatedTime = accumulatedTime.addTime(duration);
-			Task task = new FixedTask(startTime, endTime);
+			Task task = new FixedTask(startTime, endTime, taskCount++);
 			taskMap.put(task.getTaskId(), task);
 			fixedTaskIdSet.add(task.getTaskId());
 		} else {
@@ -118,12 +121,12 @@ public class CSP {
 	 */	
 	void deleteAllTasks() {
 		accumulatedTime = new Time(dayStart);
-		Task.setTaskCount(0);
+		taskCount = 0;
 		taskMap.clear();
 	}
 
 	public void createConstraintGraph() {
-		constraints = new ConstraintGraph(Task.taskCount);
+		constraints = new ConstraintGraph(taskCount);
 	}
 	
 	public void addConstraint(final int id1, final int id2, int weight) {// id1 -> id2 (task with id1 before task with id2)

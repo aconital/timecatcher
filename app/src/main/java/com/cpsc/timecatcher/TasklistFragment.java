@@ -92,7 +92,7 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
     private Map<Integer, Task> taskMap = new HashMap<>();
 
     // Solution looper
-    private List<ArrayList<TaskAssignment>> solutions;
+    private List<List<TaskAssignment>> solutions;
     private int solutionsIndex = 0, numSolutions = 0;
 
     public TasklistFragment(){}
@@ -266,7 +266,7 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
                             .show();
                     return;
                 } else {
-                    ArrayList<TaskAssignment> solution = solutions.get(solutionsIndex);
+                    List<TaskAssignment> solution = solutions.get(solutionsIndex);
                     assignSolution(solution);
                     Toast.makeText(getActivity(), "Tasks Scheduled!", Toast.LENGTH_SHORT).show();
                 }
@@ -336,7 +336,7 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
         return view;
     }
 
-    private void assignSolution(ArrayList<TaskAssignment> solution) {
+    private void assignSolution(List<TaskAssignment> solution) {
         for (TaskAssignment taskAssignment : solution) {
             Task task = taskMap.get(taskAssignment.getTaskId());
             if (!task.getFixed()) {
@@ -502,7 +502,7 @@ public class TasklistFragment extends Fragment implements SensorEventListener {
                         Toast.makeText(getContext(), "New Schedule!", Toast.LENGTH_SHORT).show();
                         solutionsIndex = (solutionsIndex + 1) % numSolutions;
                         Log.d("SHAKE", "Getting solution: " + (solutionsIndex + 1) + "/" + numSolutions);
-                        ArrayList<TaskAssignment> solution = solutions.get(solutionsIndex);
+                        List<TaskAssignment> solution = solutions.get(solutionsIndex);
                         assignSolution(solution);
 
                         taskList= sortTasks(taskList);
