@@ -73,8 +73,8 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
     private Date date;
     private boolean newDate = false;
     private Day day;
-    private final static String DATE_TAG="DATE";
-    private final static String TASK_TAG="TASK";
+    private final static String DATE_TAG = "DATE";
+    private final static String TASK_TAG = "TASK";
     private final String OTHER_TASK_LABEL = "otherTasksInDay";
 
     private boolean fixed;
@@ -103,7 +103,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param date  MAKE SURE THIS DATE IS THE STRIPED DATE WITH 0h:0m:0s:00
+     * @param date MAKE SURE THIS DATE IS THE STRIPED DATE WITH 0h:0m:0s:00
      * @return A new instance of fragment NewEditTaskFragment.
      */
     // TODO: Rename and change types and number of parameters
@@ -293,7 +293,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH));
-        
+
         if (task == null) {
             this.startTime = currentTimeCalendar.getTime();
             this.endTime = addMinutesToDate(currentTimeCalendar, 30).getTime();
@@ -490,7 +490,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                     query.whereEqualTo("user", ParseUser.getCurrentUser());
                     query.whereEqualTo("title", taskTitle);
                     // TODO: avoid this call completely if newDate
-                    if (!newDate){
+                    if (!newDate) {
                         query.whereEqualTo("day", day);
                     }
                     query.findInBackground(new FindCallback<Task>() {
@@ -504,7 +504,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                 } else if (NewEditTaskFragment.this.fixed &&
                                         NewEditTaskFragment.this.endTime.before(
                                                 NewEditTaskFragment.this.startTime
-                                        )){
+                                        )) {
                                     new AlertDialog.Builder(getContext())
                                             .setTitle("Error")
                                             .setMessage("Start time cannot be after end time!")
@@ -688,12 +688,12 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
         return view;
     }
 
-    public Day getOrCreateDay(Date date, Calendar calendar){
+    public Day getOrCreateDay(Date date, Calendar calendar) {
         ParseQuery<Day> dayParseQuery = Day.getQuery();
         dayParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
         dayParseQuery.whereEqualTo("date", date);
         Day day;
-        try{
+        try {
             List<Day> days = dayParseQuery.find();
             Log.d(Constants.NEW_EDIT_TASK_TAG, "# of day with same date: " + days.size());
             if (days.size() == 0) {
