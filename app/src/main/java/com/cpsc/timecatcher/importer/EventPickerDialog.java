@@ -31,8 +31,7 @@ import me.everything.providers.android.calendar.Instance;
  */
 public class EventPickerDialog extends Dialog {
 
-    public interface EventPickerDialogListener
-    {
+    public interface EventPickerDialogListener {
         public void userPickedEvents(SparseBooleanArray selected);
     }
 
@@ -93,7 +92,7 @@ public class EventPickerDialog extends Dialog {
         checkAll.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                for(int i = 0; i <= eventsAdaptor.getCount(); i++)
+                for (int i = 0; i <= eventsAdaptor.getCount(); i++)
                     eventsListView.setItemChecked(i, isChecked);
             }
         });

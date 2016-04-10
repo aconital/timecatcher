@@ -42,7 +42,7 @@ import me.everything.providers.android.calendar.Instance;
 /**
  * Created by yutongluo on 3/21/16.
  */
-public class ImporterDialog extends Dialog implements EventPickerDialog.EventPickerDialogListener{
+public class ImporterDialog extends Dialog implements EventPickerDialog.EventPickerDialogListener {
 
     private final String TAG = "ImportDialog";
 
@@ -61,6 +61,7 @@ public class ImporterDialog extends Dialog implements EventPickerDialog.EventPic
     public ImporterDialog(Context context) {
         super(context);
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -173,7 +174,7 @@ public class ImporterDialog extends Dialog implements EventPickerDialog.EventPic
         importButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                for(Instance i : selectedInstances) {
+                for (Instance i : selectedInstances) {
                     Log.d(TAG, "User selected: " + calendarProvider.getEvent(i.eventId).title);
                 }
                 if (selectedInstances.size() == 0) {
@@ -230,10 +231,10 @@ public class ImporterDialog extends Dialog implements EventPickerDialog.EventPic
                                                 .setMessage("Something went wrong. Please try again!")
                                                 .setPositiveButton(android.R.string.ok,
                                                         new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        importButton.setText(R.string.import_button);
-                                                    }
-                                                })
+                                                            public void onClick(DialogInterface dialog, int which) {
+                                                                importButton.setText(R.string.import_button);
+                                                            }
+                                                        })
                                                 .setIcon(android.R.drawable.ic_dialog_alert)
                                                 .show();
                                     }
@@ -279,7 +280,7 @@ public class ImporterDialog extends Dialog implements EventPickerDialog.EventPic
                                     task = objects.get(0);
                                 }
                                 task.setTitle(event.title);
-                                if(event.description == null) {
+                                if (event.description == null) {
                                     task.setDescription("");
                                 } else {
                                     task.setDescription(event.description);
@@ -320,7 +321,7 @@ public class ImporterDialog extends Dialog implements EventPickerDialog.EventPic
         // as one of the listview ones... despite the fact that the select all checkbox
         // is completely seperate of the listview.
         for (int i = 0; i < selected.size() - 1; i++) {
-            if(selected.get(i)) {
+            if (selected.get(i)) {
                 selectedInstances.add(instances.get(i));
                 count++;
             }

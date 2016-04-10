@@ -29,7 +29,6 @@ import android.widget.Toast;
 import com.cengalabs.flatui.views.FlatTextView;
 import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
 import com.cpsc.timecatcher.algorithm.TimeUtils;
-import com.cpsc.timecatcher.gui.MultiSpinner;
 import com.cpsc.timecatcher.gui.NoScrollListView;
 import com.cpsc.timecatcher.helper.Constants;
 import com.cpsc.timecatcher.model.Category;
@@ -68,14 +67,13 @@ import static com.cpsc.timecatcher.algorithm.TimeUtils.addMinutesToDate;
  */
 
 
-public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiSpinnerListener,
+public class NewEditTaskFragment extends Fragment implements
         RadialTimePickerDialogFragment.OnTimeSetListener {
     private Date date;
     private boolean newDate = false;
     private Day day;
-    private final static String DATE_TAG="DATE";
-    private final static String TASK_TAG="TASK";
-    private final String OTHER_TASK_LABEL = "otherTasksInDay";
+    private final static String DATE_TAG = "DATE";
+    private final static String TASK_TAG = "TASK";
 
     private boolean fixed;
     private boolean newTask = true;
@@ -84,13 +82,12 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
     private int totalTimeMinutes = 0;
     private int totalTimeHours = 0;
 
-    TextView totalTimeTextView;
+    private TextView totalTimeTextView;
 
     private final DateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.CANADA);
     private final DateFormat dateFormat = new SimpleDateFormat("EEE, MMM d", Locale.CANADA);
     private OnFragmentInteractionListener mListener;
     private List<String> categories;
-    private boolean[] selected;
     private Task task;
     private final Calendar calendar = Calendar.getInstance();
     private List<Constraint> constraints;
@@ -103,7 +100,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param date  MAKE SURE THIS DATE IS THE STRIPED DATE WITH 0h:0m:0s:00
+     * @param date MAKE SURE THIS DATE IS THE STRIPED DATE WITH 0h:0m:0s:00
      * @return A new instance of fragment NewEditTaskFragment.
      */
     // TODO: Rename and change types and number of parameters
@@ -293,7 +290,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH));
-        
+
         if (task == null) {
             this.startTime = currentTimeCalendar.getTime();
             this.endTime = addMinutesToDate(currentTimeCalendar, 30).getTime();
@@ -490,7 +487,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                     query.whereEqualTo("user", ParseUser.getCurrentUser());
                     query.whereEqualTo("title", taskTitle);
                     // TODO: avoid this call completely if newDate
-                    if (!newDate){
+                    if (!newDate) {
                         query.whereEqualTo("day", day);
                     }
                     query.findInBackground(new FindCallback<Task>() {
@@ -504,7 +501,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                                 } else if (NewEditTaskFragment.this.fixed &&
                                         NewEditTaskFragment.this.endTime.before(
                                                 NewEditTaskFragment.this.startTime
-                                        )){
+                                        )) {
                                     new AlertDialog.Builder(getContext())
                                             .setTitle("Error")
                                             .setMessage("Start time cannot be after end time!")
@@ -688,12 +685,12 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
         return view;
     }
 
-    public Day getOrCreateDay(Date date, Calendar calendar){
+    private Day getOrCreateDay(Date date, Calendar calendar) {
         ParseQuery<Day> dayParseQuery = Day.getQuery();
         dayParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
         dayParseQuery.whereEqualTo("date", date);
         Day day;
-        try{
+        try {
             List<Day> days = dayParseQuery.find();
             Log.d(Constants.NEW_EDIT_TASK_TAG, "# of day with same date: " + days.size());
             if (days.size() == 0) {
@@ -718,13 +715,7 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
                 // reset time
                 calendar.setTime(new Date());
 
-                try {
-                    day.pin();
-                } catch (ParseException e) {
-                    // Couldn't save Day!
-                    // Propagate error up to the outer try
-                    throw e;
-                }
+                day.pin();
             } else {
                 day = days.get(0);
             }
@@ -747,13 +738,6 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
             return null;
         }
         return day;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override
@@ -786,10 +770,6 @@ public class NewEditTaskFragment extends Fragment implements MultiSpinner.MultiS
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
-    }
-
-    public void onItemsSelected(boolean[] selected) {
-        this.selected = selected;
     }
 
     @Override
