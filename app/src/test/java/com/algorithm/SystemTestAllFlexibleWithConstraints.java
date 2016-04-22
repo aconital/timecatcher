@@ -3,7 +3,6 @@ package com.algorithm;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -107,7 +106,9 @@ public class SystemTestAllFlexibleWithConstraints extends TimedTest {
         problem.addConstraint(0, 1, 0);
         problem.addConstraint(2, 0, 0);
         problem.addConstraint(2, 3, 0);
-        CSP_Solver solver = new CSP_Solver(problem, 1);
+        CSP_Solver solver = new CSP_Solver(problem,1);
+        //CSP_Solver solver = new CSP_Solver(problem);
+        solutions = solver.getSolutions();
         try {
             AlgorithmTestUtils.noOverLap(solutions);
             AlgorithmTestUtils.checkConstraints(solutions, problem);
