@@ -13,13 +13,14 @@ import com.joanzapata.iconify.fonts.FontAwesomeModule;
 import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
+import com.vungle.publisher.VunglePub;
 
 public class AppController extends Application {
 
     public static final String TAG = AppController.class.getSimpleName();
 
     private static AppController mInstance;
-
+    final VunglePub vunglePub = VunglePub.getInstance();
 
     /**
      * Enum used to identify the tracker that needs to be used for tracking.
@@ -33,6 +34,8 @@ public class AppController extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        vunglePub.init(this, "56f9cef2f6824cc70d000023");
 
         ParseObject.registerSubclass(Task.class);
         ParseObject.registerSubclass(Category.class);
