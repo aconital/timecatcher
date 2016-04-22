@@ -50,7 +50,7 @@ public class SystemTestAllTasksNoConstraints extends TimedTest {
         problem.createConstraintGraph();
         CSP_Solver solver = new CSP_Solver(problem);
         solutions = solver.getSolutions();
-        assertEquals(true, solutions.isEmpty());
+        assertEquals(false, solutions.isEmpty());
     }
 
     @Test
@@ -62,7 +62,7 @@ public class SystemTestAllTasksNoConstraints extends TimedTest {
         problem.addConstraint(0, 2, 0);
         CSP_Solver solver = new CSP_Solver(problem);
         solutions = solver.getSolutions();
-        assertEquals(true, solutions.isEmpty());
+        assertEquals(false, solutions.isEmpty());
     }
 
     @Test

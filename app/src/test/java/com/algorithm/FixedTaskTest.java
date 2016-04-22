@@ -28,6 +28,7 @@ public class FixedTaskTest {
 
     @Test
     public void testIncreaseTaskCount() throws Exception {
+        Task.setTaskCount(1);
         assertEquals(1, Task.taskCount);
         Task.increaseTaskCount();
         Task.increaseTaskCount();
