@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -35,7 +36,8 @@ public class DomainTest {
         Time startTime=new Time(1,10);
         Time endTime=new Time(1,45);
         Set<TimeSlice> domainSet1,domainSet2;
-        ArrayList<TimeSlice> domainArrayList1,domainArrayList2;
+        List<TimeSlice> domainArrayList1;
+        List<TimeSlice> domainArrayList2;
 
         domainSet1 = new HashSet<TimeSlice>();
         domainSet1.add(new TimeSlice(startTime, endTime, true));
@@ -53,7 +55,7 @@ public class DomainTest {
     @Test //test for flexible task domain initialization
     public void testInitializeDomainSet1() throws Exception {
         Set<TimeSlice> domainSet1,domainSet2;
-        ArrayList<TimeSlice> domainArrayList1,domainArrayList2;
+        List<TimeSlice> domainArrayList1, domainArrayList2;
         domainSet1 = new HashSet<TimeSlice>();
         domainSet1.add(new TimeSlice(new Time(0,0),new Time(2,0),true));
         domainSet1.add(new TimeSlice(new Time(2,0),new Time(4,0),true));

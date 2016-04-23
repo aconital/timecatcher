@@ -18,26 +18,6 @@ public class TaskTest {
         task=new Task();
     }
 
-    @After
-    public void tearDown() throws Exception {
-        Task.setTaskCount(0);
-    }
-
-    @Test
-    public void testSetTaskCount() throws Exception {
-        Task.setTaskCount(10);
-        assertEquals(10, Task.taskCount);
-    }
-
-    @Test
-    public void testIncreaseTaskCount() throws Exception {
-        Task.setTaskCount(0);
-        //assertEquals(0, Task.taskCount);
-        Task.increaseTaskCount();
-        Task.increaseTaskCount();
-        assertEquals(2, Task.taskCount);
-    }
-
     @Test
     public void testGetTaskId() throws Exception {
         assertEquals(-1, task.getTaskId());

@@ -7,91 +7,77 @@ import java.util.*;
  * 
  */
 public class Task {
-	static int taskCount=0;// the number of task including both flexible and fixed task 
-	protected Domain domain;//a list of possible time slice 
+	protected Domain domain;//a list of possible time slice
 	
-	Task(){
-		domain=new Domain();
+	Task() {
+		domain = new Domain();
 	}
+
 	
-	static void setTaskCount(int cnt){
-		taskCount=cnt;
-	}
-	
-	protected static void increaseTaskCount(){
-		taskCount++;
-	}
-	
-	Set<TimeSlice> getDomainSet(){
+	Set<TimeSlice> getDomainSet() {
 		return domain.getDomainSet();
 	}
 	
-	ArrayList<TimeSlice> getDomainArrayList(){
+	List<TimeSlice> getDomainArrayList() {
 		return domain.getDomainArrayList();
 	}
 	
-	int getTaskId(){return -1;}// overridden by subclass 
+	int getTaskId() {
+		return -1;
+	}
 	
-	Time getDuration(){
+	Time getDuration() {
 		return new Time (0,0);
 	}
 	
 	void initializeDomainSet(Time dayStart,Time dayEnd, Time step) {}// overridden by subclass
-	//void initializeDomainSet(){}// overridden by subclass
+	//void initializeDomainSet() {}// overridden by subclass
 }
 
-class FlexibleTask extends Task{
+class FlexibleTask extends Task {
 	private int taskId; 
 	private Time duration;// planed working time for this flexible task
 	
-	FlexibleTask(Time duration){
-		domain=new Domain();
-		this.duration= duration;
-		
-		taskId=Task.taskCount;
-		Task.increaseTaskCount();
+	FlexibleTask(Time duration, int taskId) {
+		domain = new Domain();
+		this.duration = duration;
+		this.taskId = taskId;
 	}
 	
-	int getTaskId(){
+	int getTaskId() {
 		return taskId;
 	}
 	
-	Time getDuration(){
+	Time getDuration() {
 		return duration;
 	}
 
-	void initializeDomainSet(Time dayStart,Time dayEnd, Time step){
+	void initializeDomainSet(Time dayStart, Time dayEnd, Time step) {
 		domain.initializeDomainSet(dayStart, dayEnd, duration, step);
 	}	
 }
 
-class FixedTask extends Task{
+class FixedTask extends Task {
 	private Time startTime;
 	private Time endTime;
 	private int taskId; 
 	
-	FixedTask(Time s, Time e){
-		if(s.compareTime(e) <0){
-			domain=new Domain();
-			startTime=s;
-			endTime=e;
-			taskId=Task.taskCount;
-			Task.increaseTaskCount();
+	FixedTask(Time s, Time e, int taskId) {
+		if(s.compareTime(e) < 0) {
+			domain = new Domain();
+			startTime = s;
+			endTime = e;
+			this.taskId = taskId;
 			domain.initializeDomainSet(startTime, endTime);
 		}
 	}
 	
-	Time getDuration(){
-		return endTime.substractTime(startTime);
+	Time getDuration() {
+		return endTime.subtractTime(startTime);
 	}
-	int getTaskId(){
+	int getTaskId() {
 		return taskId;
 	}
-	/*
-	void initializeDomainSet(){
-		domain.initializeDomainSet(startTime, endTime);
-	}
-	*/
 }
 
 
